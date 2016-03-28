@@ -1,6 +1,6 @@
 ## The Sensact Hub
 ### An Arduino shield with analog inputs and IR and relay outputs
-### - with generic 'sensing' and 'acting' interface configurable by software
+### - with generic 'sensing' and 'acting' functions configurable by software
 
 #### Features
 
@@ -28,9 +28,9 @@ We have also been able to plug in a 6DO gyroscope+accelerator module. The user c
 
 #### Set up
 
-The shield design is place in the *hardware* directory. We plan to make the physical board available on cost recovery basis for users with physical impairment.
+The shield design is in the *hardware* directory. We plan to make the physical board available on cost recovery basis for users with physical impairment.
 
-The Arduino code is contained in the *Sensact* directory. 
+The Arduino code is in the *Sensact* directory. 
 
 The web-based configuration software is in the *configSensact* directory.
 
@@ -41,5 +41,23 @@ The web-based software requires the a serial port server downloadable from <http
 All design and code are provided with no warranty whatsoever.
 
 #### License
-MIT license.
+Copyright (c) 2015-2016 Ability Spectrum
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
