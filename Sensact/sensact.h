@@ -1,6 +1,6 @@
 
 #include "Arduino.h"
-#define SENSACT_V1
+#define SENSACT_V2
 
 const int bluetoothTx = 0;  // RX 0 of Arduino
 const int bluetoothRx = 1;  // TX 1 of Arduino
@@ -38,8 +38,8 @@ const int SENSACT_BUZZER = 10;
 
 const int SENSACT_SDA = 2;
 const int SENSACT_SLK = 3;
-const int SENSACT_IN1A = 2;
-const int SENSACT_IN1B = 3;
+const int SENSACT_IN1A = 3;
+const int SENSACT_IN1B = 2;
 
 const int SENSACT_IN2 = A2;
 const int SENSACT_IN3 = A1;  

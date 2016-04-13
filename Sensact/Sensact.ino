@@ -46,6 +46,7 @@ const int USE_BT = 1;
 int OpMode = 2;  //must not be in debug if OpMode==1
 
 #include "pitches.h"
+/*
 #include "AACgyromouse.h"
 #include "AACgyroclick.h"
 #include "I2Cdev.h"
@@ -90,7 +91,7 @@ void dmpDataReady() {
 
 #include <L3G.h>
 L3G my_gyro;
-
+*/
 
 #include <SoftwareSerial.h>  
 #include <EEPROM.h>
@@ -427,7 +428,8 @@ void load_config() {
 void report_signals() {
    if( (currentMillis - previousMillis) < report_interval) return;
    previousMillis = currentMillis;
-
+   delay(10); // ylh ******
+   
    //if( whichSerial == 0 ) { //ylh kludge
    if( USE_GYRO == 0 ) {
 
@@ -441,9 +443,9 @@ void report_signals() {
       Serial.print(map(analogRead( SENSACT_IN4 ), 0, 1023, 0, 100 ));
 #endif
 #ifdef SENSACT_V2
-      Serial.print(map(analogRead( SENSACT_IN1A ), 0, 1023, 0, 100));
+      Serial.print( SENSACT_IN1A ); //(map(analogRead( SENSACT_IN1A ), 0, 1023, 0, 100));
       Serial.print(",");
-      Serial.print(map(analogRead( SENSACT_IN1B ), 0, 1023, 0, 100));
+      Serial.print( SENSACT_IN1B ); // (map(analogRead( SENSACT_IN1B ), 0, 1023, 0, 100));
       Serial.print(",");
       Serial.print(map(analogRead( SENSACT_IN2 ), 0, 1023, 0, 100));
       Serial.print(",");      
@@ -453,14 +455,14 @@ void report_signals() {
 
    } 
    else { // use gyro
-      Serial.print(gyro_read());
-      Serial.print(",");
-      Serial.print(map( my_gyro.g.x, -31000, 31000, 0, 100));
-      Serial.print(",");      
-      Serial.print(map( my_gyro.g.y, -31000, 31000, 0, 100 ));
-      Serial.print(",");
-      Serial.print(map( my_gyro.g.z , -31000, 31000, 0, 100 ));
-      Serial.print("\n");
+//      Serial.print(gyro_read());
+//      Serial.print(",");
+//      Serial.print(map( my_gyro.g.x, -31000, 31000, 0, 100));
+//      Serial.print(",");      
+//      Serial.print(map( my_gyro.g.y, -31000, 31000, 0, 100 ));
+//      Serial.print(",");
+//      Serial.print(map( my_gyro.g.z , -31000, 31000, 0, 100 ));
+//      Serial.print("\n");
 
    }
    /*} 
@@ -480,7 +482,9 @@ void process_signals() {
    for(int i=0; i<nInputs; i++ ) {
       if( (currentMillis - lastRead[i]) < read_interval ) continue;
       lastRead[i] = currentMillis;
-
+       
+      delay(10); //ylh ******
+       
       int offset = i*nOutputs;
       int offset2 = i*nValues + nInputs*nOutputs;
 
@@ -488,7 +492,7 @@ void process_signals() {
          switch(i) {
 #ifdef SENSACT_V1
          case 0: 
-            val = (byte) gyro_read();
+            val = 0; //(byte) gyro_read();
             break;
          default:
             val = (byte) map(analogRead( map_in[i-1] ), 0, 1023, 0, 100);
@@ -502,20 +506,20 @@ void process_signals() {
          }
       } 
       else {
-         switch (i) {
-         case 0: 
-            val = (byte) gyro_read();
-            break;
-         case 1:
-            val = (byte) map(my_gyro.g.x, -31000, 31000, 0, 100);
-            break;
-         case 2:
-            val = (byte) map(my_gyro.g.y, -31000, 31000, 0, 100);
-            break;
-         case 3:
-            val = (byte) map(my_gyro.g.z, -31000, 31000, 0, 100);
-            break;
-         }
+//         switch (i) {
+//         case 0: 
+//            val = (byte) gyro_read();
+//            break;
+//         case 1:
+//            val = (byte) map(my_gyro.g.x, -31000, 31000, 0, 100);
+//            break;
+//         case 2:
+//            val = (byte) map(my_gyro.g.y, -31000, 31000, 0, 100);
+//            break;
+//         case 3:
+//            val = (byte) map(my_gyro.g.z, -31000, 31000, 0, 100);
+//            break;
+//         }
       }
 
       if( config[ offset  + INVERT]==1 )
@@ -624,7 +628,7 @@ void startedOutput( int x ) {
  
  ylh - WATCH the init()
  
- */
+ 
 
 void gyro_setup() {
 
@@ -891,14 +895,14 @@ void mpu_loop() {
       } 
       else if( OpMode == 2 ){
          // display real acceleration, adjusted to remove gravity
-         /*
-         mpu.dmpGetQuaternion(&q, fifoBuffer);
-          mpu.dmpGetAccel(&aa, fifoBuffer);
-          mpu.dmpGetGravity(&gravity, &q);
-          mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-          mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-          mpu.dmpGetEuler(euler, &q);
-          */
+         
+//         mpu.dmpGetQuaternion(&q, fifoBuffer);
+//          mpu.dmpGetAccel(&aa, fifoBuffer);
+//          mpu.dmpGetGravity(&gravity, &q);
+//          mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+//          mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+//          mpu.dmpGetEuler(euler, &q);
+          
 
          mpu.dmpGetGyro((int16_t *) &gyro, (uint8_t *) fifoBuffer);
 
@@ -922,6 +926,7 @@ void mpu_loop() {
    }
 
 }
+*/
 
 
 void beep(int j) {
