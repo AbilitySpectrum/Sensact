@@ -1,6 +1,6 @@
 
 #include "Arduino.h"
-#define SENSACT_V2
+#define SENSACT_V1
 
 const int bluetoothTx = 0;  // RX 0 of Arduino
 const int bluetoothRx = 1;  // TX 1 of Arduino
@@ -60,6 +60,7 @@ const int SENSACT_RUN = 9;
 const int SENSACT_CONFIG = 8;
 const int SENSACT_UNKNOWN = 99;
 
+const int JOY_LEFT_RIGHT = 0, JOY_UP_DOWN = 1;
 
 // config output indices and then the 3 values, threshold, bt char, hid char
 
@@ -71,13 +72,15 @@ RELAY_A = 1,
 RELAY_B = 2,
 BLUETOOTH = 3,
 USB_HID = 4,
-LED = 5,
-BUZZER = 6,
-nOutputs = 7,
+CLICK = 5,  // was LED
+JOYSTICK = 6,
+BUZZER = 7,
+nOutputs = 8,
 THRESHOLD_VAL = 0,
 BT_HID_VAL = 1,
 USB_HID_VAL = 2,
-nValues = 3
+JOY_VAL = 3,
+nValues = 4
 ;
 
 /* EEPROM data structure - also stored in config[] - in bytes

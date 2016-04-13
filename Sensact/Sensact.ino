@@ -13,13 +13,13 @@
  p5 version of configSensact (~/0/p5/configSensact)
  
  p5 -> Sensact
- "8," - config mode, 
+ "8," - config mode - 'get profile' on p5
  a) sends config info to p5, one time begin with "9999,...."
- b) receive config info from p5, any number of times
+ b) receive config info from p5, any number of times - 'set profile'
  "0,...."
  c) return input readings to p5, every x msec
  
- "9" - Senseact goes into Run mode
+ "9" - Senseact goes into Run mode - 'run'
  a) no output to p5
  b) act according to config info
  
@@ -97,34 +97,33 @@ L3G my_gyro;
 //#include "AACswitch.h"
 #include "sensact.h"
 
-// constants won't change. Used here to 
 // set pin numbers:
-int ledPin = SENSACT_RED;      // the number of the LED pin
+int ledPin = SENSACT_RED;      // which LED light to signal
 
-// Variables will change:
-int ledState = LOW;             // ledState used to set the LED
-long previousMillis = 0;        // will store last time LED was updated
-long previousMillis0 = 0;
+// We are not flipping the LED on and off
+//int ledState = LOW;          // ledState used to set the LED
+//long previousMillis0 = 0;    // will store last time LED was updated
+//long interval0 = 200;           // interval at which to blink (milliseconds)
+
+long previousMillis = 0;        
 
 // the follow variables is a long because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
 //long interval = 400; 
-long interval0 = 200;           // interval at which to blink (milliseconds)
 
-long report_interval = 200;
-long beep_interval = 20;
-long read_interval = 400; // refractory for signals
+long report_interval = 200; // interval between reporting signal levels
+long pulseWidth = 50;  // output pulsewidth for the controls[] 
+long read_interval = 50; // 400; // interval between processing the sensor signals
 long currentMillis = millis();
-
 
 int whichSerial = 0; // 0 for Serial; 1 for bluetooth
 
 int state = SENSACT_RUN;  
-byte config[300];
+byte config[400];
 
 long lastRead[nInputs];
 long whenOn[nOutputs], control[nOutputs] = { 
-   0, RELAY_A, RELAY_B, 0,0, SENSACT_RED, SENSACT_BUZZER };
+   0, RELAY_A, RELAY_B, 0,0, SENSACT_RED, SENSACT_BUZZER, SENSACT_BUZZER }; // ylh WHY????
 long onOff[nOutputs];
 
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
@@ -180,23 +179,23 @@ void setup() {
       onOff[j] = 0;
    }
 
-   delay(1000);
+   delay(200);
 
-   //Serial.println("1");
+   global_reset(); // multiclick_setup(); //mc_setup(); // ylh test version, overrides config
 
-   bt_setup();
-   //Serial.println("2");
-   gyro_setup();
-   //Serial.println("3");
-   mpu_setup();
+   //   bt_setup();
+   //   gyro_setup();
+   //   mpu_setup();
 
    load_config();
-
    beep(2);
 }
 
 void loop()
 {
+
+   //multiclick_loop(); //mc_loop(); //YLH TESt
+
    currentMillis = millis();
 
    serial_loop();
@@ -205,9 +204,9 @@ void loop()
    //Serial.println("loop");
 
    for( int j=0; j<nOutputs; j++ ) {
-      if( (currentMillis - whenOn[j]) > beep_interval ) {
+      if( (currentMillis - whenOn[j]) > pulseWidth ) {
          if( control[j] == SENSACT_BUZZER )
-            ;  //noTone(SENSACT_BUZZER);
+            ;  //noTone(SENSACT_BUZZER); // NO NEED TO RESET BUZZER - we use tone()
          else     
             digitalWrite( control[j], LOW );
          onOff[j] = 0;
@@ -222,26 +221,19 @@ void loop()
       break;
    case SENSACT_RUN:
       process_signals();
+      //mc_loop(); // ylh test version, overrides config
       break;
    default:
       break;
    }
 
-   if( (currentMillis - previousMillis0) > interval0) {
-      // save the last time you blinked the LED 
-      previousMillis0 = currentMillis;      
-      // if the LED is off turn it on and vice-versa:
-      if (ledState == LOW)
-         ledState = HIGH;
-      else
-         ledState = LOW;
-      /* hard-coded test
-       if( analogRead( SENSACT_IN4 ) > 500 ) {
-       previousMillis0 += interval0;
-       bluetooth.write( 'j' );
-       }
-       */
-   }
+   //   if( (currentMillis - previousMillis0) > interval0) {
+   //      previousMillis0 = currentMillis;      
+   //      if (ledState == LOW)
+   //         ledState = HIGH;
+   //      else
+   //         ledState = LOW;
+   //   }
 }
 
 void bt_setup()
@@ -273,7 +265,7 @@ void bt_loop()
    }
 }
 
-// led_state RED=config; GREEN=run; BLUE=unknown
+// led_state RED=output actuated; GREEN=run; BLUE=config
 int ledInterval = 800;
 long ledTime = 0;
 
@@ -301,9 +293,9 @@ void led_loop() {
       }
    }
    digitalWrite(ledPin, HIGH);
-
 }
 
+// processing the interaction with web app
 char inString [300];
 int charpos = 0;
 void serial_loop() {
@@ -417,6 +409,7 @@ void process_serial() {
       break;
    case 9:
       state = SENSACT_RUN;
+      global_reset();
       break;
    default:
       state = SENSACT_UNKNOWN;
@@ -433,7 +426,6 @@ void load_config() {
 
 void report_signals() {
    if( (currentMillis - previousMillis) < report_interval) return;
-   // save the last time you blinked the LED  
    previousMillis = currentMillis;
 
    //if( whichSerial == 0 ) { //ylh kludge
@@ -536,40 +528,98 @@ void process_signals() {
             case BLUETOOTH:   
                if( config[offset+BLUETOOTH] && onOff[j]==0 ) {
                   bluetooth.write( config[offset2 + BT_HID_VAL]);
-                  ledTime = whenOn[j] = currentMillis;
-                  onOff[j] ++;
+                  startedOutput(j);
                }
                break;
             case USB_HID:   
                if( config[offset+USB_HID]  && onOff[j]==0 ) {
                   Keyboard.write( config[offset2 + USB_HID_VAL]);
-                  ledTime = whenOn[j] = currentMillis;
-                  onOff[j] ++;
+                  startedOutput(j);
                }
                break;
             case BUZZER:
                if( config[offset+j] ) {
-                  tone(control[j], NOTE_C7, 250); //digitalWrite(control[j], HIGH);
-                  ledTime = whenOn[j] = currentMillis;
-                  onOff[j] ++;
+                  tone(control[j], NOTE_C5, 250); //digitalWrite(control[j], HIGH);
+                  startedOutput(j);
                }
+               break;
+            case CLICK:              
+               if( config[offset+j] ) {
+                  mark();
+               }
+
                break;
                // the following cases have the same behaviour
             case RELAY_A:   
             case RELAY_B:  
-            case LED: 
-               if( config[offset+j] ) {
+
+               if( config[offset+j] && onOff[j]==0 ) {
                   digitalWrite(control[j], HIGH);
-                  ledTime = whenOn[j] = currentMillis;
-                  onOff[j] ++;
+                  startedOutput(j);
                }
                break;
+            default: 
+               break;
             }
+         }
+      } 
+      else { // non trigger
+         for( int j=0; j<nOutputs; j++ ) {
+            switch( j ) {
+            case CLICK: 
+               if( config[offset+j] ) {
+                  no_mark();
+               }
+               break;
+               // the following cases have the same behaviour
+            case BLUETOOTH: 
+            case USB_HID:   
+            case BUZZER:
+            case RELAY_A:   
+            case RELAY_B:  
+            default:
+               break;
+            }
+         }
+      }
+      // special handling for joystick
+      if( config[offset+JOYSTICK] && onOff[JOYSTICK]==0 ) {
+         if( val<20 ) {
+            joySelection(0, config[offset2 + JOY_VAL]);
+            startedOutput(JOYSTICK);
+         }
+         if( val>80 ) {
+            joySelection(1, config[offset2 + JOY_VAL]);
+            startedOutput(JOYSTICK);
          }
       }
    }
 }
 
+void joySelection( int lowHigh, int selection ) {
+   if( selection == JOY_LEFT_RIGHT ) {
+      if( lowHigh == 0 ) {
+         Keyboard.press(KEY_LEFT_ARROW); 
+      } 
+      else {
+         Keyboard.press(KEY_RIGHT_ARROW);
+      }
+   } 
+   else if( selection == JOY_UP_DOWN ) {
+      if( lowHigh == 0 ) {
+         Keyboard.press(KEY_UP_ARROW); 
+      } 
+      else {
+         Keyboard.press(KEY_DOWN_ARROW);
+      }
+   }
+   Keyboard.releaseAll();
+}
+
+void startedOutput( int x ) {
+   ledTime = whenOn[x] = currentMillis;
+   onOff[x] ++;
+}
 /* 4th input 
  
  ylh - WATCH the init()
@@ -879,7 +929,7 @@ void beep(int j) {
    for( int i=0; i<j; i++ ) {
       tone(SENSACT_BUZZER, NOTE_C7, 250);
       delay(50);
-      noTone(SENSACT_BUZZER);      
+      //noTone(SENSACT_BUZZER);      
       delay(150);
 
       /*
@@ -890,6 +940,143 @@ void beep(int j) {
        */
    }
 }
+
+/* derived from ASshort_longDigital v5d - 20150515
+ short click ON DOWN sends iPad Select
+ v5 closes pinControl port as well
+ long click ON UP sends relay signal
+ 
+ Added timer so that beyond longclickTime then
+ sends relay signal
+ 
+ const int testing = 1; // set this to 0 for final version
+ 
+ const int nLevels = 3; // number of levels
+ const int triggerA = 0; // reading at this value or less will trigger; must be less than nLevels
+ const long ignoreTime = 400;  //400
+ const long longclickTime = 1200;  //1200
+ const long discardTime = 2500;  //2500
+ 
+ long lastTriggeredA = 0;
+ int lastReadA=1;
+ long now;
+ int count=0;
+ 
+ 
+ void multiclick_setup() {    
+ pinMode(SENSACT_IN3, INPUT);
+ }
+ void multiclick_loop() {
+ int xA;
+ //
+ //   delay(10);
+ //   relay.Check();
+ //   buzzer.Check();
+ //   control.Check();
+ 
+ count++;
+ xA = digitalRead(SENSACT_IN3);
+ //   if( CapTouch ) { 
+ //      xA = 1- digitalRead(pinIn); 
+ //   } // invert for capacitive touch sensor
+ //
+ 
+ //xA=sD.Read();  // digital read using library routine 
+ //************** DISABLE ANALOG  xA=sA.Level(nLevels);  //analog read
+ 
+ if( testing>0 && xA!=lastReadA) {
+ //Serial.print(count);
+ //      Serial.print("a=");
+ //      Serial.print(xA);
+ //      Serial.print(" ");
+ //      Serial.flush();
+ }
+ 
+ 
+ if( xA!=lastReadA ) {
+ // state changed
+ if( xA==triggerA ) {  // DOWN TICK
+ now = millis();  
+ if( now < (lastTriggeredA + ignoreTime) ) {  //ignore
+ return;
+ }
+ else  {   // CHANGE HERE: trigger SHORT -------
+ if( testing == 0 ) {
+ // iPad click
+ Keyboard.press(KEY_UP_ARROW); 
+ Keyboard.press(KEY_DOWN_ARROW); 
+ Keyboard.releaseAll();
+ 
+ //               control.On(100);
+ 
+ // app click 
+ //               Keyboard.press('1');
+ //               Keyboard.releaseAll();
+ 
+ 
+ //               buzzer.On(10);
+ }  
+ else {
+ Serial.print(count);
+ Serial.print(" *A*\n");  // Triggered
+ //               relay.On(50);
+ //               buzzer.On(10);
+ }       
+ 
+ //            serialBuzzer.Go(1,1);
+ lastTriggeredA = millis();
+ }
+ }
+ else { // UP TICK
+ tryTriggerLongA(1);
+ }
+ } 
+ else {     //xA==last level
+ if( xA==triggerA ) {
+ tryTriggerLongA(2);
+ }
+ }
+ lastReadA = xA; 
+ }
+ 
+ void tryTriggerLongA(int byWhat) {
+ now = millis();
+ if( ( now > (lastTriggeredA + longclickTime) ) &&
+ ( now < (lastTriggeredA + discardTime) ) )
+ {
+ if( testing == 0 )  // CHANGE HERE: what to do on LONG click
+ {
+ //         relay.On(500);
+ //         buzzer.On(500);
+ //         serialBuzzer.Go (1,byWhat);
+ } 
+ else {
+ Serial.print(count);
+ if( byWhat==1 ) {
+ Serial.print("*A--------A*\n");  // Triggered
+ } 
+ else {
+ Serial.print("*A       A*\n");  // Triggered
+ }
+ //         if( testing == 1) {  //non silent testing
+ //            relay.On(300);
+ //            buzzer.On(300);
+ //         }
+ }
+ }
+ }
+ 
+ */
+void global_reset() {
+   click_setup();
+}
+
+
+
+
+
+
+
 
 
 

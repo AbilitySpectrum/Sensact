@@ -48,18 +48,23 @@ var input = [],
   nInputs = 4,
   X_MAIN = 50,
   Y_MAIN = 30,
+  X_IN_WIDTH = 250,
+  X_OUT_WIDTH = 250,
   VSKIP = 170,
+  VSPACE = 20,
   H_CHK = 250,
-  H_INPUT = 350,
+  H_INPUT = 360,
   INVERT = 0,
   RELAY_A = 1,
   RELAY_B = 2,
   BLUETOOTH = 3,
   USB_HID = 4,
-  LED = 5,
-  BUZZER = 6,
-  nOutputs = 7,
+  CLICK = 5,
+  JOYSTICK = 6,
+  BUZZER = 7,
+  nOutputs = 8,
   button = [],
+
   REFRESHPORT = 0,
   NEXTPORT = 1,
   SELECTPORT = 2,
@@ -156,6 +161,8 @@ function setup() {
     //input[i].invert.position(input[i].x + 97, input[i].y);
     input[i].check = []; // the check box
     input[i].HID = []; // only used for HID boxes
+    input[i].Click = [];
+    input[i].JOY = [];
     for (j = 0; j < nOutputs; j++) {
       input[i].check[j] = createCheckbox('chk', false);
       // (j-1) below because the first element is 'invert'
@@ -165,6 +172,21 @@ function setup() {
         input[i].y + (j - 1) * 20);
       input[i].HID[j].style('width', '14px');
       input[i].HID[j].hide();
+      
+      input[i].Click[j] = createSelect();
+      input[i].Click[j].position(input[i].x + H_INPUT,
+        input[i].y + (j - 1) * 20);
+      input[i].Click[j].option('mouse click');
+      input[i].Click[j].option('other');
+      input[i].Click[j].hide();
+      
+      input[i].JOY[j] = createSelect();
+      input[i].JOY[j].position(input[i].x + H_INPUT,
+        input[i].y + (j - 1) * 20);
+      input[i].JOY[j].option('left-right');
+      input[i].JOY[j].option('up-down');
+      input[i].JOY[j].value('left-right');
+      input[i].JOY[j].hide();
     }
     // move the invert checkbox
     input[i].check[INVERT].position(input[i].x + 97, input[i].y);
@@ -199,7 +221,7 @@ function setup() {
       break;
     }
     button[i] = createButton(name);
-    button[i].position(X_MAIN + 450, Y_MAIN + i * 50 - 5);
+    button[i].position(X_MAIN + X_IN_WIDTH + X_OUT_WIDTH + 30, Y_MAIN + i * 50 - 5);
     button[i].style('color', 'blue');
     button[i].style('background', BACKGROUNDCOLOR);
     button[i].size(80, 40);
@@ -237,7 +259,7 @@ function draw() {
     stroke(180);
     strokeWeight(1);
     // input bounding box
-    rect(input[i].x - 15, input[i].y - 15, 250, VSKIP - 40, 10, 10, 10, 10);
+    rect(input[i].x - 15, input[i].y - 15, X_IN_WIDTH, VSKIP - VSPACE, 10, 10, 10, 10);
 
     fill(20, 20, 200); // set the fill color
     noStroke();
@@ -252,16 +274,16 @@ function draw() {
     text('relay B', input[i].x + H_CHK + 13, input[i].y + 25);
     text('bluetooth HID', input[i].x + H_CHK + 13, input[i].y + 45);
     text('USB Keyboard', input[i].x + H_CHK + 13, input[i].y + 65);
-    text('LED', input[i].x + H_CHK + 13, input[i].y + 85);
-    text('buzzer', input[i].x + H_CHK + 13, input[i].y + 105);
-    text(portsList[portsequence], X_MAIN + 535, Y_MAIN + 50 + 12);
+    text('Click', input[i].x + H_CHK + 13, input[i].y + 85);
+    text('Joystick', input[i].x + H_CHK + 13, input[i].y + 105);
+    text('buzzer', input[i].x + H_CHK + 13, input[i].y + 125);
+    text(portsList[portsequence], X_MAIN + X_IN_WIDTH + X_OUT_WIDTH + 115, Y_MAIN + 50 + 12);
 
     fill(150, 150, 240);
     // check if we invert the input signal
     val = results[i];
     if (input[i].check[INVERT].checked()) {
       val = 100 - val;
-
     }
 
     if (input[i].slider.value() <= val) {
@@ -279,8 +301,9 @@ function draw() {
       strokeWeight(2);
     }
     // output bounding box, color depending on if threshold exceeded
-    rect(input[i].x + 250, input[i].y - 15,
-      VSKIP - 25, VSKIP - 40, 10, 10, 10, 10);
+    rect(input[i].x + X_IN_WIDTH, input[i].y - 15,
+      X_OUT_WIDTH, VSKIP - VSPACE, 10, 10, 10, 10);
+    //VSKIP - 25, VSKIP - 40, 10, 10, 10, 10);
 
     if (input[i].check[BLUETOOTH].checked())
       input[i].HID[BLUETOOTH].show();
@@ -290,12 +313,21 @@ function draw() {
       input[i].HID[USB_HID].show();
     else
       input[i].HID[USB_HID].hide();
-
+    if (input[i].check[CLICK].checked())
+      input[i].Click[CLICK].show();
+    else
+      input[i].Click[CLICK].hide();
+    if (input[i].check[JOYSTICK].checked())
+      input[i].JOY[JOYSTICK].show();
+    else
+      input[i].JOY[JOYSTICK].hide();
     //text( input[i].HID[BLUETOOTH].value(), input[i].x + 500, input[i].y + 5);
   }
 }
 
 function refreshport() {
+  resetAllButtons();
+  button[REFRESHPORT].style('color', 'red');
   if (ws && ws.readyState == 1)
     ws.send("list");
   else web_socket();
@@ -303,11 +335,15 @@ function refreshport() {
 }
 
 function nextport() {
+  resetAllButtons();
+  button[NEXTPORT].style('color', 'red');
   portsequence++;
   if (portsequence == portsList.length) portsequence = 0;
 }
 
 function selectport() {
+  resetAllButtons();
+  button[SELECTPORT].style('color', 'red');
   currentport = portsList[portsequence];
 
   if (ws && ws.readyState == 1)
@@ -324,6 +360,16 @@ function getprofile() {
   //  socket.emit("message", "8\n");
 }
 
+/* interaction with Sensact board
+0, followed by 
+nInputs[] of 0 or 1 depending on each of nOutputs[], whether they are checked
+followed by
+nInputs of 
+  - threshold value
+  - Bluetooth char to output
+  - USB char to output
+
+*/
 function setprofile() {
   resetAllButtons();
   button[SETPROFILE].style('color', 'red');
@@ -338,7 +384,8 @@ function setprofile() {
   for (var i = 0; i < nInputs; i++) {
     commandString += ',' + input[i].slider.value() +
       ',' + input[i].HID[BLUETOOTH].value().charCodeAt(0) +
-      ',' + input[i].HID[USB_HID].value().charCodeAt(0);
+      ',' + input[i].HID[USB_HID].value().charCodeAt(0) +
+      ',' + from_joy( input[i].JOY[JOYSTICK].value() );
     /*
         socket.emit("message", ',' + input[i].slider.value());
         socket.emit("message", ',' + input[i].HID[BLUETOOTH].value().charCodeAt(0));
@@ -381,6 +428,18 @@ function parseJSPS(data) {
   }
 }
 
+function to_joy(v) {
+  var ret='left-right'; 
+  if (v==1) ret = 'up-down';
+  return ret;
+}
+
+function from_joy(v) {
+  var ret=0; 
+  if (v=='up-down') ret = 1;
+  return ret;
+}
+
 function readData(data) {
   console.log('data->' + data);
   var res = data.split(','); // split the data on the commas
@@ -396,6 +455,7 @@ function readData(data) {
       input[i].slider.value(res[pos++]);
       input[i].HID[BLUETOOTH].value(String.fromCharCode(res[pos++]));
       input[i].HID[USB_HID].value(String.fromCharCode(res[pos++]));
+      input[i].JOY[JOYSTICK].value(to_joy(res[pos++]));
     }
   } else {
     results = data.split(',');
