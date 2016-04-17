@@ -172,20 +172,22 @@ function setup() {
         input[i].y + (j - 1) * 20);
       input[i].HID[j].style('width', '14px');
       input[i].HID[j].hide();
-      
+
       input[i].Click[j] = createSelect();
       input[i].Click[j].position(input[i].x + H_INPUT,
         input[i].y + (j - 1) * 20);
       input[i].Click[j].option('mouse click');
       input[i].Click[j].option('other');
       input[i].Click[j].hide();
-      
+
       input[i].JOY[j] = createSelect();
       input[i].JOY[j].position(input[i].x + H_INPUT,
         input[i].y + (j - 1) * 20);
-      input[i].JOY[j].option('left-right');
-      input[i].JOY[j].option('up-down');
-      input[i].JOY[j].value('left-right');
+      input[i].JOY[j].option('arrow L-R');
+      input[i].JOY[j].option('arrow U-D');
+      input[i].JOY[j].option('mouse L-R');
+      input[i].JOY[j].option('mouse U-D');
+      input[i].JOY[j].value('arrow L-R');
       input[i].JOY[j].hide();
     }
     // move the invert checkbox
@@ -385,7 +387,7 @@ function setprofile() {
     commandString += ',' + input[i].slider.value() +
       ',' + input[i].HID[BLUETOOTH].value().charCodeAt(0) +
       ',' + input[i].HID[USB_HID].value().charCodeAt(0) +
-      ',' + from_joy( input[i].JOY[JOYSTICK].value() );
+      ',' + from_joy(input[i].JOY[JOYSTICK].value());
     /*
         socket.emit("message", ',' + input[i].slider.value());
         socket.emit("message", ',' + input[i].HID[BLUETOOTH].value().charCodeAt(0));
@@ -428,16 +430,24 @@ function parseJSPS(data) {
   }
 }
 
-function to_joy(v) {
-  var ret='left-right'; 
-  if (v==1) ret = 'up-down';
+var joy_values = { 1: 'arrow L-R', 2: 'arrow U-D', 3: 'mouse L-R', 4: 'arrow U-D' };
+
+function to_joy(v) { return joy_values[v]; }
+
+function to_joy2(v) {
+  var ret = 'arrow L-R';
+  if (v == 1) ret = 'arrow U-D';
+  if (v == 2) ret = 'mouse L-R';
+  if (v == 3) ret = 'mouse U-D';
   return ret;
 }
 
 function from_joy(v) {
-  var ret=0; 
-  if (v=='up-down') ret = 1;
-  return ret;
+  if (v == 'arrow L-R') return 0;
+  if (v == 'arrow U-D') return 1;
+  if (v == 'mouse L-R') return 2;
+  if (v == 'mouse U-D') return 3;
+  return 0;
 }
 
 function readData(data) {

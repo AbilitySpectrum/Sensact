@@ -1,6 +1,14 @@
 
+#define SENSACT_V1
+
+//#define INCLUDE_MPU6050
+//#define INCLUDE_LGGYRO
+//#define INCLUDE_BLUETOOTH
+
+#define INCLUDE_REPORTING_WHEN_RUNNING
+
 #include "Arduino.h"
-#define SENSACT_V2
+#include "pitches.h"
 
 const int bluetoothTx = 0;  // RX 0 of Arduino
 const int bluetoothRx = 1;  // TX 1 of Arduino
@@ -60,7 +68,7 @@ const int SENSACT_RUN = 9;
 const int SENSACT_CONFIG = 8;
 const int SENSACT_UNKNOWN = 99;
 
-const int JOY_LEFT_RIGHT = 0, JOY_UP_DOWN = 1;
+const int KEY_L_R = 0, KEY_U_D = 1, MOUSE_L_R = 2, MOUSE_U_D = 3;
 
 // config output indices and then the 3 values, threshold, bt char, hid char
 
