@@ -35,7 +35,7 @@ const int RESET_EEPROM = 0;
 const int USE_GYRO = 0;
 const int USE_BT = 1;
 
-#include <Keyboard.h>
+//#include <Keyboard.h>
 #include <Wire.h>
 
 #include <SoftwareSerial.h>  
@@ -60,6 +60,7 @@ long previousMillis = 0;
 long report_interval = 200; // interval between reporting signal levels
 long pulseWidth = 50;  // output pulsewidth for the controls[] 
 long read_interval = 50; // 400; // interval between processing the sensor signals
+long REFRACTORY = 800;
 long currentMillis = millis();
 
 int whichSerial = 0; // 0 for Serial; 1 for bluetooth
@@ -68,8 +69,10 @@ int state = SENSACT_RUN;
 byte config[400];
 
 long lastRead[nInputs];
+// output signals: invert, relay1, relay2, BT, USB, click, joystick, buzzer
+// 0 is a dummy pin!!
 long whenOn[nOutputs], control[nOutputs] = { 
-   0, RELAY_A, RELAY_B, 0,0, SENSACT_RED, SENSACT_BUZZER, SENSACT_BUZZER }; // ylh WHY????
+   0, SENSACT_OUT1, SENSACT_OUT2, 0,0, SENSACT_RED, SENSACT_BUZZER, SENSACT_BUZZER }; // ylh WHY????
 long onOff[nOutputs];
 
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
@@ -85,8 +88,7 @@ void setup() {
          delay(10);          
       }
    }
-   // set the digital pin as output:
-   //pinMode(ledPin, OUTPUT);
+
 
    pinMode(SENSACT_IN2, INPUT);
    pinMode(SENSACT_IN3, INPUT);
@@ -113,6 +115,7 @@ void setup() {
    pinMode(SENSACT_OUT3, OUTPUT);
 #endif
 
+   pinMode(ledPin, OUTPUT);
    digitalWrite( ledPin, HIGH);
 
    for( int i=0; i<nInputs; i++ ) lastRead[i] = 0;
@@ -233,7 +236,7 @@ void bt_loop()
 #endif
 
 // led_state RED=output actuated; GREEN=run; BLUE=config
-int ledInterval = 800;
+long ledInterval = 800;
 long ledTime = 0;
 
 void led_loop() {
@@ -302,6 +305,8 @@ void process_serial() {
    //    '-' - send "---\n" to BT to exti command mode
    //    '@' - send the rest of the line plus '\n'
    //    '#' - send the rest of the line
+   //    '%' - set bt to 9600
+   //    '^' - set bt to 115200
    //    else - it's meant for Sensact to process
 
    if( whichSerial == 0 ) {
@@ -495,6 +500,7 @@ void process_signals() {
          val = 100 - val;
       }
       if( val > config[ offset2 + THRESHOLD_VAL] ) {
+        lastRead[i] = currentMillis + REFRACTORY;
          for( int j=0; j<nOutputs; j++ ) {
             switch( j ) {
             case BLUETOOTH:   
@@ -566,10 +572,12 @@ void process_signals() {
          if( val<20 ) {
             joySelection(0, config[offset2 + JOY_VAL]);
             startedOutput(JOYSTICK);
+            // don't add REFRACTORY
          }
          if( val>80 ) {
             joySelection(1, config[offset2 + JOY_VAL]);
             startedOutput(JOYSTICK);
+            // don't add REFRACTORY
          }
       }
    }

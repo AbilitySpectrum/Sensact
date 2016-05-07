@@ -1,5 +1,5 @@
 
-#define SENSACT_V1
+#define SENSACT_V2
 
 //#define INCLUDE_MPU6050
 //#define INCLUDE_LGGYRO
