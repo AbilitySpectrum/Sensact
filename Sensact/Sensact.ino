@@ -35,7 +35,8 @@ const int RESET_EEPROM = 0;
 const int USE_GYRO = 0;
 const int USE_BT = 1;
 
-//#include <Keyboard.h>
+#include <Keyboard.h>
+#include<Mouse.h>
 #include <Wire.h>
 
 #include <SoftwareSerial.h>  
@@ -361,11 +362,11 @@ void process_serial() {
       break;
    case 8:  // report sensact config from EEPROM
       if(whichSerial == 0 ) { /// ylh kludge
-         Serial.print("9999,");
+         Serial.print("9999");
          for( int i=0; i<nInputs*(nOutputs + nValues); i++) {
+            Serial.print(","); 
             config[i] = EEPROM.read(i);
             Serial.print(config[i]);   
-            Serial.print(",");      
          }
          Serial.println();
       } 
