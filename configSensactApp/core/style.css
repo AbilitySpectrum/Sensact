@@ -1,4 +1,4 @@
-
+/*Any element with a 'hidden' class will not be displayed */
 .hidden{
 	display:none;
 }
@@ -8,13 +8,47 @@
 	background: white;
 	color:black;
 	height: 500px;
-	width:580px;
+	width:auto;
 	overflow:auto;
 	border: solid 5px;
 }
 
+#noPorts{
+	border: solid black 5px;
+	padding: 10px;
+	color: red;
+	background-color: white;
+	position: relative;
+	top: 50px;
+}
+
+.threshContainer{
+	padding:10px;
+	border:solid 1px;
+}
+
+div.trigoptions
+{
+	padding: 10px;
+}
+
+div > input[type=text]{
+	position:relative;
+	top:0px;
+	height:15px;
+}
+
+input[type=checkbox]{
+	position:relative;
+	top:3px;
+}
+
+div > select{
+	position:relative;
+	top:0px;
+}
+
 h1{
-	
 	font-size:15px;
 	font: Verdana;
 	padding-left:5px;
@@ -24,6 +58,7 @@ h1:hover{
 	background-color: D8E5FE;
 }
 
+/* This code is all for the range slider (threshold level setting) */
 input[type=range]{
 	position: relative;
 	height:20px;
@@ -141,6 +176,7 @@ input[type=range]:focus::-ms-fill-upper {
   background: #367ebd;
 }
 
+/* Input for threshold levels */
 input[type=number]{
 	margin-left: 5px;
 	margin-right: 5px;
@@ -158,6 +194,7 @@ button{
     margin: 3px 5px 10px 3px;
 }
 
+/* This code is for the current sensor values (displayed beside the sensor name) */
 progress {
 	-webkit-appearance: none;
      -moz-appearance: none;
@@ -193,6 +230,7 @@ select{
 	margin-right: 5px;
 }
 
+/* For choosing the keyboard key*/
 input[type=text] {
 	width: 20px;
 	height: 18px;

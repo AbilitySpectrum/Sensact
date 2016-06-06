@@ -57,11 +57,14 @@ var serial = new SerialPort();
 
 document.getElementById('close').addEventListener('click',serial.closeSerial);
 document.getElementById('start').addEventListener('click',function(){
-	serial.write("1");
-	console.log(sensors[0].num);
+	serial.write(" 8\n");
+});
+document.getElementById('send').addEventListener('click',function(){
+	serial.write(sendConfigData() + "\n");
+	console.log(sendConfigData() + "\n");
 });
 document.getElementById('stop').addEventListener('click',function(){
-	serial.write("0");
+	serial.write(" 9\n");
 });
 
 
@@ -72,7 +75,13 @@ var onReceiveCallback = function(info) {
       var str = serial.ab2str(info.data);
       if (str.charAt(str.length-1) === '\n') {
         stringReceived += str.substring(0, str.length-1);
-        updateSensorValues(stringReceived);
+		if(stringReceived.split(',').length == 4){ //The current sensor readings
+			updateSensorValues(stringReceived);
+		}else if(stringReceived.split(',')[0] == 9999){ //Config package
+			receiveSensactConfig(stringReceived.substring(5));
+		}else{
+			console.log('Receive Error: Unknown package signature')
+		}
         stringReceived = '';
       } else {
         stringReceived += str;
