@@ -35,7 +35,10 @@ const int RESET_EEPROM = 0;
 const int USE_GYRO = 0;
 const int USE_BT = 1;
 
+// depending on the Arduino IDE, comment out the HID.h, Keyboard.h and Mouse.h in new versions
+//#include <HID.h>
 //#include <Keyboard.h>
+//#include <Mouse.h>
 #include <Wire.h>
 
 #include <SoftwareSerial.h>  
@@ -72,7 +75,7 @@ long lastRead[nInputs];
 // output signals: invert, relay1, relay2, BT, USB, click, joystick, buzzer
 // 0 is a dummy pin!!
 long whenOn[nOutputs], control[nOutputs] = { 
-   0, SENSACT_OUT1, SENSACT_OUT2, 0,0, SENSACT_RED, SENSACT_BUZZER, SENSACT_BUZZER }; // ylh WHY????
+   0, SENSACT_OUT1, SENSACT_OUT2, 0,0, SENSACT_RED, 0, SENSACT_BUZZER }; // ylh WHY????
 long onOff[nOutputs];
 
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);

@@ -99,6 +99,7 @@ nValues = 4
  THRESHOLD - input trigger threshold
  BT_HID_VAL - char to output to BT
  USB_HID_VAL - char to output to USB HID
+ JOY_VAL - joystick
  */
 
 

@@ -47,6 +47,7 @@ int OpMode = 2;  //must not be in debug if OpMode==1
 
 
 //*
+//#include "Mouse.h"
 #include "AACgyromouse.h"
 #include "AACgyroclick.h"
 #include "I2Cdev.h"
@@ -146,13 +147,15 @@ void mpu_setup() {
    //   mpu.setXGyroOffset(27);
    //   mpu.setYGyroOffset(-44);
    //   mpu.setZGyroOffset(59);
+   //-2703 238 1187  14  -16 84
+
 
    mpu.setXAccelOffset(-2739);
-   mpu.setYAccelOffset(365);
-   mpu.setZAccelOffset(4907);
-   mpu.setXGyroOffset(27);
-   mpu.setYGyroOffset(-41);
-   mpu.setZGyroOffset(65);
+   mpu.setYAccelOffset(238);
+   mpu.setZAccelOffset(1187);
+   mpu.setXGyroOffset(14);
+   mpu.setYGyroOffset(-16);
+   mpu.setZGyroOffset(84);
 
    // make sure it worked (returns 0 if so)
    if (devStatus == 0) {
