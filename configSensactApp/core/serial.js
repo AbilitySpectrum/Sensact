@@ -58,6 +58,7 @@ var serial = new SerialPort();
 document.getElementById('close').addEventListener('click',serial.closeSerial);
 document.getElementById('start').addEventListener('click',function(){
 	serial.write("1");
+	updateSensorWidgets(sensors);
 	console.log(sensors[0].num);
 });
 document.getElementById('stop').addEventListener('click',function(){
