@@ -1,0 +1,13 @@
+{
+  "name": "gendisplay",
+  "main": "./touchpad.js",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.13.1",
+    "robotjs": "^0.4.2"
+  },
+  "scripts": {
+    "lint": "jshint src/*.js",
+    "clean": "rm -r dist"
+  }
+}

@@ -37,8 +37,8 @@ const int USE_BT = 1;
 
 // depending on the Arduino IDE, comment out the HID.h, Keyboard.h and Mouse.h in new versions
 //#include <HID.h>
-//#include <Keyboard.h>
-//#include <Mouse.h>
+#include <Keyboard.h>
+#include <Mouse.h>
 #include <Wire.h>
 
 #include <SoftwareSerial.h>  
@@ -364,11 +364,11 @@ void process_serial() {
       break;
    case 8:  // report sensact config from EEPROM
       if(whichSerial == 0 ) { /// ylh kludge
-         Serial.print("9999,");
+         Serial.print("9999");
          for( int i=0; i<nInputs*(nOutputs + nValues); i++) {
+            Serial.print(","); 
             config[i] = EEPROM.read(i);
             Serial.print(config[i]);   
-            Serial.print(",");      
          }
          Serial.println();
       } 
@@ -647,111 +647,4 @@ void beep( int j) {
 void global_reset() {
    click_setup();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
