@@ -1,24 +1,14 @@
 
-var sensors = [new Sensor(0,[new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none","")]),
-				new Sensor(1,[new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none","")]),
-				new Sensor(2,[new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none","")]),
-				new Sensor(3,[new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none","")]),
-				new Sensor(4,[new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none",""),
-							 new Trigger(50,"rising","none","")])];
+var sensors = [new Sensor(0,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				new Sensor(1,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				new Sensor(2,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				new Sensor(3,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				new Sensor(4,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")])];
 							 
 
 
@@ -45,10 +35,27 @@ function updateThreshold(n,i,val){
 	document.getElementById('thresh' + n + "_" + i).value = val;
 }
 
+//when the sensact sends the current sensor values, this function updates the progressbars
 function updateSensorValues(incoming){
 	var vals = incoming.split(",");
 	for(var i = 0;i < vals.length; i++){
 		document.getElementById('sensorValue'+i).value = vals[i];
+	}
+}
+
+//This function makes the widget display whatever is inside the sensors array
+function updateSensorWidgets(sensorArr){
+	for(var n = 0; n < sensorArr.length; n++){
+		for(var i = 0; i < sensorArr[n].triggers.length; i++){
+			updateThreshold(n,i,sensorArr[n].triggers[i].level);
+			
+			document.getElementById('response' + n + '_' + i).value = String(sensorArr[n].triggers[i].response);
+			document.getElementById('trigEvent' + n + '_' + i).value = String(sensorArr[n].triggers[i].event);
+			document.getElementById('blueDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].blueDetail);
+			document.getElementById('keyDet' + n + '_' + i).value = (sensorArr[n].triggers[i].keyDetail);
+			document.getElementById('mouseDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].mouseDetail);
+			document.getElementById('IRDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].IRDetail);
+		}
 	}
 }
 
@@ -145,8 +152,8 @@ function drawSensor(sens){
 	//progress bar to display the incoming value from the sensor
 	var sensProg = document.createElement('progress');
 	sensProg.setAttribute('id','sensorValue'+sens.num);
-	sensProg.setAttribute('max','1024');
-	sensProg.setAttribute('value','500');
+	sensProg.setAttribute('max','100');
+	sensProg.setAttribute('value','50');
 	head.appendChild(sensProg);
 	
 	var threshContainer = document.createElement('div');
@@ -159,7 +166,9 @@ function drawSensor(sens){
 		//range slider for threshold
 		var slide = document.createElement("input");
 		slide.setAttribute("type", "range");
-		slide.setAttribute("value", sens.triggers[i].value);
+		slide.setAttribute('min','0');
+		slide.setAttribute('max','100');
+		slide.setAttribute("value", '0');
 		slide.setAttribute("id", "thresh" + sens.num + "_" + i);
 		slide.addEventListener("change",function(){
 			var temp = this.getAttribute("id").substring(6);
@@ -174,9 +183,9 @@ function drawSensor(sens){
 		var textThresh = document.createElement('input');
 		textThresh.setAttribute('id','tThresh' + sens.num + "_" + i);
 		textThresh.setAttribute('type','number');
-		textThresh.setAttribute('value',sens.triggers[i].value);
+		textThresh.setAttribute('value','0');
 		textThresh.setAttribute('min','0');
-		textThresh.setAttribute('max','1024');
+		textThresh.setAttribute('max','100');
 		textThresh.addEventListener('change',function(){
 			var temp = this.getAttribute("id").substring(7);
 			var n = temp.substring(0,1); //sensor number
@@ -194,84 +203,194 @@ function drawSensor(sens){
 		response.addEventListener("change",function(){
 			var temp = this.getAttribute("id").substring(8); //substring(8) will grab the sensor number and trigger number with an underscore inbetween
 			var detail = document.getElementById("detail"+temp)
-			var p = detail.parentNode;
 			var n = temp.substring(0,1); //sensor number
 			var i = temp.substring(2,3); //trigger number
 			
-			sensors[n].triggers[i].response = this.value;
-			console.log(this.value);
-			
-			p.removeChild(detail);
-			detail = createDetail(p,this.value,n,i);
-			
-			p.appendChild(detail);
+			sensors[n].triggers[i].event = this.value;
+			console.log(sensors[n].triggers[i].event);
 		});
-		
+	
 		var opt = document.createElement("option");
-		opt.setAttribute("value","none");
+		opt.setAttribute("value","0");
 		opt.appendChild(document.createTextNode("None"));
 		response.appendChild(opt);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","keyboard");
+		opt.setAttribute("value","1");
+		opt.appendChild(document.createTextNode("Relay A"));
+		response.appendChild(opt);
+		
+		opt = document.createElement("option");
+		opt.setAttribute("value","2");
+		opt.appendChild(document.createTextNode("Relay B"));
+		response.appendChild(opt);
+		
+		opt = document.createElement("option");
+		opt.setAttribute("value","3");
+		opt.appendChild(document.createTextNode("BT HID"));
+		response.appendChild(opt);
+		
+		opt = document.createElement("option");
+		opt.setAttribute("value","4");
 		opt.appendChild(document.createTextNode("Keyboard"));
 		response.appendChild(opt);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","mouse");
+		opt.setAttribute("value","5");
 		opt.appendChild(document.createTextNode("Mouse"));
 		response.appendChild(opt);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","digital");
-		opt.appendChild(document.createTextNode("Digital"));
+		opt.setAttribute("value","6");
+		opt.appendChild(document.createTextNode("Buzzer"));
 		response.appendChild(opt);
 		
+		opt = document.createElement("option");
+		opt.setAttribute("value","7");
+		opt.appendChild(document.createTextNode("Infrared"));
+		response.appendChild(opt);
+		
+		response.value = "0";	
 		trig.appendChild(response);
 		
-		//Combo box for triggering type
+		//Combo box for triggering event
 		var trigType = document.createElement("select");
-		trigType.setAttribute("id", "trigType" + sens.num + "_" + i);
+		trigType.setAttribute("id", "trigEvent" + sens.num + "_" + i);
 		trigType.addEventListener("change", function(){
-			var temp = this.getAttribute("id").substring(8);
+			var temp = this.getAttribute("id").substring(9);
 			var n = temp.substring(0,1); //sensor number
 			var i = temp.substring(2,3); //trigger number
 			
-			sensors[n].triggers[i].type = this.value;
+			sensors[n].triggers[i].type = parseInt(this.value);
 			console.log(this.value);
 		});
 		
 		opt1 = document.createElement("option");
-		opt1.setAttribute("value","rising");
+		opt1.setAttribute("value","0");
 		opt1.appendChild(document.createTextNode("Rising Edge"));
 		trigType.appendChild(opt1);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","falling");
+		opt.setAttribute("value","1");
 		opt.appendChild(document.createTextNode("Falling Edge"));
 		trigType.appendChild(opt);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","above");
+		opt.setAttribute("value","2");
 		opt.appendChild(document.createTextNode("Above Level"));
 		trigType.appendChild(opt);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","below");
+		opt.setAttribute("value","3");
 		opt.appendChild(document.createTextNode("Below Level"));
 		trigType.appendChild(opt);
 		
 		opt = document.createElement("option");
-		opt.setAttribute("value","both");
-		opt.appendChild(document.createTextNode("Falling & Rising"));
+		opt.setAttribute("value","4");
+		opt.appendChild(document.createTextNode("Held Above"));
+		trigType.appendChild(opt);
+		
+		opt = document.createElement("option");
+		opt.setAttribute("value","5");
+		opt.appendChild(document.createTextNode("Held Below"));
 		trigType.appendChild(opt);
 		
 		trig.appendChild(trigType);
 		
-		var detail = createDetail(trig,sens.triggers[i].response,sens.num,i);
-		trig.appendChild(detail);
+		//Create the Detail widgets
 		
-		response.value = sens.triggers[i].response;	
+		//the text detail will be the char input for the keyboard and
+		//the bluetooth HID.
+		var det = document.createElement('input');
+		det.setAttribute('type','text');
+		det.setAttribute('id','blueDet' + sens.num + "_" + i);
+		det.setAttribute('maxlength','1');
+		det.setAttribute('class','hidden');
+		det.addEventListener('change',function(){
+			var temp = this.getAttribute('id').substring(7);
+			var n = temp.substring(0,1); //sensor number
+			var i = temp.substring(2,3); //trigger number
+			
+			sensors[n].triggers[i].blueDetail = parseInt(this.value);
+			console.log(this.value);
+		});
+		trig.appendChild(det);
+		
+		var det = document.createElement('input');
+		det.setAttribute('type','text');
+		det.setAttribute('id','keyDet' + sens.num + "_" + i);
+		det.setAttribute('maxlength','1');
+		det.setAttribute('class','hidden');
+		det.addEventListener('change',function(){
+			var temp = this.getAttribute('id').substring(6);
+			var n = temp.substring(0,1); //sensor number
+			var i = temp.substring(2,3); //trigger number
+			
+			sensors[n].triggers[i].keyDetail = parseInt(this.value);
+			console.log(this.value);
+		});
+		trig.appendChild(det);
+		
+		//select detail for the  mouse
+		det = document.createElement("select");
+		det.setAttribute('class','hidden');
+		var opt = document.createElement("option");
+		opt.setAttribute("value","moveUp");
+		opt.appendChild(document.createTextNode("Move Up"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","moveDown");
+		opt.appendChild(document.createTextNode("Move Down"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","moveLeft");
+		opt.appendChild(document.createTextNode("Move Left"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","moveRight");
+		opt.appendChild(document.createTextNode("Move Right"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","leftClick");
+		opt.appendChild(document.createTextNode("Left Click"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","rightClick");
+		opt.appendChild(document.createTextNode("Right Click"));
+		det.appendChild(opt);
+		
+		det.setAttribute("id","mouseDet" + sens.num + "_" + i);
+		det.addEventListener("change", function(){
+			var temp = this.getAttribute("id").substring(8);
+			var n = temp.substring(0,1); //sensor number
+			var i = temp.substring(2,3); //trigger number
+			
+			sensors[n].triggers[i].mouseDetail = parseInt(this.value);
+			console.log(this.value);
+		});
+		trig.appendChild(det);
+		
+		//Text box for the IR code
+		det = document.createElement('input');
+		det.setAttribute('type','text');
+		det.setAttribute('id','IRDet' + sens.num + "_" + i);
+		det.setAttribute('class','largeText hidden');
+		det.addEventListener('change',function(){
+			var temp = this.getAttribute('id').substring(5);
+			var n = temp.substring(0,1); //sensor number
+			var i = temp.substring(2,3); //trigger number
+			
+			sensors[n].triggers[i].IRDetail = this.value;
+			console.log(this.value);
+		});
+		
+		trig.appendChild(det);
+		
 		threshContainer.appendChild(trig);	
 	};
 	
@@ -324,18 +443,6 @@ function createDetail(p,r,n,i){
 		var opt = document.createElement("option");
 		opt.setAttribute("value","rightClick");
 		opt.appendChild(document.createTextNode("Right Click"));
-		detail.appendChild(opt);
-		
-	} else if (r == "digital"){
-		detail = document.createElement("select");
-		var opt = document.createElement("option");
-		opt.setAttribute("value","pulse");
-		opt.appendChild(document.createTextNode("Pulse"));
-		detail.appendChild(opt);
-		
-		var opt = document.createElement("option");
-		opt.setAttribute("value","step");
-		opt.appendChild(document.createTextNode("Step"));
 		detail.appendChild(opt);
 		
 	} else {

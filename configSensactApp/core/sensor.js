@@ -1,13 +1,12 @@
-/* value: threshold value
- * trigType: string with value rising, falling, both, above, or below
- * responseType: string with value keyboard, mouse, digital
- * detail: string with keyboard character, mouse movement (up,down,left,right,left_click,right_click), digital signal (pulse, step)
- */
-function Trigger(value, trigType, responseType, detail){
-	this.type = trigType;
-	this.value = value;
+
+function Trigger(level, trigType, responseType, detail){
+	this.level = level;
+	this.event = trigType;
 	this.response = responseType;
-	this.detail = detail;
+	this.blueDetail = 65;
+	this.keyDetail = 65;
+	this.mouseDetail = 0;
+	this.IRDetail = "";
 };
 
 function Sensor(num, triggers){
@@ -15,12 +14,3 @@ function Sensor(num, triggers){
 	this.triggers = triggers;
 };
 
-/*
- * Alternative grouping of Sensor. Sensor has multiple modes,
- * each mode will have a response, and the responses can be changed.
- */
-function TriggerMode(trigType, responseType, detail){
-	this.type = trigType;
-	this.response = reponseType;
-	this.detail = detail;
-}
