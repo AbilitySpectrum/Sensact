@@ -1,3 +1,7 @@
+#include <HID-Project.h>
+#include <HID-Settings.h>
+
+#include <Mouse.h>
 /*********************************************************
   2016-06-11 Sat : ylh
 
@@ -13,7 +17,7 @@
   HID mouse control is controlled from the Joystick's A0, A1 signals,
   click = digital pin 3 (LEFT) pin 2 (RIGHT)
 
- --- touch pad code comes from
+  --- touch pad code comes from
   This is a library for the MPR121 12-channel Capacitive touch sensor
 
   Designed specifically to work with the MPR121 Breakout in the Adafruit shop
@@ -29,12 +33,26 @@
   Written by Limor Fried/Ladyada for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
 **********************************************************/
+/*** HOW TO USE
+    #define SERIAL_OUTPUT to output input signals. Do not use with mouse.
+    #define SEE_ANALOG to output the analog pins
+    #define SEE_DIGITAL to output the digital lines
+    #define SEE_TOUCHPAD to output touchpad (I2C) data
+    #define USE_MOUSE use mouse control - must turn off SERIAL_OUTPUT
 
+*/
 //#define SERIAL_OUTPUT
+//#define SEE_ANALOG
+//#define SEE_DIGITAL
+//#define SEE_TOUCHPAD
+#define USE_MOUSE
+
+const uint32_t REFRACTORY = 20;
+uint32_t l_checked;
 
 #include <Wire.h>
 #include "Adafruit_MPR121.h"
-#include "Mouse.h"
+
 
 // MPR touchpad
 // You can have up to 4 on one i2c bus but one is enough for testing!
@@ -56,7 +74,7 @@ int analogPins[3] = { A0, A1, A2 };
 int nDigitalPins = 4;
 int digitalPins[4] = { 3, 4, 5, 6 };
 
-  
+
 void setup() {
 
 #ifdef SERIAL_OUTPUT
@@ -64,23 +82,48 @@ void setup() {
   Serial.begin(9600);
 #endif
 
-  //    touchSetup();
+#ifdef SEE_TOUCHPAD
+  touchSetup();
+#endif
+
+#ifdef SEE_DIGITAL
   digitalPinsSetup();
+#endif
+
+#ifdef SEE_ANALOG
   analogPinsSetup();
+#endif
+
+#ifdef USE_MOUSE
   mouseSetup();
+#endif
 }
 
 
-long l_checked;
+
 void loop() {
 
-  if ( millis() - l_checked < 50 ) return;
+  if( l_checked < REFRACTORY ) l_checked = millis();
+
+  if ( millis() - l_checked < REFRACTORY ) return;
   l_checked = millis();
 
-  //    touchLoop();
+#ifdef SEE_TOUCHPAD
+  touchLoop();
+#endif
+
+#ifdef SEE_DIGITAL
   digitalPinsLoop();
+#endif
+
+#ifdef SEE_ANALOG
   analogPinsLoop();
+#endif
+
+#ifdef USE_MOUSE
   mouseLoop();
+#endif
+
 }
 
 void analogPinsSetup() {

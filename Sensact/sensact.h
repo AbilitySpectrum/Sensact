@@ -10,6 +10,11 @@
 #include "Arduino.h"
 #include "pitches.h"
 
+const unsigned long report_interval = 200; // interval between reporting signal levels
+const unsigned long pulseWidth = 50;       // output pulsewidth for the controls[] 
+const unsigned long read_interval = 50;    // interval between processing the sensor signals
+const unsigned long REFRACTORY = 800;      // interval within which, output will not re-trigger
+
 const int bluetoothTx = 0;  // RX 0 of Arduino
 const int bluetoothRx = 1;  // TX 1 of Arduino
 

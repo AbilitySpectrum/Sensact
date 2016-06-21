@@ -1,0 +1,11 @@
+#outbox {
+    border: 1px solid skyblue;
+    color: #51a9cc;
+    padding: 5px;
+    font: 12px sans-serif;
+    width: 700px;
+    height: 180px;
+    overflow: auto;
+}
+
+;

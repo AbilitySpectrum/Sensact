@@ -72,6 +72,11 @@ var input = [],
     SETPROFILE = 4,
     RUNSENSACT = 5,
     nButtons = 6,
+
+    outputArea = null,
+    outputText = "",
+    outputDev = console.log,
+
     BACKGROUNDCOLOR = '240';
 
 var x, y, button; // readings from the server
@@ -85,14 +90,6 @@ var ws = null,
     commandString = '',
     receiveddata = '';
 
-if ("WebSocket" in window) {
-    console.log("WebSocket is supported by your Browser!");
-} else {
-    // The browser doesn't support WebSocket
-    console.log("WebSocket NOT supported by your Browser!");
-}
-
-web_socket();
 
 function web_socket() {
 
@@ -141,8 +138,9 @@ function web_socket() {
 
 function setup() {
     var i, j;
-    createCanvas(1000, 730);
+    createCanvas(1000, 930); //730);
     textSize(20);
+
 
     frameRate(15);
 
@@ -235,6 +233,21 @@ function setup() {
     button[GETPROFILE].mousePressed(getprofile);
     button[SETPROFILE].mousePressed(setprofile);
     button[RUNSENSACT].mousePressed(runsensact);
+
+    outputArea = createP("---");
+    outputArea.position(10, 730);
+    outputArea.id("outbox");
+
+    if ("WebSocket" in window) {
+        console.log("WebSocket is supported by your Browser!");
+        outputText = "WebSocket is supported by your Browser!";
+    } else {
+        // The browser doesn't support WebSocket
+        console.log("WebSocket NOT supported by your Browser!");
+        outputText = "WebSocket is NOT supported by your Browser!";
+    }
+
+    web_socket();
 }
 
 function resetAllButtons() {
@@ -325,6 +338,9 @@ function draw() {
             input[i].JOY[JOYSTICK].hide();
         //text( input[i].HID[BLUETOOTH].value(), input[i].x + 500, input[i].y + 5);
     }
+
+    outputArea.html(outputText);
+    outputArea.elt.scrollTop = outputArea.elt.scrollHeight;
 }
 
 function refreshport() {
@@ -457,8 +473,16 @@ function from_joy(v) {
     return 0;
 }
 
+//function scrollToTheBottom() {
+//    let elem = document.getElementById(outputArea.id());
+//    elem.scrollTop = elem.scrollHeight;
+//}
+
 function readData(data) {
-    console.log('data->' + data);
+    outputDev('data->' + data);
+    outputText = outputText + "<br>" + data;
+
+
     var res = data.split(','); // split the data on the commas
     if (res[0] == 9999) {
         var pos = 1;

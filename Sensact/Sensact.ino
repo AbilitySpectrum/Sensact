@@ -1,3 +1,6 @@
+#include <HID-Project.h>
+#include <HID-Settings.h>
+
 /* Sensact_v3 : 20151106 : 20151026 : ylh
  
  20160407 : now being modified for Sensact board v2, check defines
@@ -37,8 +40,8 @@ const int USE_BT = 1;
 
 // depending on the Arduino IDE, comment out the HID.h, Keyboard.h and Mouse.h in new versions
 //#include <HID.h>
-#include <Keyboard.h>
-#include <Mouse.h>
+//#include <Keyboard.h>
+//#include <Mouse.h>
 #include <Wire.h>
 
 #include <SoftwareSerial.h>  
@@ -53,25 +56,18 @@ int ledPin = SENSACT_RED;      // which LED light to signal
 //int ledState = LOW;          // ledState used to set the LED
 //long previousMillis0 = 0;    // will store last time LED was updated
 //long interval0 = 200;           // interval at which to blink (milliseconds)
+  
 
-long previousMillis = 0;        
 
-// the follow variables is a long because the time, measured in miliseconds,
-// will quickly become a bigger number than can be stored in an int.
-//long interval = 400; 
-
-long report_interval = 200; // interval between reporting signal levels
-long pulseWidth = 50;  // output pulsewidth for the controls[] 
-long read_interval = 50; // 400; // interval between processing the sensor signals
-long REFRACTORY = 800;
-long currentMillis = millis();
+unsigned long currentMillis = millis();
+unsigned long previousMillis = 0;      
 
 int whichSerial = 0; // 0 for Serial; 1 for bluetooth
 
 int state = SENSACT_RUN;  
 byte config[400];
 
-long lastRead[nInputs];
+unsigned long lastRead[nInputs];
 // output signals: invert, relay1, relay2, BT, USB, click, joystick, buzzer
 // 0 is a dummy pin!!
 long whenOn[nOutputs], control[nOutputs] = { 
