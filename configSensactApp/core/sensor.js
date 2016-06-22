@@ -12,5 +12,82 @@ function Trigger(level, trigType, responseType, detail){
 function Sensor(num, triggers){
 	this.num = num;
 	this.triggers = triggers;
+	
+	/* Takes all of the data from the sensor and turns it onto a comma separated string */
+	this.toString = function(){
+		var out = "";
+		
+		//loop for each trigger
+		for(var i = 0; i < triggers.length; i++){
+			out += triggers[i].level + "," + triggers[i].event + "," + 
+					triggers[i].response + ",";
+					
+			switch(parseInt(triggers[i].response)){
+				case 3:
+					out += triggers[i].blueDetail;
+					break;
+				case 4:
+					out += triggers[i].keyDetail;
+					break;
+				case 5:
+					out += triggers[i].mouseDetail;
+					break;
+				case 7:
+					out += triggers[i].IRDetail;
+					break;
+				default:
+					out += "0";
+					break;
+			};
+			out += ","
+		}
+		
+		return out.substring(0,out.length-1);
+	};
+	
+	this.updateSensor = function(inString){
+		var data = inString.split(',');
+		if(data.length != this.triggers.length * 4){
+			console.log("unexpected packet length");
+			return;
+		}
+		
+		for(var i = 0;i < triggers.length;i++){
+			console.log(this);
+			this.triggers[i].level = parseInt(data[i*4]);
+			triggers[i].event = parseInt(data[i*4+1]);
+			triggers[i].response = parseInt(data[i*4+2]);
+			
+			triggers[i].blueDetail = 0;
+			triggers[i].keyDetail = 0;
+			triggers[i].mouseDetail = 0;
+			triggers[i].IRDetail = "";
+			switch(triggers[i].response){
+				case 3:
+					triggers[i].blueDetail = parseInt(data[i*4+3]);
+					break;
+				case 4:
+					triggers[i].keyDetail = parseInt(data[i*4+3]);
+					break;
+				case 5:
+					triggers[i].mouseDetail = parseInt(data[i*4+3]);
+					break;
+				case 7:
+					triggers[i].IRDetail = parseInt(data[i*4+3]);
+					break;
+				default:
+					break;
+			};
+		}
+		
+		console.log(this);
+	};
 };
 
+function makeConfigPackage(sensArr){
+	var out = "0,";
+	for (var i = 0; i < sensArr.length;i++){
+		out += sensArr[i].toString() + ",";
+	}
+	return out.substring(0,out.length-1) + "\n";
+}

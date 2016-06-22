@@ -26,11 +26,12 @@ window.addEventListener('load',function(){
 	for(var i=0;i<sensors.length;i++){
 		drawSensor(sensors[i]);
 	}
+	updateSensorWidgets(sensors);
 });
 
 // n is sensor number, i is thresh number, val is the new value
 function updateThreshold(n,i,val){
-	sensors[n].triggers[i].value = val;
+	sensors[n].triggers[i].level = val;
 	document.getElementById('tThresh' + n + "_" + i).value = val;
 	document.getElementById('thresh' + n + "_" + i).value = val;
 }
@@ -43,18 +44,68 @@ function updateSensorValues(incoming){
 	}
 }
 
+function displayDetail(n,i,r){
+	setHidden(document.getElementById('blueDet' + n + '_' + i),true);
+	setHidden(document.getElementById('keyDet' + n + '_' + i),true);
+	setHidden(document.getElementById('mouseDet' + n + '_' + i),true);
+	setHidden(document.getElementById('IRDet' + n + '_' + i),true);
+	
+	switch(parseInt(r)){
+		case 3:
+			setHidden(document.getElementById('blueDet' + n + '_' + i),false);
+			break;
+		case 4:
+			setHidden(document.getElementById('keyDet' + n + '_' + i),false);
+			break;
+		case 5:
+			setHidden(document.getElementById('mouseDet' + n + '_' + i),false);
+			break;
+		case 7:
+			setHidden(document.getElementById('IRDet' + n + '_' + i),false);
+			break;
+		default:
+			break;
+	};
+}
+
+function toggleHidden(widget){
+	var clazz = widget.getAttribute('class').trim();
+	if(clazz.includes('hidden')){
+		widget.setAttribute('class',clazz.replace('hidden',''));
+	}else{
+		widget.setAttribute('class',clazz.concat(' hidden'));
+	}
+}
+
+function setHidden(widget, flag){
+	var clazz = widget.getAttribute('class').trim();
+	if(flag){
+		if(clazz.includes('hidden')){
+			return;
+		}
+		widget.setAttribute('class',clazz.concat(' hidden'));
+	}else{
+		if(clazz.includes('hidden')){
+			widget.setAttribute('class',clazz.replace('hidden',''));
+		}		
+	}
+}
+
 //This function makes the widget display whatever is inside the sensors array
 function updateSensorWidgets(sensorArr){
 	for(var n = 0; n < sensorArr.length; n++){
 		for(var i = 0; i < sensorArr[n].triggers.length; i++){
 			updateThreshold(n,i,sensorArr[n].triggers[i].level);
 			
-			document.getElementById('response' + n + '_' + i).value = String(sensorArr[n].triggers[i].response);
+			var res = document.getElementById('response' + n + '_' + i)
+			res.value = String(sensorArr[n].triggers[i].response);
 			document.getElementById('trigEvent' + n + '_' + i).value = String(sensorArr[n].triggers[i].event);
-			document.getElementById('blueDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].blueDetail);
-			document.getElementById('keyDet' + n + '_' + i).value = (sensorArr[n].triggers[i].keyDetail);
+			document.getElementById('blueDet' + n + '_' + i).value = String.fromCharCode(sensorArr[n].triggers[i].blueDetail);
+			document.getElementById('keyDet' + n + '_' + i).value = String.fromCharCode(sensorArr[n].triggers[i].keyDetail);
 			document.getElementById('mouseDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].mouseDetail);
 			document.getElementById('IRDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].IRDetail);
+		
+			res.dispatchEvent(new Event('change'));
 		}
 	}
 }
@@ -206,8 +257,9 @@ function drawSensor(sens){
 			var n = temp.substring(0,1); //sensor number
 			var i = temp.substring(2,3); //trigger number
 			
-			sensors[n].triggers[i].event = this.value;
+			sensors[n].triggers[i].response = parseInt(this.value);
 			console.log(sensors[n].triggers[i].event);
+			displayDetail(n,i,parseInt(this.value));
 		});
 	
 		var opt = document.createElement("option");
@@ -261,7 +313,7 @@ function drawSensor(sens){
 			var n = temp.substring(0,1); //sensor number
 			var i = temp.substring(2,3); //trigger number
 			
-			sensors[n].triggers[i].type = parseInt(this.value);
+			sensors[n].triggers[i].event = parseInt(this.value);
 			console.log(this.value);
 		});
 		
@@ -311,8 +363,8 @@ function drawSensor(sens){
 			var n = temp.substring(0,1); //sensor number
 			var i = temp.substring(2,3); //trigger number
 			
-			sensors[n].triggers[i].blueDetail = parseInt(this.value);
-			console.log(this.value);
+			sensors[n].triggers[i].blueDetail = this.value.charCodeAt(0);
+			console.log(sensors[n].triggers[i].blueDetail);
 		});
 		trig.appendChild(det);
 		
@@ -326,8 +378,8 @@ function drawSensor(sens){
 			var n = temp.substring(0,1); //sensor number
 			var i = temp.substring(2,3); //trigger number
 			
-			sensors[n].triggers[i].keyDetail = parseInt(this.value);
-			console.log(this.value);
+			sensors[n].triggers[i].keyDetail = this.value.charCodeAt(0);
+			console.log(sensors[n].triggers[i].keyDetail);
 		});
 		trig.appendChild(det);
 		
@@ -335,32 +387,32 @@ function drawSensor(sens){
 		det = document.createElement("select");
 		det.setAttribute('class','hidden');
 		var opt = document.createElement("option");
-		opt.setAttribute("value","moveUp");
+		opt.setAttribute("value","0");
 		opt.appendChild(document.createTextNode("Move Up"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");
-		opt.setAttribute("value","moveDown");
+		opt.setAttribute("value","1");
 		opt.appendChild(document.createTextNode("Move Down"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");
-		opt.setAttribute("value","moveLeft");
+		opt.setAttribute("value","2");
 		opt.appendChild(document.createTextNode("Move Left"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");
-		opt.setAttribute("value","moveRight");
+		opt.setAttribute("value","3");
 		opt.appendChild(document.createTextNode("Move Right"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");
-		opt.setAttribute("value","leftClick");
+		opt.setAttribute("value","4");
 		opt.appendChild(document.createTextNode("Left Click"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");
-		opt.setAttribute("value","rightClick");
+		opt.setAttribute("value","5");
 		opt.appendChild(document.createTextNode("Right Click"));
 		det.appendChild(opt);
 		

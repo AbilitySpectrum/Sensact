@@ -56,14 +56,15 @@ function SerialPort() {
 var serial = new SerialPort();
 
 document.getElementById('close').addEventListener('click',serial.closeSerial);
-document.getElementById('start').addEventListener('click',function(){
-	serial.write("1");
-	updateSensorWidgets(sensors);
-	console.log(sensors[0].num);
+document.getElementById('send').addEventListener('click',function(){
+	// updateSensorWidgets(sensors);
+	serial.write(makeConfigPackage(sensors))
+	console.log(makeConfigPackage(sensors));
 });
-document.getElementById('stop').addEventListener('click',function(){
-	serial.write("0");
+document.getElementById('request').addEventListener('click',function(){
+	serial.write("8\n");
 });
+
 
 
 //this is to add the incoming data together until a new line is detected
@@ -73,7 +74,16 @@ var onReceiveCallback = function(info) {
       var str = serial.ab2str(info.data);
       if (str.charAt(str.length-1) === '\n') {
         stringReceived += str.substring(0, str.length-1);
-        updateSensorValues(stringReceived);
+		var inArray = stringReceived.split(',');
+
+		if(inArray.length == sensors.length){
+			updateSensorValues(stringReceived);
+		}else if(inArray[0] == "9999"){
+			console.log(stringReceived);
+		}else{
+			console.log(stringReceived);
+		}
+		
         stringReceived = '';
       } else {
         stringReceived += str;
