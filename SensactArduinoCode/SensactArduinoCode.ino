@@ -1,4 +1,5 @@
 #include "Sensor.h"
+#include "Controller.h"
 
 #include <Mouse.h>
 //#include <Keyboard.h>
@@ -10,6 +11,8 @@
 #define INCLUDE_BTHID
 #define INCLUDE_BTXBEE
 
+
+
 //SoftwareSerial bluetooth(BT_TX_PIN,BT_RX_PIN);
 float EA[3];
 
@@ -19,7 +22,7 @@ float oldX;
 char inString[300];
 
 
-Sensor sensors[8];
+Sensor sensors[SENSOR_NUM];
 
 void setup() {
   Serial.begin(9600);
@@ -95,7 +98,7 @@ void process_serial(){
         {
           Serial.print("9999 ");
           char buff[60] = {0};
-          for(int i = 0; i < 8; i++){
+          for(int i = 0; i < SENSOR_NUM; i++){
             sensors[i].get_sensor_params(buff);
             Serial.print(buff);
           }
@@ -108,6 +111,12 @@ void process_serial(){
       default:
         break;
     }
+}
+
+void process_responses(){
+  for(int i=0; i < SENSOR_NUM; i++){
+    
+  }
 }
 
 void printData(){
