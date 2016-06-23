@@ -9,6 +9,7 @@
 
 #define TRIG_NUM 2
 
+#include "EEPROM.h"
 #include <Arduino.h>
 #include <Keyboard.h>
 
@@ -38,10 +39,10 @@ class Sensor{
     int get_sensor_params(char* buff);
 
     /* Writes the data in the sensor to the EEPROM */
-    void write_to_EEPROM(int startByte);
+    int write_to_EEPROM(int startByte);
 
     /* Read the sensor params from EEPROM */
-    void read_from_EEPROM(int startByte);
+    int read_from_EEPROM(int startByte);
 
     byte getLevel(byte trig);
     byte getEvent(byte trig);

@@ -129,3 +129,17 @@ int Controller::get_sensor_param_package(char* buff){
   return count;
 }
 
+void Controller::write_sensors_to_EEPROM(){
+  int currentAddress = 0;
+  for(int i = 0; i < SENSOR_NUM; i++){
+    currentAddress += sensors[i].write_to_EEPROM(currentAddress);
+  }
+}
+
+void Controller::read_sensors_from_EEPROM(){
+  int currentAddress = 0;
+  for(int i = 0; i < SENSOR_NUM; i++){
+    currentAddress += sensors[i].read_from_EEPROM(currentAddress);
+  }
+}
+

@@ -53,6 +53,39 @@ int Sensor::get_sensor_params(char* buff){
   return count;
 }
 
+int Sensor::write_to_EEPROM(int startByte){
+  int it = startByte;
+  byte t = 0;
+  for(int i = 0; i < TRIG_NUM; i++){
+    EEPROM.write(it++,triggers[i].level);
+    EEPROM.write(it++,triggers[i].event);
+    EEPROM.write(it++,triggers[i].response);
+//    t = triggers[i].event;
+//    t = t | (triggers[i].response << 4);
+//    EEPROM.write(it++,t);
+
+    EEPROM.write(it++,triggers[i].detail);
+  }
+  return it-startByte;
+}
+
+int Sensor::read_from_EEPROM(int startByte){
+  int it = startByte;
+  byte t = 0;
+  for(int i = 0; i < TRIG_NUM; i++){
+    triggers[i].level = EEPROM.read(it++);
+    triggers[i].event = EEPROM.read(it++);
+    triggers[i].response = EEPROM.read(it++);
+    triggers[i].detail = EEPROM.read(it++);
+//    t = EEPROM.read(it++);
+//    triggers[i].event = t & 0b1111;
+//    triggers[i].response = triggers[i].response >> 4;
+    
+  }
+  return it-startByte;
+}
+
+
 byte Sensor::getCounter(){return counter;}
 void Sensor::incrementCounter(){ ++counter;}
 void Sensor::decrementCounter(){ if(counter>0) {--counter; }}

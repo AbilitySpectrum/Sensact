@@ -13,11 +13,12 @@
 //
 #include <Mouse.h>
 #include <Keyboard.h>
-//#include <EEPROM.h>
 //#include <SoftwareSerial.h>
 
 #define BT_TX_PIN 3
 #define BT_RX_PIN 2
+
+#define RESET_FROM_EEPROM
 //#define INCLUDE_BTHID
 //#define INCLUDE_BTXBEE
 
@@ -72,6 +73,14 @@ void setup() {
 #ifdef INCLUDE_BTXBEE
 //    Serial1.begin(115200);
 #endif 
+
+#ifdef RESET_FROM_EEPROM
+  reset_from_EEPROM();
+#endif
+}
+
+void reset_from_EEPROM(){
+  controller.read_sensors_from_EEPROM();
 }
 
 void loop() {
@@ -126,7 +135,7 @@ void process_serial(){
         currentState = CONFIG;
 //        Serial.println("config");
         controller.set_sensor_param_package(&inString[2]);
-        
+        controller.write_sensors_to_EEPROM();
         break;
       case 8: //report current config setup
 //        Serial.println("request");
