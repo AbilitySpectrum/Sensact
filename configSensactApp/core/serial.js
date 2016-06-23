@@ -74,12 +74,14 @@ var onReceiveCallback = function(info) {
       var str = serial.ab2str(info.data);
       if (str.charAt(str.length-1) === '\n') {
         stringReceived += str.substring(0, str.length-1);
+		console.log(stringReceived);
 		var inArray = stringReceived.split(',');
-
+		
 		if(inArray.length == sensors.length){
 			updateSensorValues(stringReceived);
 		}else if(inArray[0] == "9999"){
-			console.log(stringReceived);
+			readConfigPackage(inArray.slice(1),sensors);
+			updateSensorWidgets(sensors);
 		}else{
 			console.log(stringReceived);
 		}

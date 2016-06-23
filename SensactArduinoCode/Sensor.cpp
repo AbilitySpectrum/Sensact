@@ -8,9 +8,8 @@ Sensor::Sensor(){
     triggers[i].event = 0;
     triggers[i].response = 0;
     triggers[i].detail = 0;
-    triggers[i].counter = 0;
-    triggers[i].triggered = false;
   }
+  counter = 0;
 }
 
 void Sensor::update_sensor_params(byte* params){
@@ -50,18 +49,20 @@ int Sensor::get_sensor_params(char* buff){
 
     buff[count++] = ',';
   }
-  buff[count++] = 0; //add this to the end to show that the c_string is finished
+//  buff[count++] = 0; //add this to the end to show that the c_string is finished
   return count;
 }
 
-void Sensor::incrementCounter(byte trig){ triggers[trig].counter++;}
-void Sensor::resetCounter(byte trig){ triggers[trig].counter = 0;}
+byte Sensor::getCounter(){return counter;}
+void Sensor::incrementCounter(){ ++counter;}
+void Sensor::decrementCounter(){ if(counter>0) {--counter; }}
+void Sensor::resetCounter(){ counter = 0;}
 
 byte Sensor::getLevel(byte trig){return triggers[trig].level;}
 byte Sensor::getEvent(byte trig){return triggers[trig].event;}
 byte Sensor::getResponse(byte trig){return triggers[trig].response;}
 byte Sensor::getDetail(byte trig){return triggers[trig].detail;}
-byte Sensor::getCounter(byte trig){return triggers[trig].counter;}
-bool Sensor::getTriggered(byte trig){return triggers[trig].triggered;}
-void Sensor::setTriggered(byte trig, bool flag){triggers[trig].triggered = flag;}
+
+
+
 

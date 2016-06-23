@@ -410,11 +410,7 @@ function drawSensor(sens){
 		opt.setAttribute("value","4");
 		opt.appendChild(document.createTextNode("Left Click"));
 		det.appendChild(opt);
-		
-		var opt = document.createElement("option");
-		opt.setAttribute("value","5");
-		opt.appendChild(document.createTextNode("Right Click"));
-		det.appendChild(opt);
+
 		
 		det.setAttribute("id","mouseDet" + sens.num + "_" + i);
 		det.addEventListener("change", function(){

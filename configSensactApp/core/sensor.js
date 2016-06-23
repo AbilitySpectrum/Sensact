@@ -45,15 +45,13 @@ function Sensor(num, triggers){
 		return out.substring(0,out.length-1);
 	};
 	
-	this.updateSensor = function(inString){
-		var data = inString.split(',');
+	this.updateSensor = function(data){
 		if(data.length != this.triggers.length * 4){
 			console.log("unexpected packet length");
 			return;
 		}
 		
 		for(var i = 0;i < triggers.length;i++){
-			console.log(this);
 			this.triggers[i].level = parseInt(data[i*4]);
 			triggers[i].event = parseInt(data[i*4+1]);
 			triggers[i].response = parseInt(data[i*4+2]);
@@ -79,15 +77,25 @@ function Sensor(num, triggers){
 					break;
 			};
 		}
-		
-		console.log(this);
+
 	};
 };
 
 function makeConfigPackage(sensArr){
-	var out = "0,";
+	var out = "0,"; //'0' is necessary to tell the arduino that the following is a config package
 	for (var i = 0; i < sensArr.length;i++){
 		out += sensArr[i].toString() + ",";
 	}
 	return out.substring(0,out.length-1) + "\n";
+}
+
+function readConfigPackage(data, sensArr){
+	if(data.length != sensArr.length*sensArr[0].triggers.length*4){
+		console.log("unexpected config package size");
+		return;
+	}
+	
+	for(var i=0;i < sensArr.length; i++){
+		sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4, i*sensArr[i].triggers.length*4 + 8));
+	}
 }

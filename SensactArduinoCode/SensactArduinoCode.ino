@@ -1,55 +1,98 @@
+/*
+ * This code is very similar to the original Sensact code, except it is split into classes for a modular architecture.
+ * 
+ * Most of the work goes on in the Controller class.
+ * 
+ * NL
+ */
+
+
+
 #include "Sensor.h"
 #include "Controller.h"
-
+//
 #include <Mouse.h>
-//#include <Keyboard.h>
+#include <Keyboard.h>
 //#include <EEPROM.h>
 //#include <SoftwareSerial.h>
 
 #define BT_TX_PIN 3
 #define BT_RX_PIN 2
-#define INCLUDE_BTHID
-#define INCLUDE_BTXBEE
+//#define INCLUDE_BTHID
+//#define INCLUDE_BTXBEE
 
+/* Define the pins for INPUTs and relays here */
+#define IN_PIN1 0
+#define IN_PIN2 1
+#define IN_PIN3 2
+#define IN_PIN4 3
+#define IN_PIN5 4
 
+#define RELAY_PINA 9
+#define RELAY_PINB 10
 
+enum state{
+  RUN,
+  CONFIG
+};
 //SoftwareSerial bluetooth(BT_TX_PIN,BT_RX_PIN);
-float EA[3];
 
+void response_callback(byte r, byte d);
+Controller controller(&response_callback);
+
+byte readings[SENSOR_NUM];
+char inString[300];
+state currentState;
+
+float EA[3];
 float oldX;
 
-
-char inString[300];
-
-
-Sensor sensors[SENSOR_NUM];
-
 void setup() {
+
+  pinMode(IN_PIN1,INPUT);
+  pinMode(IN_PIN2,INPUT);
+  pinMode(IN_PIN3,INPUT);
+  pinMode(IN_PIN4,INPUT);
+  pinMode(IN_PIN5,INPUT);
+
+  pinMode(RELAY_PINA,OUTPUT);
+  pinMode(RELAY_PINB,OUTPUT);
+
+  currentState = CONFIG;
+  
   Serial.begin(9600);
+  
+  Mouse.begin();
+  Keyboard.begin();
   
 #ifdef INCLUDE_BTHID
 //    bt_init();
 #endif
 
 #ifdef INCLUDE_BTXBEE
-    Serial1.begin(115200);
-#endif
-  oldX = 0;
+//    Serial1.begin(115200);
+#endif 
 }
 
 void loop() {
   if(Serial.available()){
     serial_loop();
   }
+//
+//  if(Serial1.available()){
+//    readBT();
+////    Serial.print(incoming);
+//  }
 
-  if(Serial1.available()){
-    readBT();
-//    Serial.print(incoming);
-  }
-
+  read_sensors();
   
-//  Serial.println("triggered");
+  if(currentState == RUN)
+    controller.process_triggers();
+  else
+    printData();
+    
   delay(10);
+
 }
 
 //Taken from Sensact Code
@@ -80,69 +123,131 @@ void process_serial(){
   byte sens[8];
     switch(atoi(val)){
       case 0: //config package
-        do{
-          val = strtok(NULL,",");
-          if(val != NULL){
-//            Serial.println(val);
-            sens[tCount++] = atoi(val);
-            if(tCount == 8){
-              tCount = 0;
-              sensors[sCount++].update_sensor_params(sens);
-            }
-          }
-        }while (val != NULL);
+        currentState = CONFIG;
+//        Serial.println("config");
+        controller.set_sensor_param_package(&inString[2]);
         
         break;
       case 8: //report current config setup
 //        Serial.println("request");
         {
-          Serial.print("9999 ");
-          char buff[60] = {0};
-          for(int i = 0; i < SENSOR_NUM; i++){
-            sensors[i].get_sensor_params(buff);
-            Serial.print(buff);
-          }
-          Serial.println();
+          currentState = CONFIG;
+          Serial.print("9999,");
+          char buff[300] = {0};
+          controller.get_sensor_param_package(buff);
+          Serial.println(buff);
         }
         break;
       case 9: //run Sensact
-        
+        currentState = RUN;
         break;
       default:
         break;
     }
 }
 
-void process_responses(){
-  for(int i=0; i < SENSOR_NUM; i++){
-    
-  }
+void read_sensors(){
+
+  readings[0] = analogRead(IN_PIN1) * 100.0/1024;
+  readings[1] = analogRead(IN_PIN2) * 100/1024;
+  readings[2] = analogRead(IN_PIN3) * 100/1024;
+  readings[3] = analogRead(IN_PIN4) * 100/1024;
+  readings[4] = analogRead(IN_PIN5) * 100/1024;
+
+  controller.update_sensor_values(readings);
 }
 
-void printData(){
-//  if(EA[0] > 300 && oldX < 300){
-    
-//  }
-}
 
-void readBT(){
-  char incoming[8];
-  byte i = 0;
-  byte j = 0;
-  oldX = EA[0];
-  while(Serial1.available()){
-    incoming[i] = Serial1.read();
-//    Serial.print(incoming[i]);
-   if(incoming[i] == ',' || incoming[i] == '\n'){
-    EA[j++] = atof(incoming);
-    i = 0;
-   }else{
-    i++;
-   }
-  }
-//  Serial.print(oldX);
+/* 
+ * This is in the form of a callback. When the controller knows that a trigger should happen, it will call this function
+ * I made it a callback so that the controller wouldn't have to deal with any communications.
+ * It could be changed quite easily
+ * 
+ * NL
+ */
+void response_callback(byte r, byte d){
+//  Serial.print("got callback:");
+//  Serial.print(r);
 //  Serial.print(",");
-//  Serial.println(EA[0]);
-  printData();
+//  Serial.println(d);
+  //reset the relays here
+  
+  switch(r){
+    case 1: //relay A
+      //pulse relay A
+      break; 
+    case 2: //relay B
+      //pulse relay B
+      break;
+    case 3: // Bluetooth HID
+      break;
+    case 4: //Keyboard
+
+      Keyboard.write(d);
+      break;
+    case 5: //Mouse
+      switch(d){
+        case 0: //move left
+          Mouse.move(-5,0);
+          break;
+        case 1: //move right
+          Mouse.move(5,0);
+          break;
+        case 2: //move up
+          Mouse.move(0,-5);
+          break;
+        case 3: //move down
+          Mouse.move(0,5);
+          break;
+        case 4: //click
+          Mouse.click();
+          break;
+        default:
+          break;
+      }
+    
+      break;
+    case 6: //Buzzer
+      break;
+    case 7: // IR
+      break;
+    default:
+      break;
+  }
 }
+
+/*
+ * Outputs the current sensor readings
+ */
+void printData(){
+  Serial.print(readings[0]);
+  for(int i = 1; i < 5; i++){
+    Serial.print(",");
+    Serial.print(readings[i]);
+  }
+  Serial.println();
+}
+
+
+//
+//void readBT(){
+//  char incoming[8];
+//  byte i = 0;
+//  byte j = 0;
+//  oldX = EA[0];
+//  while(Serial1.available()){
+//    incoming[i] = Serial1.read();
+////    Serial.print(incoming[i]);
+//   if(incoming[i] == ',' || incoming[i] == '\n'){
+//    EA[j++] = atof(incoming);
+//    i = 0;
+//   }else{
+//    i++;
+//   }
+//  }
+////  Serial.print(oldX);
+////  Serial.print(",");
+////  Serial.println(EA[0]);
+//  printData();
+//}
 

@@ -1,22 +1,28 @@
+/*
+ * The Sensor class owns all the parameters for the sensors.
+ * It can read from and make individual config packets, read and write itself to and from EEPROM
+ */
+
+
 #ifndef SENSOR_H
 #define SENSOR_H
 
 #define TRIG_NUM 2
 
 #include <Arduino.h>
+#include <Keyboard.h>
 
 struct Trigger_t{
     byte level;
     byte event;
     byte response;
     byte detail;
-    byte counter; //rudimentary counter. keeps track of how long the signal is held above or held below.
-    bool triggered; //tells if a response was just triggered or not. Used for held below and held above
 };
 
 class Sensor{
   private: 
     Trigger_t triggers[TRIG_NUM];
+    byte counter; //rudimentary counter. keeps track of how long the signal is held above or held below.
 
 
   public:
@@ -41,13 +47,11 @@ class Sensor{
     byte getEvent(byte trig);
     byte getResponse(byte trig);
     byte getDetail(byte trig);
-    byte getCounter(byte trig);
-    byte getHeldFor(byte trig);
-    bool getTriggered(byte trig);
-
-    void setTriggered(byte trig, bool flag);
-    void incrementCounter(byte trig);
-    void resetCounter(byte trig);
+    
+    byte getCounter();
+    void incrementCounter();
+    void decrementCounter();
+    void resetCounter();
 };
 
 
