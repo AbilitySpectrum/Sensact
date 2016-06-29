@@ -95,9 +95,9 @@ void loop() {
 
   read_sensors();
   
-  if(currentState == RUN)
+//  if(currentState == RUN)
     controller.process_triggers();
-  else
+//  else
     printData();
     
   delay(10);
