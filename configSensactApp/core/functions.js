@@ -44,6 +44,7 @@ function updateSensorValues(incoming){
 	}
 }
 
+//changes what detail is displayed based on the response
 function displayDetail(n,i,r){
 	setHidden(document.getElementById('blueDet' + n + '_' + i),true);
 	setHidden(document.getElementById('keyDet' + n + '_' + i),true);

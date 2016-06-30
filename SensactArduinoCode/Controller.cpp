@@ -77,13 +77,12 @@ void Controller::process_triggers(){
   }
 }
 
-//TODO: for some reason the size is 2...
-bool Controller::update_sensor_values(byte* newValues){
+bool Controller::update_sensor_values(byte* newValues, byte num){
   //the number of sensors doesn't match
-//  if(sizeof(newValues)/sizeof(byte) != SENSOR_NUM)
-//    return false;
+  if(num != SENSOR_NUM)
+    return false;
 
-//  Serial.print("updating sensor values");
+//  Serial.print("updating values");
 
   for(int i = 0; i < SENSOR_NUM; i++){
     oldValues[i] = currentValues[i];

@@ -195,11 +195,15 @@ select{
 
 input[type=text] {
 	width: 20px;
-	height: 18px;
+	height: 20px;
 	text-align: center;
 	position:relative;
 	top:-5px;
 	margin-left: 5px;
+}
+
+input[type=text].largeText{
+	width: 100px;
 }
 
 /* For choosing the port */

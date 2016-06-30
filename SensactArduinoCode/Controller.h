@@ -1,6 +1,10 @@
 /*
  * The Controller class owns and modulates the Sensor objects. It is responsible for reading and writing the sensor parameters to EEPROM, 
  * for checking when a trigger should occur, and for reading and creating config packages to talk to the CONFIG software.
+ * 
+ * The parent class creates the Controller, giving it a callback function, and periodically updates the values of the Controller.
+ * If the parent class wants the Controller to check if any of the events are triggered it will call the process_triggers() function.
+ * If a trigger event is registered, it will call the callback function with the response type and detail.
  */
 
 
@@ -31,6 +35,9 @@ class Controller{
 
   public:
 
+    /*
+     * Constructor
+     */
     Controller(void (*callback)(byte r, byte d));
   
     /*
@@ -45,8 +52,9 @@ class Controller{
      * Moves the current values to old values, and new values to current values.
      * 
      * @param newValues - the current readings of the sensors
+     * @param num - the length of newValues
      */
-    bool update_sensor_values(byte* newValues);
+    bool update_sensor_values(byte* newValues, byte num);
 
     bool set_sensor_param_package(char* inString); 
 

@@ -56,19 +56,28 @@ function Sensor(num, triggers){
 			triggers[i].event = parseInt(data[i*4+1]);
 			triggers[i].response = parseInt(data[i*4+2]);
 			
-			triggers[i].blueDetail = 0;
-			triggers[i].keyDetail = 0;
+			triggers[i].blueDetail = 65;
+			triggers[i].keyDetail = 65;
 			triggers[i].mouseDetail = 0;
 			triggers[i].IRDetail = "";
 			switch(triggers[i].response){
 				case 3:
 					triggers[i].blueDetail = parseInt(data[i*4+3]);
+					if(triggers[i].blueDetail > 126 || triggers[i].blueDetail < 32){
+						triggers[i].blueDetail = 65;
+					};
 					break;
 				case 4:
 					triggers[i].keyDetail = parseInt(data[i*4+3]);
+					if(triggers[i].keyDetail > 126 || triggers[i].keyDetail < 32){
+						triggers[i].keyDetail = 65;
+					};
 					break;
 				case 5:
 					triggers[i].mouseDetail = parseInt(data[i*4+3]);
+					if(triggers[i].mouseDetail > 4 || triggers[i].mouseDetail < 0){
+						triggers[i].mouseDetail = 0;
+					};
 					break;
 				case 7:
 					triggers[i].IRDetail = parseInt(data[i*4+3]);

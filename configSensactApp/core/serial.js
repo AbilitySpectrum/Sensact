@@ -61,8 +61,15 @@ document.getElementById('send').addEventListener('click',function(){
 	serial.write(makeConfigPackage(sensors))
 	console.log(makeConfigPackage(sensors));
 });
+
+//Requests a config packet from the Sensact
 document.getElementById('request').addEventListener('click',function(){
 	serial.write("8\n");
+});
+
+//Sends the RUN identifier to the Sensact
+document.getElementById('run').addEventListener('click',function(){
+	serial.write("9\n");
 });
 
 
