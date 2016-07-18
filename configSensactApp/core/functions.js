@@ -128,6 +128,9 @@ function displayPorts(){
 		console.log(ports[i]);	
 		var butt = document.createElement("button");
 		var portName = ports[i].displayName;
+		if(ports[i].displayName == undefined){ //There are no display names on Macs or Linux
+			portName = ports[i].path;
+		}
 		if(portName.length > 20){
 			portName = portName.substring(0,21);
 		}
