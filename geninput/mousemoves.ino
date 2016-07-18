@@ -1,7 +1,7 @@
 #include <Mouse.h>
 
-const int xAxis = A0;         //analog sensor for X axis
-const int yAxis = A1;         // analog sensor for Y axis
+const int xAxis = A1;         //analog sensor for X axis
+const int yAxis = A0;         // analog sensor for Y axis
 
 int range = 24;               // output range of X or Y movement
 int responseDelay = 2;        // response delay of the mouse, in ms
@@ -68,8 +68,8 @@ int readAxis(int axisNumber) {
 void mouseSetup() {
   Mouse.begin();
   // read and scale the two axes:
-  raw_center[0] = analogRead(0);
-  raw_center[1] = analogRead(1);
+  raw_center[0] = analogRead(axis[0]);
+  raw_center[1] = analogRead(axis[1]);
 }
 
 void mouseLoop() {
