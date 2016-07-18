@@ -140,7 +140,10 @@ void loop() {
 //  }
 
   read_sensors();
-
+  
+//  digitalWrite(RELAY_PINA, LOW);
+//  digitalWrite(RELAY_PINB, LOW);
+  
   //Only allow responses when the Sensact is in RUN mode, and only print the sensor data when the Sensact is in CONFIG mode
   if(currentState == RUN)
     controller.process_triggers();
@@ -152,8 +155,7 @@ void loop() {
   //update the LED to reflect the current status
   led_loop();
   //reset the relays
-  digitalWrite(RELAY_PINA, LOW);
-  digitalWrite(RELAY_PINB, LOW);
+
 }
 
 //Taken from Sensact Code
