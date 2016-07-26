@@ -53,7 +53,8 @@
 
 enum state{
   RUN,
-  CONFIG
+  CONFIG,
+  DEBUG
 };
 state currentState;
 
@@ -142,10 +143,10 @@ void loop() {
   read_sensors();
   
   
-  //Only allow responses when the Sensact is in RUN mode, and only print the sensor data when the Sensact is in CONFIG mode
-  if(currentState == RUN)
+  //Precess Responses when in RUN or DEBUG mode, print sensor data when in DEBUG or CONFIG mode
+  if(currentState != CONFIG)
     controller.process_triggers();
-  else
+  if (currentState != RUN)
     printData();
     
   delay(10);
@@ -203,6 +204,8 @@ void process_serial(){
         controller.set_sensor_param_package(&inString[2]);
         controller.write_sensors_to_EEPROM();
         break;
+      case 7: //debug mode
+        currentState = DEBUG;
       case 8: //report current config setup
         {
           currentState = CONFIG;

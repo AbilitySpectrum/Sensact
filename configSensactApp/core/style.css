@@ -30,6 +30,8 @@ input[type=range]{
 	margin-right: 5px;
   -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
   background: transparent; /* Otherwise white in Chrome */
+  width: 120px;
+  z-index:2;
 }
 
 input[type=range]::-webkit-slider-thumb {
@@ -90,13 +92,13 @@ input[type=range]::-webkit-slider-runnable-track {
   height: 8.4px;
   cursor: pointer;
   box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  background: #3071a9;
+  /*background: #3071a9;*/
   border-radius: 1.3px;
   border: 0.2px solid #010101;
 }
 
 input[type=range]:focus::-webkit-slider-runnable-track {
-  background: #597BBF;
+  /*background: #597BBF;*/
 }
 
 input[type=range]::-moz-range-track {
@@ -158,15 +160,24 @@ button{
     margin: 3px 5px 10px 3px;
 }
 
+a.actionText{
+	position: relative;
+	top: -5px;
+	margin: 3px 5px 10px 15px;
+}
+
 progress {
 	-webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
 	position: relative;
-	top: -3px;
-	height: 10px;
-	margin-left: 50px;
+	top: -8px;
+	height: 8px;
+	margin-left: 30px;
+	margin-right:-123px;
 	background-color:white;
+	width: 120px;
+	z-index:1;
 }
 
 progress[value]::-webkit-progress-bar {
@@ -176,19 +187,19 @@ progress[value]::-webkit-progress-bar {
 }
 
 progress[value]::-webkit-progress-value {
-  background-image:
+   background-image:
 	   -webkit-linear-gradient(top, 
 	                           rgba(255, 255, 255, .25), 
 	                           rgba(0, 0, 0, .25)),
-	   -webkit-linear-gradient(left, #09c, #f44);
-
+ 	   -webkit-linear-gradient(left, #09c, #f44);  
+/* 	background-color: #008322; */
     border-radius: 2px; 
     background-size: 35px 20px, 100% 100%, 100% 100%;
-}
+} 
 
 select{
 	position:relative;
-	top:-5px;
+	top: -4px;
 	margin-left: 5px;
 	margin-right: 5px;
 }
@@ -210,6 +221,13 @@ input[type=text].largeText{
 div.buttonGroup {
 	margin:10px;
 }
+
+a.rangeDiv{
+	overflow:hidden;
+	position:relative;
+	width:100px;
+	height:10px;
+} 
 
 button.portButton {
 	font-size: 20px;
@@ -237,4 +255,5 @@ div.ports {
 	margin: -150px 0 0 -200px;
 	padding:10px;
 	color: white;
+	overflow:auto;
 }

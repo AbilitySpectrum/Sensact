@@ -16,9 +16,7 @@ var sensors = [new Sensor(0,[new Trigger(50,0,0,""),
 var ports;
 
 
-
-//populate list of Serial ports on load
-window.addEventListener('load',function(){
+function loadPorts(){
 	chrome.serial.getDevices(function(arr) {
 		ports = arr;
 		displayPorts();
@@ -27,7 +25,13 @@ window.addEventListener('load',function(){
 		drawSensor(sensors[i]);
 	}
 	updateSensorWidgets(sensors);
-});
+};
+
+
+//populate list of Serial ports on load
+window.addEventListener('load',loadPorts);
+
+
 
 // n is sensor number, i is thresh number, val is the new value
 function updateThreshold(n,i,val){
@@ -40,7 +44,12 @@ function updateThreshold(n,i,val){
 function updateSensorValues(incoming){
 	var vals = incoming.split(",");
 	for(var i = 0;i < vals.length; i++){
-		document.getElementById('sensorValue'+i).value = vals[i];
+		// this is for the progress bar beside the 'Sensor X' headers
+		//document.getElementById('sensorValue'+i).value = vals[i]; 
+		
+		//this is for the progress bars inside each Action
+		document.getElementById('sensorValue'+i+'0').value = vals[i];
+		document.getElementById('sensorValue'+i+'1').value = vals[i];
 	}
 }
 
@@ -112,6 +121,12 @@ function updateSensorWidgets(sensorArr){
 }
 
 function displayPorts(){
+	var check = document.getElementById('portsContainer');
+	if(check != null){
+		console.log("already found a ports container");
+		check.parentNode.removeChild(check);
+	}
+	
 	var div = document.createElement('div');
 	div.setAttribute('class','ports');
 	div.setAttribute('id','portsContainer');
@@ -150,6 +165,13 @@ function displayPorts(){
 	}
 	
 	div.appendChild(buttonGroup);
+	
+	var refreshButton = document.createElement('button');
+	refreshButton.appendChild(document.createTextNode('Refresh'));
+	refreshButton.addEventListener('click',function(){
+		loadPorts();
+	});
+	div.appendChild(refreshButton);
 }
 
 /* Takes in a sensor and creates the html elements for it
@@ -204,12 +226,12 @@ function drawSensor(sens){
 	});
 	div.appendChild(head);
 	
-	//progress bar to display the incoming value from the sensor
+/* 	//progress bar to display the incoming value from the sensor
 	var sensProg = document.createElement('progress');
 	sensProg.setAttribute('id','sensorValue'+sens.num);
 	sensProg.setAttribute('max','100');
 	sensProg.setAttribute('value','50');
-	head.appendChild(sensProg);
+	head.appendChild(sensProg); */
 	
 	var threshContainer = document.createElement('div');
 	threshContainer.setAttribute('id','threshContainer'+sens.num);
@@ -217,6 +239,18 @@ function drawSensor(sens){
 	
 	for(var i=0;i<numTrigs;i++){
 		var trig = document.createElement("div");
+		
+		
+		var action = document.createElement("a");
+		action.appendChild(document.createTextNode("Action " + (i+1)));
+		action.setAttribute("class", "actionText");
+		trig.appendChild(action);
+
+		var sensProg = document.createElement('progress');
+		sensProg.setAttribute('id','sensorValue'+sens.num+'_'+i);
+		sensProg.setAttribute('max','100');
+		sensProg.setAttribute('value','50');
+		trig.appendChild(sensProg);
 		
 		//range slider for threshold
 		var slide = document.createElement("input");
@@ -232,7 +266,7 @@ function drawSensor(sens){
 			
 			updateThreshold(n,i,this.value);
 		});
-		trig.appendChild(slide);
+		trig.appendChild(slide); 
 		
 		//text input for threshold
 		var textThresh = document.createElement('input');
@@ -249,6 +283,8 @@ function drawSensor(sens){
 			updateThreshold(n,i,this.value);
 		});
 		trig.appendChild(textThresh);
+		
+		
 		
 		//Combo Box for the trigger response
 		var response = document.createElement("select");

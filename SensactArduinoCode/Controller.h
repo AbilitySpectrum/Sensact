@@ -6,7 +6,10 @@
  * If the parent class wants the Controller to check if any of the events are triggered it will call the process_triggers() function.
  * If a trigger event is registered, it will call the callback function with the response type and detail.
  */
-
+/*
+ * TODO: Change Held above and Held below to only trigger once
+ * TODO: Use millis() as a timer for timing the holding, make it a user configurable gap of time
+ */
 
 #ifndef CONTROLLER_H
 #define CONTROLLER_H

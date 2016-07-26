@@ -1,3 +1,6 @@
+
+
+
 #include "Arduino.h"
 #include "Controller.h"
 
@@ -45,8 +48,8 @@ void Controller::process_triggers(){
           if(currentValues[s] > sensors[s].getLevel(t)){
                     
             //loops here and increments the counter every time. if the sensor is held above the trigger level for long enough, the response will occur
-            // the number 50 is arbitrary, and can be set to whatever number is appropriate to give the desired effect.
-            if(sensors[s].getCounter() >= 50){ 
+            // the number 100 is arbitrary, and can be set to whatever number is appropriate to give the desired effect.
+            if(sensors[s].getCounter() >= 100){ 
               response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
               sensors[s].resetCounter();
             }else{

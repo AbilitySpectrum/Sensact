@@ -57,9 +57,13 @@ var serial = new SerialPort();
 
 document.getElementById('close').addEventListener('click',serial.closeSerial);
 document.getElementById('send').addEventListener('click',function(){
-	// updateSensorWidgets(sensors);
-	serial.write(makeConfigPackage(sensors))
-	console.log(makeConfigPackage(sensors));
+ 	serial.write(makeConfigPackage(sensors))
+	console.log(makeConfigPackage(sensors)); 
+});
+
+//Sends the DEBUG identifier to the Sensact
+document.getElementById('debug').addEventListener('click',function(){
+	serial.write("7\n");
 });
 
 //Requests a config packet from the Sensact
