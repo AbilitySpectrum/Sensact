@@ -7,13 +7,13 @@
  */
 
 
-
 #include "Sensor.h"
 #include "Controller.h"
 #include "pitches.h"
 #include <Mouse.h>
 #include <Keyboard.h>
 #include <SoftwareSerial.h>
+#include <EEPROM.h>
 
 /******************************************************************************
  * Define the options for the Sensact Here
@@ -129,7 +129,6 @@ void setup() {
 }
 
 
-
 void loop() {
   if(Serial.available()){
     serial_loop();
@@ -148,7 +147,8 @@ void loop() {
     controller.process_triggers();
   if (currentState != RUN)
     printData();
-    
+
+
   delay(10);
 
   //update the LED to reflect the current status
@@ -206,6 +206,8 @@ void process_serial(){
         break;
       case 7: //debug mode
         currentState = DEBUG;
+        Serial.println("debug mode");
+        break;
       case 8: //report current config setup
         {
           currentState = CONFIG;

@@ -46,10 +46,10 @@ function updateSensorValues(incoming){
 	for(var i = 0;i < vals.length; i++){
 		// this is for the progress bar beside the 'Sensor X' headers
 		//document.getElementById('sensorValue'+i).value = vals[i]; 
-		
+
 		//this is for the progress bars inside each Action
-		document.getElementById('sensorValue'+i+'0').value = vals[i];
-		document.getElementById('sensorValue'+i+'1').value = vals[i];
+		document.getElementById('sensorValue'+i+'_0').value = vals[i];
+		document.getElementById('sensorValue'+i+'_1').value = vals[i];
 	}
 }
 
