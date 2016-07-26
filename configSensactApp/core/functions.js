@@ -8,6 +8,12 @@ var sensors = [new Sensor(0,[new Trigger(50,0,0,""),
 				new Sensor(3,[new Trigger(50,0,0,""),
 							 new Trigger(50,0,0,"")]),
 				new Sensor(4,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				 new Sensor(5,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				 new Sensor(6,[new Trigger(50,0,0,""),
+							 new Trigger(50,0,0,"")]),
+				 new Sensor(7,[new Trigger(50,0,0,""),
 							 new Trigger(50,0,0,"")])];
 							 
 

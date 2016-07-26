@@ -21,7 +21,9 @@
 
 #define RESET_FROM_EEPROM
 #define INCLUDE_BTHID
-//#define INCLUDE_BTXBEE
+#define INCLUDE_BTXBEE
+
+#define XBEE_NUM_SENSORS 3
 
 /*******************************************************************************
  * Define the pins for INPUTs and OUTPUTs
@@ -64,6 +66,7 @@ Controller controller(&response_callback);
 
 //used to store the most recent readings of the sensors
 byte readings[SENSOR_NUM];
+float xbeeSensors[XBEE_NUM_SENSORS];
 //used to store the incoming config sequences
 char inString[300]; 
 
@@ -120,7 +123,7 @@ void setup() {
 #endif
 
 #ifdef INCLUDE_BTXBEE
-//    Serial1.begin(115200);
+    Serial1.begin(115200);
 #endif 
 
 #ifdef RESET_FROM_EEPROM
@@ -133,11 +136,10 @@ void loop() {
   if(Serial.available()){
     serial_loop();
   }
-//
-//  if(Serial1.available()){
-//    readBT();
-////    Serial.print(incoming);
-//  }
+  
+#ifdef INCLUDE_BTXBEE
+    readBT();
+#endif 
 
   read_sensors();
   
@@ -149,14 +151,15 @@ void loop() {
     printData();
 
 
-  delay(10);
 
   //update the LED to reflect the current status
   led_loop();
-  
+ 
   //reset the relays
   digitalWrite(RELAY_PINA, LOW);
   digitalWrite(RELAY_PINB, LOW);
+  
+  delay(10);
 }
 
 //Taken from Sensact Code
@@ -235,6 +238,9 @@ void read_sensors(){
   readings[2] = analogRead(IN_PIN3) * 100/1024;
   readings[3] = analogRead(IN_PIN4) * 100/1024;
   readings[4] = analogRead(IN_PIN5) * 100/1024;
+  readings[5] = xbeeSensors[0];
+  readings[6] = xbeeSensors[1];
+  readings[7] = xbeeSensors[2];
 
   controller.update_sensor_values(readings, sizeof(readings));
 }
@@ -323,34 +329,27 @@ void beep( int j) {
  */
 void printData(){
   Serial.print(readings[0]);
-  for(int i = 1; i < 5; i++){
+  for(int i = 1; i < SENSOR_NUM; i++){
     Serial.print(",");
     Serial.print(readings[i]);
   }
   Serial.println();
 }
 
+#ifdef INCLUDE_BTXBEE
 
-
-//
-//void readBT(){
-//  char incoming[8];
-//  byte i = 0;
-//  byte j = 0;
-//  oldX = EA[0];
-//  while(Serial1.available()){
-//    incoming[i] = Serial1.read();
-////    Serial.print(incoming[i]);
-//   if(incoming[i] == ',' || incoming[i] == '\n'){
-//    EA[j++] = atof(incoming);
-//    i = 0;
-//   }else{
-//    i++;
-//   }
-//  }
-////  Serial.print(oldX);
-////  Serial.print(",");
-////  Serial.println(EA[0]);
-//  printData();
-//}
-
+void readBT(){
+  char incoming[20];
+  byte i = 0;
+  byte j = 0;
+  while(Serial1.available()){
+    incoming[i] = Serial1.read();
+   if(incoming[i] == ',' || incoming[i] == '\n'){
+    xbeeSensors[j++] = atof(incoming);
+    i = 0;
+   }else{
+    i++;
+   }
+  }
+}
+#endif

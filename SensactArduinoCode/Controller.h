@@ -17,7 +17,7 @@
 #include "Sensor.h"
 
 
-#define SENSOR_NUM 5
+#define SENSOR_NUM 8
 
 class Controller{
   private:
