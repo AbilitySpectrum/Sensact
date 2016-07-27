@@ -96,6 +96,11 @@ byte Sensor::getEvent(byte trig){return triggers[trig].event;}
 byte Sensor::getResponse(byte trig){return triggers[trig].response;}
 byte Sensor::getDetail(byte trig){return triggers[trig].detail;}
 
+long Sensor::getTimer(){ return heldTimer;}
+void Sensor::setTimer(long t){ heldTimer = t;}
+
+bool Sensor::getTriggered(){ return heldTriggered;}
+void Sensor::setTriggered(bool t){ heldTriggered = t;}
 
 
 

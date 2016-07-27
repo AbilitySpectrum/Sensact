@@ -238,6 +238,8 @@ void read_sensors(){
   readings[2] = analogRead(IN_PIN3) * 100/1024;
   readings[3] = analogRead(IN_PIN4) * 100/1024;
   readings[4] = analogRead(IN_PIN5) * 100/1024;
+
+  //this is the bluetooth sensor data
   readings[5] = xbeeSensors[0];
   readings[6] = xbeeSensors[1];
   readings[7] = xbeeSensors[2];

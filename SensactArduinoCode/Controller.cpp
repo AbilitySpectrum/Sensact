@@ -20,16 +20,14 @@ void Controller::process_triggers(){
       switch(sensors[s].getEvent(t)){
         case 0: //Rising edge
           //If will only recognize a rising edge as long as there was enough time from the last 'held below' trigger.
-          // The number 20 is arbitrary and can be set to any number
-          if(oldValues[s] < sensors[s].getLevel(t) && currentValues[s] > sensors[s].getLevel(t) && sensors[s].getCounter() < 20 ){
+          if(oldValues[s] < sensors[s].getLevel(t) && currentValues[s] > sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
             response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
           }
           break;
         
         case 1://Falling Edge
           //If will only recognize a rising edge as long as there was enough time from the last 'held above' trigger.
-          // The number 20 is arbitrary and can be set to any number
-          if(oldValues[s] > sensors[s].getLevel(t) && currentValues[s] < sensors[s].getLevel(t) && sensors[s].getCounter() < 20 ){
+          if(oldValues[s] > sensors[s].getLevel(t) && currentValues[s] < sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
             response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
           }
           break;
@@ -46,32 +44,50 @@ void Controller::process_triggers(){
         
         case 4: //held above
           if(currentValues[s] > sensors[s].getLevel(t)){
-                    
-            //loops here and increments the counter every time. if the sensor is held above the trigger level for long enough, the response will occur
-            // the number 100 is arbitrary, and can be set to whatever number is appropriate to give the desired effect.
-            if(sensors[s].getCounter() >= 100){ 
+
+            /*  If the timer is 0, then the held above can start.
+             *  It records when the held above starts and when it is held for over the desired time it triggers.
+             *  Once it triggers it will continue to reset the timer to the current time until it is reset.
+             */
+            if(sensors[s].getTimer() == 0){
+              sensors[s].setTimer(millis());
+            }else if(!sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 1000){
               response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
-              sensors[s].resetCounter();
-            }else{
-              sensors[s].incrementCounter();
+              sensors[s].setTriggered(true);
+            }else if(sensors[s].getTriggered()){
+              sensors[s].setTimer(millis());
             }
+                    
           }else{
-            sensors[s].decrementCounter();
+
+            /* 
+             *  If the held above was triggered, it stays triggered for a moment to allow it to skip any falling edge triggers.
+             *  Once the sensor falls from the long trigger for the required time, the held above is reset and can be used again.
+             */
+            if(sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 100){
+              sensors[s].setTriggered(false);
+              sensors[s].setTimer(0);
+            }
           }
           break;
         
         case 5: //held below
           if(currentValues[s] < sensors[s].getLevel(t)){
-                    
-            //loops here and increments the counter every time. if the sensor is held above the trigger level for long enough, the response will occur
-            if(sensors[s].getCounter() >= 100){ 
+
+            if(sensors[s].getTimer() == 0){
+              sensors[s].setTimer(millis());
+            }else if(!sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 1000){
               response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
-              sensors[s].resetCounter();
-            }else{
-              sensors[s].incrementCounter();
+              sensors[s].setTriggered(true);
+            }else if(sensors[s].getTriggered()){
+              sensors[s].setTimer(millis());
             }
+           
           }else{
-            sensors[s].decrementCounter();
+            if(sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 200){
+              sensors[s].setTriggered(false);
+              sensors[s].setTimer(0);
+            }
           }
           break;
       }
