@@ -7,6 +7,7 @@
 
 Controller::Controller(void (*callback)(byte r, byte d)){
   response_callback = callback;
+  heldThreshold = 1000;
 }
 
 
@@ -24,7 +25,7 @@ void Controller::process_triggers(){
             response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
           }
           break;
-        
+
         case 1://Falling Edge
           //If will only recognize a rising edge as long as there was enough time from the last 'held above' trigger.
           if(oldValues[s] > sensors[s].getLevel(t) && currentValues[s] < sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
@@ -41,7 +42,7 @@ void Controller::process_triggers(){
           if(currentValues[s] < sensors[s].getLevel(t))
             response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
           break;
-        
+
         case 4: //held above
           if(currentValues[s] > sensors[s].getLevel(t)){
 
@@ -51,7 +52,7 @@ void Controller::process_triggers(){
              */
             if(sensors[s].getTimer() == 0){
               sensors[s].setTimer(millis());
-            }else if(!sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 1000){
+            }else if(!sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= heldThreshold){
               response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
               sensors[s].setTriggered(true);
             }else if(sensors[s].getTriggered()){
@@ -63,9 +64,12 @@ void Controller::process_triggers(){
             /* 
              *  If the held above was triggered, it stays triggered for a moment to allow it to skip any falling edge triggers.
              *  Once the sensor falls from the long trigger for the required time, the held above is reset and can be used again.
+             *  If it never triggered then it will reset automatically
              */
             if(sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 100){
               sensors[s].setTriggered(false);
+              sensors[s].setTimer(0);
+            }else if(!sensors[s].getTriggered()){
               sensors[s].setTimer(0);
             }
           }
@@ -76,7 +80,7 @@ void Controller::process_triggers(){
 
             if(sensors[s].getTimer() == 0){
               sensors[s].setTimer(millis());
-            }else if(!sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 1000){
+            }else if(!sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= heldThreshold){
               response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
               sensors[s].setTriggered(true);
             }else if(sensors[s].getTriggered()){
@@ -86,6 +90,8 @@ void Controller::process_triggers(){
           }else{
             if(sensors[s].getTriggered() && millis() - sensors[s].getTimer() >= 200){
               sensors[s].setTriggered(false);
+              sensors[s].setTimer(0);
+            }else if(!sensors[s].getTriggered()){
               sensors[s].setTimer(0);
             }
           }
@@ -120,6 +126,9 @@ bool Controller::set_sensor_param_package(char* inString){
   byte sCount = 0, tCount = 0;
   byte sens[8];
 
+  heldThreshold = atoi(val);
+  val = strtok(NULL,",");
+  
   while (val != NULL){
     sens[tCount++] = atoi(val);
     if(tCount == 8){
@@ -160,4 +169,7 @@ void Controller::read_sensors_from_EEPROM(){
     currentAddress += sensors[i].read_from_EEPROM(currentAddress);
   }
 }
+
+void Controller::setHeldThreshold(int held){ heldThreshold = held;}
+int Controller::getHeldThreshold(){ return heldThreshold;}
 

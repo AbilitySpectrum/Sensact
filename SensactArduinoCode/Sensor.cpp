@@ -9,7 +9,8 @@ Sensor::Sensor(){
     triggers[i].response = 0;
     triggers[i].detail = 0;
   }
-  counter = 0;
+  heldTimer = 0;
+  heldTriggered = false;
 }
 
 void Sensor::update_sensor_params(byte* params){
@@ -85,11 +86,6 @@ int Sensor::read_from_EEPROM(int startByte){
   return it-startByte;
 }
 
-
-byte Sensor::getCounter(){return counter;}
-void Sensor::incrementCounter(){ ++counter;}
-void Sensor::decrementCounter(){ if(counter>0) {--counter; }}
-void Sensor::resetCounter(){ counter = 0;}
 
 byte Sensor::getLevel(byte trig){return triggers[trig].level;}
 byte Sensor::getEvent(byte trig){return triggers[trig].event;}

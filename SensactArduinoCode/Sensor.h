@@ -23,7 +23,6 @@ struct Trigger_t{
 class Sensor{
   private: 
     Trigger_t triggers[TRIG_NUM];
-    byte counter; //rudimentary counter. keeps track of how long the signal is held above or held below.
     long heldTimer; //stores the millis for when the held above or below is triggered.
     bool heldTriggered;
 
@@ -50,10 +49,6 @@ class Sensor{
     byte getResponse(byte trig);
     byte getDetail(byte trig);
     
-    byte getCounter();
-    void incrementCounter();
-    void decrementCounter();
-    void resetCounter();
 
     long getTimer();
     void setTimer(long t);

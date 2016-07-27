@@ -16,7 +16,8 @@ var sensors = [new Sensor(0,[new Trigger(50,0,0,""),
 				 new Sensor(7,[new Trigger(50,0,0,""),
 							 new Trigger(50,0,0,"")])];
 							 
-
+//tells how long the held about or held below must be held for in ms.
+var heldTime = 1000;
 
 //find the list of all com ports
 var ports;
@@ -36,7 +37,15 @@ function loadPorts(){
 
 //populate list of Serial ports on load
 window.addEventListener('load',loadPorts);
+document.getElementById('heldTime').addEventListener('change', function(){
+	setHeldTime(this.value);
+});
 
+function setHeldTime(time){
+	heldTime = time;
+	console.log(heldTime)
+	document.getElementById('heldTime').value = heldTime;
+};
 
 
 // n is sensor number, i is thresh number, val is the new value

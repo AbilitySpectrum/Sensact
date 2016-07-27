@@ -27,6 +27,8 @@ class Controller{
     byte currentValues[SENSOR_NUM];
     byte oldValues[SENSOR_NUM];
 
+    int heldThreshold;
+
     /* 
      * Makes the response happen. 
      * This is a function that is called when an event occurs. The response is handled by whatever made the controller 
@@ -72,6 +74,9 @@ class Controller{
      * Calls the Sensor class' function to read from EEPROM
      */
     void read_sensors_from_EEPROM();
+
+    void setHeldThreshold(int held);
+    int getHeldThreshold();
 };
 
 

@@ -1,4 +1,6 @@
 
+
+
 function Trigger(level, trigType, responseType, detail){
 	this.level = level;
 	this.event = trigType;
@@ -92,6 +94,7 @@ function Sensor(num, triggers){
 
 function makeConfigPackage(sensArr){
 	var out = "0,"; //'0' is necessary to tell the arduino that the following is a config package
+	out += heldTime.toString() + ",";
 	for (var i = 0; i < sensArr.length;i++){
 		out += sensArr[i].toString() + ",";
 	}
@@ -99,12 +102,14 @@ function makeConfigPackage(sensArr){
 }
 
 function readConfigPackage(data, sensArr){
-	if(data.length != sensArr.length*sensArr[0].triggers.length*4){
+	if(data.length != sensArr.length*sensArr[0].triggers.length*4 + 1){ // + 1 for the held time
 		console.log("unexpected config package size");
 		return;
 	}
 	
-	for(var i=0;i < sensArr.length; i++){
-		sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4, i*sensArr[i].triggers.length*4 + 8));
+	setHeldTime(data[0]);
+	
+	for(var i=1;i < sensArr.length; i++){
+		 sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4, i*sensArr[i].triggers.length*4 + 8));
 	}
 }

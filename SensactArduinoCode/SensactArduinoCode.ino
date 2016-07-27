@@ -215,9 +215,13 @@ void process_serial(){
         {
           currentState = CONFIG;
           Serial.print("9999,");
+          Serial.print(controller.getHeldThreshold());
+          Serial.print(",");
           char buff[300] = {0};
           controller.get_sensor_param_package(buff);
-          Serial.println(buff);
+          Serial.print(buff);
+          Serial.println("");
+          Serial.flush();
         }
         break;
       case 9: //run Sensact
