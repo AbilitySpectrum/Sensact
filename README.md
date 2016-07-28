@@ -26,15 +26,29 @@ We have used a number of sensors: light, capacitive touch, microphone as touch d
 
 We have also been able to plug in a 6DO gyroscope+accelerator module. The user can then use movements to control a mouse.
 
-#### Set up
+#### Compatibility:
 
-The shield design is in the *hardware* directory. We plan to make the physical board available on cost recovery basis for users with physical impairment.
+Board v1 + Arduino v1 + Config v1 or /Serial_port_version
 
-The Arduino code is in the *Sensact* directory. 
+Board v2 + Arduino v1 + Config v1 or /Chrome_version
+
+Board v2 + Arduino v2 + Config v2
+
+#### Set up Config v1
 
 The web-based configuration software is in the *configSensact* directory.
 
 The web-based software requires the a serial port server downloadable from <https://github.com/johnlauer/serial-port-json-server>. It is compatible with OSX, Linux and Windows.
+
+#### Set up Config v2
+
+The Config v2 is a Chrome App. The a production release would be downloadable as a Chrome App but it currently must be added as an extension. 
+
+More Tools -> Extensions. Check "Developer Mode". Load unpacked extension. Direct it to the configSensactApp directory.
+
+#### Partners
+
+Bruyere's Saint Vincent Hospital AAC Clinic.
 
 #### Disclaimer
 
