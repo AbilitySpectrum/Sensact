@@ -160,20 +160,18 @@ button{
     margin: 3px 5px 10px 3px;
 }
 
-.invertLabel{
-	position:relative;
-	top:-5px;
-}
-
 input[type=checkbox]{
 	position:relative;
 	top:-3px;
 }
 
-a.actionText{
-	position: relative;
-	top: -5px;
-	margin: 3px 5px 10px 15px;
+label{
+	position:relative;
+	top:-5px;
+}
+
+label.actionText{
+	margin: 3px 5px 10px 35px;
 }
 
 progress {

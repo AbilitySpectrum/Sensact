@@ -32,12 +32,12 @@ function Sensor(num, triggers){
 		//loop for each trigger
 		for(var i = 0; i < triggers.length; i++){
 			out += triggers[i].level + ",";
-			out += triggers[i].event;
-			// if(triggers[i].invert){ //adjust for the inversion
-				// out += triggers[i].event + 1;
-			// }else {
-				// out += triggers[i].event;
-			// }
+			
+			if(triggers[i].invert){ //adjust for the inversion
+				out += triggers[i].event + 1;
+			}else {
+				out += triggers[i].event;
+			}
 			out +=  "," + 
 					triggers[i].response + ",";
 					
@@ -59,7 +59,7 @@ function Sensor(num, triggers){
 					break;
 			};
 			out += ","
-		}
+		};
 		
 		return out.substring(0,out.length-1);
 	};
@@ -71,20 +71,18 @@ function Sensor(num, triggers){
 		if(data.length != this.triggers.length * 4){
 			console.log("unexpected packet length");
 			return;
-		}
+		};
 		
 		for(var i = 0;i < triggers.length;i++){
 			this.triggers[i].level = parseInt(data[i*4]);
 			triggers[i].event = parseInt(data[i*4+1]);
 			
-			// if(triggers[i].event % 2 == 1){ //This is to see if the trigger type is one of the inverted types
-				// console.log("odd");
-				// triggers[i].event = triggers[i].event - 1;
-				// triggers[i].invert = true;
-			// }else{
-				// console.log("even");
-				// triggers[i].invert = false;
-			// };
+			if(triggers[i].event % 2 == 1){ //This is to see if the trigger type is one of the inverted types
+				triggers[i].event = triggers[i].event - 1;
+				triggers[i].invert = true;
+			}else{
+				triggers[i].invert = false;
+			};
 			triggers[i].response = parseInt(data[i*4+2]);
 			
 			triggers[i].blueDetail = 65;
@@ -116,7 +114,7 @@ function Sensor(num, triggers){
 				default:
 					break;
 			};
-		}
+		};
 
 	};
 };
@@ -125,23 +123,20 @@ function makeConfigPackage(sensArr){
 	var out = "0,"; //'0' is necessary to tell the arduino that the following is a config package
 	out += heldTime.toString() + ",";
 	for (var i = 0; i < sensArr.length;i++){
-		var t = sensArr[i].toString();
-		console.log(t);
-		out += t + ",";
-	}
+		out += sensArr[i].toString() + ",";
+	};
 	return out.substring(0,out.length-1) + "\n";
-}
+};
 
 function readConfigPackage(data, sensArr){
 	if(data.length != sensArr.length*sensArr[0].triggers.length*4 + 1){ // + 1 for the held time
 		console.log("unexpected config package size");
 		return;
-	}
+	};
 	
 	setHeldTime(data[0]);
 	
-	for(var i=1;i < sensArr.length; i++){
-		 sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4, i*sensArr[i].triggers.length*4 + 8));
-		console.log(sensArr[i]);
-	}
-}
+	for(var i=0;i < sensArr.length; i++){
+		 sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4 +1, i*sensArr[i].triggers.length*4 + 8 + 1));
+	};
+};

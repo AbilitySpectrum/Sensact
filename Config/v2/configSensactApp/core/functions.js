@@ -43,7 +43,7 @@ document.getElementById('heldTime').addEventListener('change', function(){
 
 function setHeldTime(time){
 	heldTime = time;
-	console.log(heldTime)
+	// console.log(heldTime)
 	document.getElementById('heldTime').value = heldTime;
 };
 
@@ -134,7 +134,7 @@ function updateSensorWidgets(sensorArr){
 			document.getElementById('keyDet' + n + '_' + i).value = String.fromCharCode(sensorArr[n].triggers[i].keyDetail);
 			document.getElementById('mouseDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].mouseDetail);
 			document.getElementById('IRDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].IRDetail);
-		
+			document.getElementById('invert'+ n + '_' + i).checked = sensorArr[n].triggers[i].invert;
 			res.dispatchEvent(new Event('change'));
 		};
 	};
@@ -261,7 +261,7 @@ function drawSensor(sens){
 		var trig = document.createElement("div");
 		
 		
-		var action = document.createElement("a");
+		var action = document.createElement("label");
 		action.appendChild(document.createTextNode("Action " + (i+1)));
 		action.setAttribute("class", "actionText");
 		trig.appendChild(action);
@@ -336,7 +336,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].response = parseInt(this.value);
-			console.log(sensors[n].triggers[i].event);
+			// console.log(sensors[n].triggers[i].event);
 			displayDetail(n,i,parseInt(this.value));
 		});
 	
@@ -392,14 +392,15 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].event = parseInt(this.value);
-			console.log(this.value);
+			// console.log(this.value);
 		});
 		
 		opt1 = document.createElement("option");
 		opt1.setAttribute("value","0");
-		opt1.appendChild(document.createTextNode("Falling Edge"));
+		opt1.appendChild(document.createTextNode("Short Click"));
 		trigType.appendChild(opt1);
 		
+		//Took these options out to simplify trigger types
 		// opt = document.createElement("option");
 		// opt.setAttribute("value","1");
 		// opt.appendChild(document.createTextNode("Rising Edge"));
@@ -407,7 +408,7 @@ function drawSensor(sens){
 		
 		opt = document.createElement("option");
 		opt.setAttribute("value","2");
-		opt.appendChild(document.createTextNode("Above Level"));
+		opt.appendChild(document.createTextNode("Repeat"));
 		trigType.appendChild(opt);
 		
 		// opt = document.createElement("option");
@@ -417,7 +418,7 @@ function drawSensor(sens){
 		
 		opt = document.createElement("option");
 		opt.setAttribute("value","4");
-		opt.appendChild(document.createTextNode("Held Above"));
+		opt.appendChild(document.createTextNode("Long Click"));
 		trigType.appendChild(opt);
 		
 		// opt = document.createElement("option");
@@ -442,7 +443,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].blueDetail = this.value.charCodeAt(0);
-			console.log(sensors[n].triggers[i].blueDetail);
+			// console.log(sensors[n].triggers[i].blueDetail);
 		});
 		trig.appendChild(det);
 		
@@ -457,7 +458,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].keyDetail = this.value.charCodeAt(0);
-			console.log(sensors[n].triggers[i].keyDetail);
+			// console.log(sensors[n].triggers[i].keyDetail);
 		});
 		trig.appendChild(det);
 		
@@ -497,7 +498,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].mouseDetail = parseInt(this.value);
-			console.log(this.value);
+			// console.log(this.value);
 		});
 		trig.appendChild(det);
 		
@@ -512,7 +513,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].IRDetail = this.value;
-			console.log(this.value);
+			// console.log(this.value);
 		});
 		
 		trig.appendChild(det);
