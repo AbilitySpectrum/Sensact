@@ -21,7 +21,7 @@
 
 #define RESET_FROM_EEPROM
 #define INCLUDE_BTHID
-#define INCLUDE_BTXBEE
+//#define INCLUDE_BTXBEE
 
 #define XBEE_NUM_SENSORS 3
 
@@ -189,10 +189,17 @@ void led_loop(){
     case CONFIG:
       digitalWrite(LED_RED, HIGH);
       digitalWrite(LED_GREEN, LOW);
+      digitalWrite(LED_BLUE, LOW);
       break;
     case RUN:
       digitalWrite(LED_GREEN, HIGH);
       digitalWrite(LED_RED, LOW);
+      digitalWrite(LED_BLUE, LOW);
+      break;    
+    case DEBUG:
+      digitalWrite(LED_GREEN, LOW);
+      digitalWrite(LED_RED, LOW);
+      digitalWrite(LED_BLUE, HIGH);
       break;    
   }
 }
@@ -209,7 +216,6 @@ void process_serial(){
         break;
       case 7: //debug mode
         currentState = DEBUG;
-        Serial.println("debug mode");
         break;
       case 8: //report current config setup
         {

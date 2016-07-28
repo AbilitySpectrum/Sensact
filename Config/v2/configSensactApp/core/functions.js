@@ -43,7 +43,7 @@ document.getElementById('heldTime').addEventListener('change', function(){
 
 function setHeldTime(time){
 	heldTime = time;
-	console.log(heldTime)
+	// console.log(heldTime)
 	document.getElementById('heldTime').value = heldTime;
 };
 
@@ -53,7 +53,7 @@ function updateThreshold(n,i,val){
 	sensors[n].triggers[i].level = val;
 	document.getElementById('tThresh' + n + "_" + i).value = val;
 	document.getElementById('thresh' + n + "_" + i).value = val;
-}
+};
 
 //when the sensact sends the current sensor values, this function updates the progressbars
 function updateSensorValues(incoming){
@@ -63,10 +63,15 @@ function updateSensorValues(incoming){
 		//document.getElementById('sensorValue'+i).value = vals[i]; 
 
 		//this is for the progress bars inside each Action
-		document.getElementById('sensorValue'+i+'_0').value = vals[i];
-		document.getElementById('sensorValue'+i+'_1').value = vals[i];
-	}
-}
+		for(var j = 0; j < sensors[i].triggers.length; j++){
+			if(sensors[i].triggers[j].invert){
+				document.getElementById('sensorValue'+i+'_' + j).value = 100 - vals[i];
+			}else{
+				document.getElementById('sensorValue'+i+'_' + j).value = vals[i];
+			};
+		};
+	};
+};
 
 //changes what detail is displayed based on the response
 function displayDetail(n,i,r){
@@ -91,7 +96,7 @@ function displayDetail(n,i,r){
 		default:
 			break;
 	};
-}
+};
 
 function toggleHidden(widget){
 	var clazz = widget.getAttribute('class').trim();
@@ -99,8 +104,8 @@ function toggleHidden(widget){
 		widget.setAttribute('class',clazz.replace('hidden',''));
 	}else{
 		widget.setAttribute('class',clazz.concat(' hidden'));
-	}
-}
+	};
+};
 
 function setHidden(widget, flag){
 	var clazz = widget.getAttribute('class').trim();
@@ -113,8 +118,8 @@ function setHidden(widget, flag){
 		if(clazz.includes('hidden')){
 			widget.setAttribute('class',clazz.replace('hidden',''));
 		}		
-	}
-}
+	};
+};
 
 //This function makes the widget display whatever is inside the sensors array
 function updateSensorWidgets(sensorArr){
@@ -129,18 +134,18 @@ function updateSensorWidgets(sensorArr){
 			document.getElementById('keyDet' + n + '_' + i).value = String.fromCharCode(sensorArr[n].triggers[i].keyDetail);
 			document.getElementById('mouseDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].mouseDetail);
 			document.getElementById('IRDet' + n + '_' + i).value = String(sensorArr[n].triggers[i].IRDetail);
-		
+			document.getElementById('invert'+ n + '_' + i).checked = sensorArr[n].triggers[i].invert;
 			res.dispatchEvent(new Event('change'));
-		}
-	}
-}
+		};
+	};
+};
 
 function displayPorts(){
 	var check = document.getElementById('portsContainer');
 	if(check != null){
 		console.log("already found a ports container");
 		check.parentNode.removeChild(check);
-	}
+	};
 	
 	var div = document.createElement('div');
 	div.setAttribute('class','ports');
@@ -177,7 +182,7 @@ function displayPorts(){
 		if(i!=0)
 			buttonGroup.appendChild(document.createElement('br'));
 		buttonGroup.appendChild(butt);
-	}
+	};
 	
 	div.appendChild(buttonGroup);
 	
@@ -187,7 +192,7 @@ function displayPorts(){
 		loadPorts();
 	});
 	div.appendChild(refreshButton);
-}
+};
 
 /* Takes in a sensor and creates the html elements for it
 
@@ -256,7 +261,7 @@ function drawSensor(sens){
 		var trig = document.createElement("div");
 		
 		
-		var action = document.createElement("a");
+		var action = document.createElement("label");
 		action.appendChild(document.createTextNode("Action " + (i+1)));
 		action.setAttribute("class", "actionText");
 		trig.appendChild(action);
@@ -299,6 +304,24 @@ function drawSensor(sens){
 		});
 		trig.appendChild(textThresh);
 		
+		var inL = document.createElement('label');
+		inL.setAttribute('class', 'invertLabel');
+		inL.setAttribute('for','invert' + sens.num + "_" + i);
+		inL.appendChild(document.createTextNode("invert"));
+		trig.appendChild(inL);
+		
+		var invert = document.createElement('input');
+		invert.setAttribute('type','checkbox');
+		invert.setAttribute('id','invert' + sens.num + "_" + i);
+		invert.setAttribute('class','invertCheck');
+		invert.addEventListener('change',function(){
+			var temp = this.getAttribute("id").substring(6);
+			var n = temp.substring(0,1); //sensor number
+			var i = temp.substring(2,3); //trigger number
+			
+			sensors[n].triggers[i].invert = this.checked;
+		});
+		trig.appendChild(invert);
 		
 		
 		//Combo Box for the trigger response
@@ -313,7 +336,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].response = parseInt(this.value);
-			console.log(sensors[n].triggers[i].event);
+			// console.log(sensors[n].triggers[i].event);
 			displayDetail(n,i,parseInt(this.value));
 		});
 	
@@ -369,38 +392,39 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].event = parseInt(this.value);
-			console.log(this.value);
+			// console.log(this.value);
 		});
 		
 		opt1 = document.createElement("option");
 		opt1.setAttribute("value","0");
-		opt1.appendChild(document.createTextNode("Rising Edge"));
+		opt1.appendChild(document.createTextNode("Short Click"));
 		trigType.appendChild(opt1);
 		
-		opt = document.createElement("option");
-		opt.setAttribute("value","1");
-		opt.appendChild(document.createTextNode("Falling Edge"));
-		trigType.appendChild(opt);
+		//Took these options out to simplify trigger types
+		// opt = document.createElement("option");
+		// opt.setAttribute("value","1");
+		// opt.appendChild(document.createTextNode("Rising Edge"));
+		// trigType.appendChild(opt);
 		
 		opt = document.createElement("option");
 		opt.setAttribute("value","2");
-		opt.appendChild(document.createTextNode("Above Level"));
+		opt.appendChild(document.createTextNode("Repeat"));
 		trigType.appendChild(opt);
 		
-		opt = document.createElement("option");
-		opt.setAttribute("value","3");
-		opt.appendChild(document.createTextNode("Below Level"));
-		trigType.appendChild(opt);
+		// opt = document.createElement("option");
+		// opt.setAttribute("value","3");
+		// opt.appendChild(document.createTextNode("Below Level"));
+		// trigType.appendChild(opt);
 		
 		opt = document.createElement("option");
 		opt.setAttribute("value","4");
-		opt.appendChild(document.createTextNode("Held Above"));
+		opt.appendChild(document.createTextNode("Long Click"));
 		trigType.appendChild(opt);
 		
-		opt = document.createElement("option");
-		opt.setAttribute("value","5");
-		opt.appendChild(document.createTextNode("Held Below"));
-		trigType.appendChild(opt);
+		// opt = document.createElement("option");
+		// opt.setAttribute("value","5");
+		// opt.appendChild(document.createTextNode("Held Below"));
+		// trigType.appendChild(opt);
 		
 		trig.appendChild(trigType);
 		
@@ -419,7 +443,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].blueDetail = this.value.charCodeAt(0);
-			console.log(sensors[n].triggers[i].blueDetail);
+			// console.log(sensors[n].triggers[i].blueDetail);
 		});
 		trig.appendChild(det);
 		
@@ -434,7 +458,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].keyDetail = this.value.charCodeAt(0);
-			console.log(sensors[n].triggers[i].keyDetail);
+			// console.log(sensors[n].triggers[i].keyDetail);
 		});
 		trig.appendChild(det);
 		
@@ -474,7 +498,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].mouseDetail = parseInt(this.value);
-			console.log(this.value);
+			// console.log(this.value);
 		});
 		trig.appendChild(det);
 		
@@ -489,7 +513,7 @@ function drawSensor(sens){
 			var i = temp.substring(2,3); //trigger number
 			
 			sensors[n].triggers[i].IRDetail = this.value;
-			console.log(this.value);
+			// console.log(this.value);
 		});
 		
 		trig.appendChild(det);
@@ -501,7 +525,7 @@ function drawSensor(sens){
 
 	var element = document.getElementById("sensorContainer");
 	element.appendChild(div);
-}
+};
 
 
 /*
@@ -551,7 +575,7 @@ function createDetail(p,r,n,i){
 	} else {
 		detail = document.createElement("select");
 		detail.setAttribute("class","hidden");
-	}
+	};
 	detail.setAttribute("id","detail" + n + "_" + i);
 	detail.addEventListener("change", function(){
 			var temp = this.getAttribute("id").substring(6);
@@ -564,4 +588,4 @@ function createDetail(p,r,n,i){
 	
 	detail.dispatchEvent(new Event('change'));
 	return detail;
-}
+};

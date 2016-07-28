@@ -1,14 +1,24 @@
-
+/*
+ * The trigger and sensor class stores all of the data for a config package.
+ *
+ * In order to simplify the config app, half of the triggering types were removed (rising edge, below level, held below). These types still exist in the arduino code and in the class,
+ * but they are hidden in the app by the invert option. If the trigger should invert the signal, then the Falling edge becomes a Rising edge, above level becomes below level, held above becomes held below.
+ * Falling edge is 0, Rising edge is 1,
+ * Above Level is 2, Below level is 3,
+ * held above is 4, held below is 5.
+ *
+ */
 
 
 function Trigger(level, trigType, responseType, detail){
-	this.level = level;
-	this.event = trigType;
-	this.response = responseType;
-	this.blueDetail = 65;
-	this.keyDetail = 65;
-	this.mouseDetail = 0;
-	this.IRDetail = "";
+	this.invert = false;
+	this.level = level; //0-100 threshold
+	this.event = trigType; //rising edge, falling edge, above level, etc
+	this.response = responseType; //keyboard, mouse, Bluteooth HID, etc
+	this.blueDetail = 65; //bluetooth keyboard character
+	this.keyDetail = 65;  //keyboard character
+	this.mouseDetail = 0; //mouse function
+	this.IRDetail = "";   //IR function code
 };
 
 function Sensor(num, triggers){
@@ -21,7 +31,14 @@ function Sensor(num, triggers){
 		
 		//loop for each trigger
 		for(var i = 0; i < triggers.length; i++){
-			out += triggers[i].level + "," + triggers[i].event + "," + 
+			out += triggers[i].level + ",";
+			
+			if(triggers[i].invert){ //adjust for the inversion
+				out += triggers[i].event + 1;
+			}else {
+				out += triggers[i].event;
+			}
+			out +=  "," + 
 					triggers[i].response + ",";
 					
 			switch(parseInt(triggers[i].response)){
@@ -42,20 +59,30 @@ function Sensor(num, triggers){
 					break;
 			};
 			out += ","
-		}
+		};
 		
 		return out.substring(0,out.length-1);
 	};
 	
+	/*
+	 * This function is used to set the sensors from part of a config package
+	 */
 	this.updateSensor = function(data){
 		if(data.length != this.triggers.length * 4){
 			console.log("unexpected packet length");
 			return;
-		}
+		};
 		
 		for(var i = 0;i < triggers.length;i++){
 			this.triggers[i].level = parseInt(data[i*4]);
 			triggers[i].event = parseInt(data[i*4+1]);
+			
+			if(triggers[i].event % 2 == 1){ //This is to see if the trigger type is one of the inverted types
+				triggers[i].event = triggers[i].event - 1;
+				triggers[i].invert = true;
+			}else{
+				triggers[i].invert = false;
+			};
 			triggers[i].response = parseInt(data[i*4+2]);
 			
 			triggers[i].blueDetail = 65;
@@ -65,7 +92,7 @@ function Sensor(num, triggers){
 			switch(triggers[i].response){
 				case 3:
 					triggers[i].blueDetail = parseInt(data[i*4+3]);
-					if(triggers[i].blueDetail > 126 || triggers[i].blueDetail < 32){
+					if(triggers[i].blueDetail > 126 || triggers[i].blueDetail < 32){ //Ensures that it is a letter
 						triggers[i].blueDetail = 65;
 					};
 					break;
@@ -87,7 +114,7 @@ function Sensor(num, triggers){
 				default:
 					break;
 			};
-		}
+		};
 
 	};
 };
@@ -97,19 +124,19 @@ function makeConfigPackage(sensArr){
 	out += heldTime.toString() + ",";
 	for (var i = 0; i < sensArr.length;i++){
 		out += sensArr[i].toString() + ",";
-	}
+	};
 	return out.substring(0,out.length-1) + "\n";
-}
+};
 
 function readConfigPackage(data, sensArr){
 	if(data.length != sensArr.length*sensArr[0].triggers.length*4 + 1){ // + 1 for the held time
 		console.log("unexpected config package size");
 		return;
-	}
+	};
 	
 	setHeldTime(data[0]);
 	
-	for(var i=1;i < sensArr.length; i++){
-		 sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4, i*sensArr[i].triggers.length*4 + 8));
-	}
-}
+	for(var i=0;i < sensArr.length; i++){
+		 sensArr[i].updateSensor(data.slice(i*sensArr[i].triggers.length*4 +1, i*sensArr[i].triggers.length*4 + 8 + 1));
+	};
+};
