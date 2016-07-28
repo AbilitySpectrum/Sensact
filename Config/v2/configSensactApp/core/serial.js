@@ -91,8 +91,9 @@ var onReceiveCallback = function(info) {
 		if(inArray.length == sensors.length){
 			updateSensorValues(stringReceived);
 		}else if(inArray[0] == "9999"){
+			console.log(stringReceived);
 			readConfigPackage(inArray.slice(1),sensors);
-			// updateSensorWidgets(sensors);
+			updateSensorWidgets(sensors);
 		}else{
 			// console.log(stringReceived);
 		}

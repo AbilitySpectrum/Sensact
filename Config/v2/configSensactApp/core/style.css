@@ -8,7 +8,7 @@
 	background: white;
 	color:black;
 	height: 500px;
-	width:580px;
+	width: 680px;
 	overflow:auto;
 	border: solid 5px;
 }
@@ -158,6 +158,16 @@ button{
 	background-color: CCCC99;
 	border: solid 1px;
     margin: 3px 5px 10px 3px;
+}
+
+.invertLabel{
+	position:relative;
+	top:-5px;
+}
+
+input[type=checkbox]{
+	position:relative;
+	top:-3px;
 }
 
 a.actionText{

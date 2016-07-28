@@ -19,16 +19,18 @@ void Controller::process_triggers(){
 
       //This switch checks what type of triggering event the trigger uses and processes it accordlingly
       switch(sensors[s].getEvent(t)){
-        case 0: //Rising edge
-          //If will only recognize a rising edge as long as there was enough time from the last 'held below' trigger.
-          if(oldValues[s] < sensors[s].getLevel(t) && currentValues[s] > sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
+        case 0: //Falling edge
+        
+          //If will only recognize a Falling edge as long as there was enough time from the last 'held above' trigger.
+          if(oldValues[s] > sensors[s].getLevel(t) && currentValues[s] < sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
             response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
           }
           break;
-
-        case 1://Falling Edge
-          //If will only recognize a rising edge as long as there was enough time from the last 'held above' trigger.
-          if(oldValues[s] > sensors[s].getLevel(t) && currentValues[s] < sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
+          
+        case 1://Rising Edge
+        
+          //If will only recognize a rising edge as long as there was enough time from the last 'held below' trigger.
+          if(oldValues[s] < sensors[s].getLevel(t) && currentValues[s] > sensors[s].getLevel(t) && !sensors[s].getTriggered() ){
             response_callback(sensors[s].getResponse(t),sensors[s].getDetail(t));
           }
           break;
