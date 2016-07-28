@@ -38,7 +38,7 @@ Board v2 + Arduino v2 + Config v2
 
 The web-based configuration software is in the *configSensact* directory.
 
-The web-based software requires the a serial port server downloadable from <https://github.com/johnlauer/serial-port-json-server>. It is compatible with OSX, Linux and Windows.
+The web-based software requires a serial port server. Its binary is downloadable from <https://github.com/johnlauer/serial-port-json-server>. It is compatible with OSX, Linux and Windows.
 
 #### Set up Config v2
 
@@ -46,15 +46,22 @@ The Config v2 is a Chrome App. The a production release would be downloadable as
 
 More Tools -> Extensions. Check "Developer Mode". Load unpacked extension. Direct it to the configSensactApp directory.
 
+#### To do
+Currently no IR capability.
+
 #### Partners
 
-Bruyere's Saint Vincent Hospital AAC Clinic.
+This work is performed by volunteers and staff at Bruyère's Saint Vincent Hospital AAC Clinic and Nathan Lim from Carleton University, all in Ottawa. 
+
+Bruyère, Carleton and Ability Spectrum are not responsible for the use of this material. Please attribute the source if you republish or use partiallly or in whole, using License below.
 
 #### Disclaimer
 
 All design and code are provided with no warranty whatsoever.
 
 #### License
+<https://github.com/abilityspectrum>
+
 Copyright (c) 2015-2016 Ability Spectrum
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
