@@ -31,12 +31,11 @@ function Sensor(num, triggers){
 		
 		//loop for each trigger
 		for(var i = 0; i < triggers.length; i++){
-			out += triggers[i].level + ",";
 			
 			if(triggers[i].invert){ //adjust for the inversion
-				out += triggers[i].event + 1;
+				out += 100 - triggers[i].level + "," + (triggers[i].event + 1);
 			}else {
-				out += triggers[i].event;
+				out += triggers[i].level + "," + triggers[i].event;
 			}
 			out +=  "," + 
 					triggers[i].response + ",";
@@ -79,6 +78,7 @@ function Sensor(num, triggers){
 			
 			if(triggers[i].event % 2 == 1){ //This is to see if the trigger type is one of the inverted types
 				triggers[i].event = triggers[i].event - 1;
+				triggers[i].level = 100 - triggers[i].level;
 				triggers[i].invert = true;
 			}else{
 				triggers[i].invert = false;

@@ -255,7 +255,7 @@ div.ports {
 	background-color: 003366;
 	position: absolute;
 	min-width: 400px;
-	min-height: 300px;
+	max-height: 400px;
 	height: auto;
 	z-index: 15;
 	top: 50%;

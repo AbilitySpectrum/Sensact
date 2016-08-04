@@ -408,7 +408,7 @@ function drawSensor(sens){
 		
 		opt = document.createElement("option");
 		opt.setAttribute("value","2");
-		opt.appendChild(document.createTextNode("Repeat"));
+		opt.appendChild(document.createTextNode("Hold"));
 		trigType.appendChild(opt);
 		
 		// opt = document.createElement("option");
@@ -467,22 +467,22 @@ function drawSensor(sens){
 		det.setAttribute('class','hidden');
 		var opt = document.createElement("option");
 		opt.setAttribute("value","0");
-		opt.appendChild(document.createTextNode("Move Up"));
-		det.appendChild(opt);
-		
-		var opt = document.createElement("option");
-		opt.setAttribute("value","1");
-		opt.appendChild(document.createTextNode("Move Down"));
-		det.appendChild(opt);
-		
-		var opt = document.createElement("option");
-		opt.setAttribute("value","2");
 		opt.appendChild(document.createTextNode("Move Left"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");
-		opt.setAttribute("value","3");
+		opt.setAttribute("value","1");
 		opt.appendChild(document.createTextNode("Move Right"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","2");
+		opt.appendChild(document.createTextNode("Move Up"));
+		det.appendChild(opt);
+		
+		var opt = document.createElement("option");
+		opt.setAttribute("value","3");
+		opt.appendChild(document.createTextNode("Move Down"));
 		det.appendChild(opt);
 		
 		var opt = document.createElement("option");

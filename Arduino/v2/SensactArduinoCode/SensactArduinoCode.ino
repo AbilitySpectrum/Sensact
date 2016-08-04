@@ -20,10 +20,11 @@
  ******************************************************************************/
 
 #define RESET_FROM_EEPROM
-#define INCLUDE_BTHID
-//#define INCLUDE_BTXBEE
+//#define INCLUDE_BTHID
+#define INCLUDE_BTXBEE
 
 #define XBEE_NUM_SENSORS 3
+#define MOUSE_SPEED 3
 
 /*******************************************************************************
  * Define the pins for INPUTs and OUTPUTs
@@ -243,7 +244,7 @@ void process_serial(){
  */
 void read_sensors(){
 
-  readings[0] = analogRead(IN_PIN1) * 100.0/1024;
+  readings[0] = analogRead(IN_PIN1) * 100/1024;
   readings[1] = analogRead(IN_PIN2) * 100/1024;
   readings[2] = analogRead(IN_PIN3) * 100/1024;
   readings[3] = analogRead(IN_PIN4) * 100/1024;
@@ -280,7 +281,9 @@ void response_callback(byte r, byte d){
       digitalWrite(RELAY_PINB, HIGH);
       break;
     case 3: // Bluetooth HID
+#ifdef INCLUDE_BTHID
       blueHID.write((char)d);
+#endif
       break;
     case 4: //Keyboard
       
@@ -289,16 +292,16 @@ void response_callback(byte r, byte d){
     case 5: //Mouse
       switch(d){
         case 0: //move left
-          Mouse.move(-5,0);
+          Mouse.move(-MOUSE_SPEED,0);
           break;
         case 1: //move right
-          Mouse.move(5,0);
+          Mouse.move(MOUSE_SPEED,0);
           break;
         case 2: //move up
-          Mouse.move(0,-5);
+          Mouse.move(0,-MOUSE_SPEED);
           break;
         case 3: //move down
-          Mouse.move(0,5);
+          Mouse.move(0,MOUSE_SPEED);
           break;
         case 4: //click
           Mouse.click();
@@ -350,18 +353,50 @@ void printData(){
 
 #ifdef INCLUDE_BTXBEE
 
+char btInString[40];
+
+//read the line, sensor data should be separated by commas
 void readBT(){
-  char incoming[20];
-  byte i = 0;
-  byte j = 0;
-  while(Serial1.available()){
-    incoming[i] = Serial1.read();
-   if(incoming[i] == ',' || incoming[i] == '\n'){
-    xbeeSensors[j++] = atof(incoming);
-    i = 0;
-   }else{
-    i++;
+  int charpos = 0;
+   int inChar;
+   // Read serial input:
+   while (Serial1.available() > 0 ) { 
+      inChar = Serial1.read();       
+
+      if (inChar == '\n') {
+         btInString[charpos] = 0;
+         process_bt_serial();  //process a whole line
+         // clear the string for new input:
+         charpos = 0;
+         break;
+      }
+      btInString[charpos++] = (char)inChar;
    }
+}
+
+/* 
+ *  parse the line that came in and make sure it is the expected amount of data.
+ *  
+ *  It had a problem reading the data reliably for some reason. Possibly the baud rate. The data is checked to ensure that the correct amount is received.
+ */
+void process_bt_serial(){
+//  Serial.println(btInString);
+  int temp[XBEE_NUM_SENSORS];
+  int i = 0;
+  
+  char* val = strtok(btInString,",");
+  
+  while(val !=NULL){
+    if(i >= XBEE_NUM_SENSORS)
+      return;
+    temp[i++] = atoi(val);
+    val = strtok(NULL,",");
+  }
+  
+  if(i == XBEE_NUM_SENSORS){
+    for(int j=0; j < XBEE_NUM_SENSORS; j++){
+      xbeeSensors[j] = temp[j];
+    }
   }
 }
 #endif
