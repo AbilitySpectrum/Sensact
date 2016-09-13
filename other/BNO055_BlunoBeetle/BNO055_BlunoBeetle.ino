@@ -1,3 +1,9 @@
+/* 
+ *  Nathan Lim
+ *  
+ *  This code is meant to interact with the Sensact V2 and act as a headmouse.
+ */
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -6,8 +12,8 @@
 /* Set the delay between fresh samples */
 #define BNO055_SAMPLERATE_DELAY_MS (100)
 
-#define GYRO_INIT_THRESH 1.2
-#define GYRO_CANCEL_THRESH 0.75
+#define GYRO_INIT_THRESH 1.2 //how intense the rotation must be to start moving the mouse
+#define GYRO_CANCEL_THRESH 0.75 //how intense the rotation must be to stop the mouse from moving
 
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
@@ -94,7 +100,7 @@ void loop(void)
       gyroReadings[2] = 100;
   }
   
-  Serial.print(gyroReadings[0]);
+  Serial.print(gyroReadings[0]); 
   Serial.print(",");
   Serial.print(gyroReadings[1]);
   Serial.print(",");
