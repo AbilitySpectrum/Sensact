@@ -20,8 +20,8 @@
  ******************************************************************************/
 
 #define RESET_FROM_EEPROM
-//#define INCLUDE_BTHID
-#define INCLUDE_BTXBEE
+#define INCLUDE_BTHID
+//#define INCLUDE_BTXBEE
 
 #define XBEE_NUM_SENSORS 3
 #define MOUSE_SPEED 3
