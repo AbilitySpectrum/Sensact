@@ -40,8 +40,8 @@
    #define SEE_TOUCHPAD to output touchpad (I2C) data
    #define USE_MOUSE use mouse control - must turn off SERIAL_OUTPUT
 */
-#define SERIAL_OUTPUT
-#define SEE_ANALOG
+//#define SERIAL_OUTPUT
+//#define SEE_ANALOG
 #define SEE_DIGITAL
 //#define SEE_TOUCHPAD
 #define USE_MOUSE
@@ -73,6 +73,7 @@ int analogPins[nAnalogPins] = {
 
 // digitalPins
 // when pushed, we output "-0", "-1", "-2", "-3"
+const int nDigitalPins = 8; //14;
 int digitalPins[nDigitalPins] = {
   // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
   // 3, 4, 5, 6
