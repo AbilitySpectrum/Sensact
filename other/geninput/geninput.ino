@@ -44,7 +44,9 @@
 #define SEE_ANALOG
 #define SEE_DIGITAL
 //#define SEE_TOUCHPAD
-//#define USE_MOUSE
+#define USE_MOUSE
+//#define SEE_TOUCHPAD
+#define SPECIAL_MELANIE
 
 const uint32_t CHECK_INTERVAL = 20;
 const uint32_t REFRACTORY = 400;
@@ -71,9 +73,10 @@ int analogPins[nAnalogPins] = {
 
 // digitalPins
 // when pushed, we output "-0", "-1", "-2", "-3"
-const int nDigitalPins = 8;
-int digitalPins[nDigitalPins] = {  // 3, 4, 5, 6
-  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads
+int digitalPins[nDigitalPins] = {
+  // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+  // 3, 4, 5, 6
+  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
 };
 
 int toggleLeft = 0; // for Drag
@@ -162,79 +165,93 @@ void digitalPinsLoop() {
       Serial.print("-:");
       Serial.println(j);
 #endif
-      keyPressed = 1;
-      if ( j == 0 ) {
-        Keyboard.press(KEY_PAGE_DOWN);
-      }
-      if ( j == 1 ) {
-        Mouse.press(MOUSE_LEFT);
-        toggleLeft = 0;
-      }
-      if ( j == 2 ) {
-        Keyboard.press(KEY_PAGE_UP);
-      }
-      if ( j == 3 ) {
-        Mouse.press(MOUSE_RIGHT);
-      }
-      if ( j == 4 ) {
-        if ( toggleLeft == 0 ) {
-          Mouse.press(MOUSE_LEFT);
-        }
-        else  {
-          Mouse.release(MOUSE_LEFT);
-        }
-        toggleLeft = 1 - toggleLeft;
-      }
-      if ( j == 5 ) {
-        Keyboard.press('L');
-        Keyboard.release('L');
-        Keyboard.press('O');
-        Keyboard.press('L');
-        Keyboard.press('!');
-        Keyboard.press(KEY_RETURN);
-        Keyboard.releaseAll();
-      }
-      if ( j == 6 ) {
-        Keyboard.press(KEY_ESC);
-      }
-      if ( j == 7 ) {
-        Keyboard.press(KEY_LEFT_ALT);
-        Keyboard.press(KEY_TAB);
-      }
 
+#ifdef SPECIAL_MELANIE
+     melanieDown(j);
+#endif
     }
     else {
-      if ( j == 0 ) {
-        Keyboard.release(KEY_PAGE_DOWN);
-      }
-      if ( j == 1 ) {
-        if ( toggleLeft == 0 ) {  // release Left Click only when NOT being dragged
-          Mouse.release(MOUSE_LEFT);
-        }
-      }
-      if ( j == 2 ) {
-        Keyboard.release(KEY_PAGE_UP);
-      }
-      if ( j == 3 ) {
-        Mouse.release(MOUSE_RIGHT);
-      }
-      if ( j == 4 ) {
+#ifdef SPECIAL_MELANIE
+      melanieUp(j);
+#endif
 
-      }
-      if ( j == 5 ) {
-
-      }
-      if ( j == 6 ) {
-        Keyboard.release(KEY_ESC);
-      }
-      if ( j == 7 ) {
-        Keyboard.release(KEY_LEFT_ALT);
-        Keyboard.release(KEY_TAB);
-      }
     }
   }
 }
+void melanieDown( int j) {
+  keyPressed = 1;
+  if ( j == 0 ) {
+    Keyboard.press(KEY_PAGE_DOWN);
+  }
+  if ( j == 3 ) {
+    Mouse.press(MOUSE_LEFT);
+    toggleLeft = 0;
+  }
+  if ( j == 2 ) {
+    Keyboard.press(KEY_PAGE_UP);
+  }
+  if ( j == 1 ) {
+    Mouse.press(MOUSE_RIGHT);
+  }
+  if ( j == 4 ) {
+    if ( toggleLeft == 0 ) {
+      Mouse.press(MOUSE_LEFT);
+    }
+    else  {
+      Mouse.release(MOUSE_LEFT);
+    }
+    toggleLeft = 1 - toggleLeft;
+  }
+  if ( j == 5 ) {
+    Keyboard.press('L');
+    Keyboard.release('L');
+    Keyboard.press('O');
+    Keyboard.press('L');
+    Keyboard.press('!');
+    Keyboard.press(KEY_RETURN);
+    Keyboard.releaseAll();
+  }
+  if ( j == 6 ) {
+    Keyboard.press(KEY_ESC);
+  }
+  if ( j == 7 ) {
+    Keyboard.press(KEY_LEFT_ALT);
+    Keyboard.press(KEY_TAB);
+  }
+}
 
+
+void melanieUp(int j) {
+  if ( j == 0 ) {
+    Keyboard.release(KEY_PAGE_DOWN);
+  }
+  if ( j == 3 ) {
+    if ( toggleLeft == 0 ) {  // release Left Click only when NOT being dragged
+      Mouse.release(MOUSE_LEFT);
+    }
+  }
+  if ( j == 2 ) {
+    Keyboard.release(KEY_PAGE_UP);
+  }
+  if ( j == 1 ) {
+    Mouse.release(MOUSE_RIGHT);
+  }
+  if ( j == 4 ) {
+
+  }
+  if ( j == 5 ) {
+
+  }
+  if ( j == 6 ) {
+    Keyboard.release(KEY_ESC);
+  }
+  if ( j == 7 ) {
+    Keyboard.release(KEY_LEFT_ALT);
+    Keyboard.release(KEY_TAB);
+  }
+}
+
+#ifdef SEE_TOUCHPAD
 void touchSetup() {
 
 #ifdef SERIAL_OUTPUT
@@ -319,6 +336,10 @@ void touchLoop() {
   // put a delay so it isn't overwhelming
   delay(500);
 }
+
+#endif
+
+
 
 
 

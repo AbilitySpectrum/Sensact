@@ -3,9 +3,9 @@
 const int xAxis = A1;         //analog sensor for X axis
 const int yAxis = A0;         // analog sensor for Y axis
 
-int range = 24;               // output range of X or Y movement
-int responseDelay = 2;        // response delay of the mouse, in ms
-int threshold = range / 8;    // resting threshold
+int range = 12;               // output range of X or Y movement - was 24
+int responseDelay = 60;        // response delay of the mouse, in ms - Melanie: was 2
+int threshold = 2; // range / 8;    // resting threshold
 int center = range / 2;       // resting position value
 
 int raw_center[] = { 0, 0 };
@@ -79,7 +79,7 @@ void mouseLoop() {
   int yReading = readAxis(1);
 
   // move the mouse:
-  Mouse.move(xReading, yReading, 0);
+  Mouse.move(-xReading, -yReading, 0);
   delay(responseDelay);
 }
 
