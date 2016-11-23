@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Configure Sensact</title>
+<link rel="stylesheet" href="config.css" />
+<script type="text/javascript" src="serial.js"></script>
+<script type="text/javascript" src="triggers.js"></script>
+<script type="text/javascript" src="interface.js"></script>
+</head>
+<body onLoad="startup();">
+
+<div id="connection">
+<h1>Connection Status</h1>
+<p></p>
+<p></p>
+<div id="portChoices"></div>
+</div>
+
+<div id="buttons">
+<input type="button" onClick="getTriggers(this);" value="Get Triggers"/>
+<input type="button" onClick="setTriggers();" value="Set Triggers"/>
+<input type="button" onClick="readSensors();" value="Read Sensors"/>
+<input type="button" onClick="runSensact();" value="Run Sensact"/>
+<input type="button" onClick="saveTriggers();" value="Save"/>
+<input type="button" onClick="restoreTriggers();" value="Restore"/>
+</div>
+
+<div id="mainContent"></div>
+
+<!-- Save area -->
+<div id="savediv">
+  <h1>Save Triggers</h1>
+  <pre id="savepre">
+  </pre>
+  <input type="button" onClick="closeSave();" value="OK"/>
+</div>
+
+<!-- Restore area -->
+<div id="restorediv">
+  <h1>Restore Triggers</h1>
+  <textArea id="restoreInput"></textArea>
+  <input type="button" onClick="doTriggerRestore();" value="OK"/>
+</div>
+   
+<!-- Debug areas -->
+<div id="debug"></div>
+<div id="debug2">
+<textarea id="debugInput"></textarea>
+<input type="button" value="send" onClick="doDebugInput();"/>
+</div>
+
+<!-- Modal Dialog Box -->
+<div id="twoBtnModal" class="modal">
+<div class="modal-content">
+<p id="twoBtnModalp"></p>
+<input id="twoBtnOK" type="button" value="OK"/>
+<input id="twoBtnCancel" type="button" value="Cancel"/>
+</div>
+</div>
+
+</body>
