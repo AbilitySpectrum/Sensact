@@ -91,6 +91,11 @@ function createSensorBlocks() {
 function newSensorBlock(s) {
 	var enclosingDiv = document.createElement("div");
 	
+	// icon is a triangle showing whether the div is opened or not
+	var icon = document.createElement("div");
+	icon.className = "icon";
+	enclosingDiv.appendChild(icon);
+	
 	var head = document.createElement("h1");
 	head.innerHTML = s.name;
 	head.className = "sensorHead";
@@ -101,13 +106,41 @@ function newSensorBlock(s) {
 	groupDiv.style.display = "none";
 	enclosingDiv.appendChild(groupDiv);
 	
+	// On click toggle the div contents visible or not
+	// and change the triangle
 	head.onclick = function() {
 		if (groupDiv.style.display == "block") {
 			groupDiv.style.display = "none";
+			icon.style.background = "url(triangles.png) -15px -15px";
 		} else {
 			groupDiv.style.display = "block";
+			icon.style.background = "url(triangles.png) 0px -15px";
 		}
 	}
+	
+	// On hover change the colors of the text and triangle.
+	head.onmouseenter = function() {
+		head.style.color = "#0066FF";
+		if (groupDiv.style.display == "block") {
+			icon.style.background = "url(triangles.png) 0px -15px";
+		} else {
+			icon.style.background = "url(triangles.png) -15px -15px";
+		}
+	}
+	
+	head.onmouseleave = function() {
+		head.style.color = "white";
+		if (groupDiv.style.display == "block") {
+			icon.style.background = "url(triangles.png) 0px 0px";
+		} else {
+			icon.style.background = "url(triangles.png) -15px 0px";
+		}
+	}
+	
+	// Icon click and hover actions are the same as for text.
+	icon.onclick = head.onclick;
+	icon.onmouseenter = head.onmouseenter;
+	icon.onmouseleave = head.onmouseleave;
 	
 	var buttonDiv = document.createElement("div");
 	buttonDiv.className = "buttonGroup";

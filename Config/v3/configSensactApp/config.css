@@ -72,10 +72,19 @@ div#portChoices input {
 
 /* ------------------------------------------------------ */
 /* Sensor Groups and control buttons */
+#mainContent .icon {
+	width: 15px;
+	height: 15px;
+	float: left;
+	margin: 5px 3px 0px 3px;
+	background: url(triangles.png) -15px 0;
+}
+
 #mainContent h1 {
 	font-size: 18px;
 	color: white;
-	clear: left;
+
+	cursor: pointer;
 }
 
 .sensorGroup {
