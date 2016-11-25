@@ -140,12 +140,23 @@ void Bluetooth::doAction(long param) {
 #define CHANNEL_DOWN 5
 
 // Hard-wired IR values - for now.
+#ifdef MY_TV
+// Codes for Andrew's home TV - an LG
 IRTYPES IRProtocol         = NEC;
 unsigned long code_OnOff        = 0x20DF10EF;
 unsigned long code_VolumeUp     = 0x20DF40BF;
 unsigned long code_VolumeDown   = 0x20DFC03F;
 unsigned long code_ChannelUp    = 0;
 unsigned long code_ChannelDown  = 0;
+#else
+// Codes for Bruyere Toshiba
+IRTYPES IRProtocol         = NECX;
+unsigned long code_OnOff        = 0xE0E040BF;
+unsigned long code_VolumeUp     = 0xE0E0E01F;
+unsigned long code_VolumeDown   = 0xE0E0D02F;
+unsigned long code_ChannelUp    = 0xE0E048B7;
+unsigned long code_ChannelDown  = 0xE0E008F7;
+#endif
 
 IRsend irSender;
 
