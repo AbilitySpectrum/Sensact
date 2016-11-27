@@ -132,8 +132,8 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
 }
 
 int Triggers::readTriggers(InputStream *is) {
-  int tCount = is->getNum();
-  if (tCount == IO_ERROR) return IO_ERROR;
+  long tCount = is->getNum();
+  if (tCount == IO_NUMERROR) return IO_ERROR;
   
   for(int i=0; i<tCount; i++) {
     if (aTriggers[i].readTrigger(is) == IO_ERROR) {
@@ -163,16 +163,28 @@ void Triggers::sendTriggers(OutputStream *os) {
 }
 
 int Trigger::readTrigger(InputStream *is) {
+  int tmpint;
+  long tmplong;
+  
   if (is->getChar() != TRIGGER_START) return IO_ERROR;
-  if ((sensorID    = is->getID())        == IO_ERROR) return IO_ERROR;
-  if ((reqdState   = is->getState())     == IO_ERROR) return IO_ERROR;
-  if ((triggerValue = is->getNum())      == IO_ERROR) return IO_ERROR;
-  if ((condition   = is->getCondition()) == IO_ERROR) return IO_ERROR;
-  if ((actionID    = is->getID())        == IO_ERROR) return IO_ERROR;
-  if ((actionState = is->getState())     == IO_ERROR) return IO_ERROR;
-  if ((actionParameters = is->getLong()) == IO_ERROR) return IO_ERROR;
-  if ((delayMs     = is->getNum())       == IO_ERROR) return IO_ERROR;
-  if ((repeat      = is->getBool())      == IO_ERROR) return IO_ERROR;
+  if ((tmpint       = is->getID())        == IO_ERROR) return IO_ERROR;
+  sensorID = tmpint;
+  if ((tmpint  = is->getState())     == IO_ERROR) return IO_ERROR;
+  reqdState = tmpint;
+  if ((tmplong = is->getNum())    == IO_NUMERROR) return IO_ERROR;
+  triggerValue = tmplong;
+  if ((tmpint  = is->getCondition()) == IO_ERROR) return IO_ERROR;
+  condition = tmpint;
+  if ((tmpint  = is->getID())        == IO_ERROR) return IO_ERROR;
+  actionID = tmpint;
+  if ((tmpint = is->getState())      == IO_ERROR) return IO_ERROR;
+  actionState = tmpint;
+  if ((tmplong = is->getLong())   == IO_NUMERROR) return IO_ERROR;
+  actionParameters = tmplong;
+  if ((tmplong = is->getNum())    == IO_NUMERROR) return IO_ERROR;
+  delayMs = tmplong;
+  if ((tmpint  = is->getBool())      == IO_ERROR) return IO_ERROR;
+  repeat = tmpint;
   if (is->getChar() != TRIGGER_END) return IO_ERROR;
   return 0;
 }

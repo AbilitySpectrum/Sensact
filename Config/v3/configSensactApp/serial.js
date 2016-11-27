@@ -195,8 +195,8 @@ var inputStream = {
 	
 	getChar: function() {
 		var tmp = this.data.shift();
-		// Filter out newlines that may have been added for readability.
-		while(tmp == '\n' || tmp == '\r') {
+		// Filter out white space that may have been added for readability.
+		while(tmp == '\n' || tmp == '\r' || tmp == ' ') {
 			tmp = this.data.shift();
 		}
 		return tmp;
@@ -221,10 +221,9 @@ var inputStream = {
 		if (negative) {
 			if (count == 4) { // 4 nibbles - two bytes
 				// We will have a fairly large positive number at this point.
+				// Turn it into the correct small number.
 				value = value - 0x10000;
-			} else {
-				throw "Large negative numbers are not supported";
-			}
+			} 
 		}
 		return value;
 	},

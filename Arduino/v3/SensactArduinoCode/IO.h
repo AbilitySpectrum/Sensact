@@ -22,9 +22,12 @@
  *  Two stream types are supported: Serial and EEPROM
  */
 
-// getNum() can return 2-byte negative numbers, so IO_ERROR 
+// getNum() can return 2-byte negative numbers, so IO_NUMERROR 
 // needs to be a negative value that cannot fit in 2 bytes.
-#define IO_ERROR -66000
+// This will mean that a 4-byte value (action parameters) cannot 
+// be this large negative number.
+#define IO_NUMERROR -66000
+#define IO_ERROR -1
 
 class InputStream {
   public:
@@ -32,14 +35,14 @@ class InputStream {
     virtual int _getChar() = 0;
     
     int getChar();    // Filters out end-of-line characters.
-    int  getNum() { return _getNumber(4); }
+    long getNum() { return _getNumber(4); }
     long getLong() { return _getNumber(8); }
-    char getID() { return _getChar(2); }
-    char getState() { return _getChar(1); }
-    char getCondition();
-    char getBool(); 
+    int  getID() { return _getChar(2); }
+    int  getState() { return _getChar(1); }
+    int  getCondition();
+    int  getBool(); 
     long _getNumber(int nbytes);
-    char _getChar(int nBytes);
+    int  _getChar(int nBytes);
 };
 
 class OutputStream {
