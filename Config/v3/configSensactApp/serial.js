@@ -202,7 +202,9 @@ var inputStream = {
 		return tmp;
 	},
 	
+	// Note: 2-byte values may be negative.
 	getNum: function(count) {
+		var negative = false;
 		var value = 0;
 		for(var i=0; i< count; i++) {
 			var tmp = this.getChar().charCodeAt(0) - NUMBER_MASK;
@@ -210,6 +212,19 @@ var inputStream = {
 				throw "Invalid Number";
 			}
 			value = (value << 4) + tmp;
+			if ((i == 0) && (tmp & 0x8)) {
+				// High order bit is set.  This is a negative number.
+				negative = true;
+			}
+		}
+		
+		if (negative) {
+			if (count == 4) { // 4 nibbles - two bytes
+				// We will have a fairly large positive number at this point.
+				value = value - 0x10000;
+			} else {
+				throw "Large negative numbers are not supported";
+			}
 		}
 		return value;
 	},

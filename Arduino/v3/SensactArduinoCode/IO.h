@@ -12,7 +12,7 @@
  * Code to get and put various data types from/to a stream.
  * The types are:
  *  char  - a char
- *  num   - a 2 byte (4 nibble) number
+ *  num   - a 2 byte (4 nibble) number (may be negative)
  *  long  - a 4 byte (8 nibble) number
  *  ID    - a 1 byte (2 nibble) value
  *  State - a 1 byte (1 nibble) value
@@ -22,7 +22,10 @@
  *  Two stream types are supported: Serial and EEPROM
  */
 
-#define IO_ERROR -1
+// getNum() can return 2-byte negative numbers, so IO_ERROR 
+// needs to be a negative value that cannot fit in 2 bytes.
+#define IO_ERROR -66000
+
 class InputStream {
   public:
     virtual void init() = 0;
