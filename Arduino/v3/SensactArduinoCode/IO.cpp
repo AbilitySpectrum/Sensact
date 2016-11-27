@@ -17,6 +17,7 @@ int InputStream::getChar() {
 }
 
 long InputStream::_getNumber(int nbytes) {
+  boolean negative = false;
   long val = 0;
   int i, ch;
   
@@ -26,6 +27,17 @@ long InputStream::_getNumber(int nbytes) {
       return IO_ERROR;
     }
     val = (val << 4) + ch;
+    if ( (i == 0) && (ch & 0x8) ) {
+      negative = true;
+    }
+  }
+  
+  if (negative) {
+    if (nbytes == 4) {
+      val = val - 0x10000L;
+    } else {
+      return IO_ERROR;
+    }
   }
   return val;
 }
