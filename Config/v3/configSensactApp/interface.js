@@ -765,7 +765,7 @@ function createDiscreteValueSelector(t) {
 	var maxval = t.sensor.maxval;
 	var items = createNumericSelector("Value:", minval, maxval, "discrete" + t.id);
 	var widget = items.Widget;
-	widget.type = "text";
+	widget.type = "text";				// Override the type setting.  Hack for now.
 	widget.className = "smallnum";
 	if (t.triggerValue == minval) {
 		widget.value = '';
