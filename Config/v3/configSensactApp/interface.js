@@ -73,6 +73,10 @@ function restoreTriggers() {
 	restoreDiv.style.display = "block";
 }
 
+function disconnect() {
+	webSocket.restart();
+}
+
 // --- CREATE SENSOR BLOCKS --- //
 function createSensorBlocks() {
 	var trigDiv = document.getElementById("mainContent");

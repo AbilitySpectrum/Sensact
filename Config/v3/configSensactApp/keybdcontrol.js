@@ -11,6 +11,7 @@ function startup() {
 	}
 	
     if ("WebSocket" in window) {
+		webSocket.quickConnect = true;
         webSocket.connect();  // Calls connectionComplete when the connection is completed.
     } else {
         // The browser doesn't support WebSocket

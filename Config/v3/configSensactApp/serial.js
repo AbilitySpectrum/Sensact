@@ -5,6 +5,7 @@ var webSocket = {
 	ws: null,
 	isARestart: false, 
 	portname: null,
+	quickConnect: false,
 	
 	connect: function() {
 		// Let us open a web socket
@@ -107,7 +108,7 @@ var webSocket = {
 
 // --- Functions in webSocket below here interact with the UI and the rest of the program. ---/
 	debug: function(msg) {
-//		document.getElementById("debug").innerHTML += '<br />' + msg
+//		document.getElementById("debug").innerHTML += '<br />' + msg;
 	},
 	
 	status: function(location, msg) {
@@ -131,10 +132,31 @@ var webSocket = {
 		}
 		this.status(2, "Select a port");
 	    var jsize = serialPorts.length;
+		
+		// Check to see if a port is already open
+		var foundOpenPorts = false;
 		for (var i = 0; i < jsize; i++) {
-			portChoices.append( 
-				this.createPortBtn(serialPorts[i].Friendly, serialPorts[i].Name)
-			);
+			if (serialPorts[i].IsOpen) {
+				foundOpenPorts = true;
+				if (this.quickConnect) {
+					// If using quick connect just connect. Ask no questions.
+					this.status(2, "Using open port " + serialPorts[i].Friendly);
+					this.portname = serialPorts[i].Name;
+					this.operationComplete();
+					return;
+				}
+				// otherwise ask if this port is wanted.
+				this.status(2, "Use open port " + serialPorts[i].Friendly + "?");
+				portChoices.append( this.createOKBtn(serialPorts[i].Name) );
+			}				
+		}  
+		
+		if (!foundOpenPorts) {
+			for (var i = 0; i < jsize; i++) {
+				portChoices.append( 
+					this.createPortBtn(serialPorts[i].Friendly, serialPorts[i].Name)
+				);
+			}
 		}
 		var refreshx = document.createElement("input");
 		refreshx.type = "button";
@@ -150,6 +172,17 @@ var webSocket = {
 		input.value = friendly;
 		input.onclick = function() {
 			webSocket.openPort( name );
+		};
+		return input;
+	},
+	
+	createOKBtn: function(name) {
+		var input = document.createElement("input");
+		input.type = "button";
+		input.value = "OK";
+		input.onclick = function() {
+			webSocket.portname = name;
+			webSocket.operationComplete();
 		};
 		return input;
 	},
