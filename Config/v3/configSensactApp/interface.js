@@ -859,6 +859,7 @@ function createRepeatCheckbox(t) {
 	repeat.id = "repeat" + t.id;
 	repeat.value = t.repeat;
 	repeat.className = "repeat";
+	if (t.repeat) repeat.checked = true;
 	repeat.onchange = function() {
 		t.repeat = this.checked;
 	}

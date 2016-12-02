@@ -262,10 +262,13 @@ var inputStream = {
 		switch(tmp) {
 			case BOOL_TRUE:
 				return true;
+				break;
 			case BOOL_FALSE:
 				return false;
+				break;
 			default:
 				throw "Invalid boolean";
+				break;
 		}
 	}	
 };
