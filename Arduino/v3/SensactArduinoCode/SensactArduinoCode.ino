@@ -23,6 +23,7 @@ enum rMode{RUN, REPORT};
 rMode runMode;
 
 extern Sensors sensors;
+extern PCInputSensor *pcInput;  // Needed here so we can push commands to it.
 Triggers triggers;
 extern Actors actors;
 SerialInputStream serialInput;
@@ -79,18 +80,25 @@ void loop() {
       runMode = REPORT;
       setLED();
       break;
+    
+    case KEYBOARD_CMD:
+      int cmd = Serial.read();
+      pcInput->setNextCmd(cmd);
+      break;
   }
   
-  const SensorData *pSensorData = sensors.getData();
+  const SensorData *pSensorData;
   
   if (runMode == REPORT) {
     if ((lastActionTime + REPORTING_INTERVAL) < millis()) {
+      pSensorData = sensors.getData();
       report(pSensorData);
       lastActionTime = millis();
     }
     
   } else {
     if ((lastActionTime + READING_INTERVAL) < millis()) {
+      pSensorData = sensors.getData();
       const ActionData *pActionData = triggers.getActions(pSensorData);
       actors.doActions(pActionData);
       lastActionTime = millis();

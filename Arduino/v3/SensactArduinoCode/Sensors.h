@@ -78,6 +78,31 @@ class AnalogSensor: public Sensor {
     int nDataUnits() { return 1; }
 };
 
+class PCInputSensor: public Sensor {
+  protected:
+    int id;
+    int nextCmd;
+  public:
+    PCInputSensor(int i) {
+      id = i;
+      nextCmd = 0;
+    }
+    
+    void init() {}
+    
+    void getValues(SensorData *pData) {
+        pData->addValue(id, nextCmd);
+        nextCmd = 0;
+    }
+    
+    void setNextCmd(int val) {
+      nextCmd = val;
+    }
+    
+    int nDataUnits() { return 1; }
+}; 
+   
+
 // GyroSensor - hypothetical gyro sensor.  Not fully implemented as yet.
 // This is her just to illustrate how these classes may work.
 class GyroSensor: public Sensor {

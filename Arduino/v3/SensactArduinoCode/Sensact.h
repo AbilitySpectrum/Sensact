@@ -15,8 +15,9 @@
 #define START_OF_TRIGGER_BLOCK 'T'
 #define REQUEST_TRIGGERS  'U'
 #define GET_VERSION       'V'
+#define KEYBOARD_CMD      'W'
 #define MIN_COMMAND  'Q'
-#define MAX_COMMAND  'V'
+#define MAX_COMMAND  'W'
 
 // -- Data block separators -- //
 #define TRIGGER_START  't'
