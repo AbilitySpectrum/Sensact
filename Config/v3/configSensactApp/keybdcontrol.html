@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<link rel="stylesheet" href="keybdcontrol.css" />
+<script type="text/javascript" src="serial.js"></script>
+<script type="text/javascript" src="keybdcontrol.js"></script>
+</head>
+<body onLoad="startup();">
+<div id="connection">
+<h1>Connection Status</h1>
+<p></p>
+<p></p>
+<div id="portChoices"></div>
+</div>
+
+<div id="buttons">
+<input type="button" onClick="sendCmd('a');" value="On/Off"/>
+<input type="button" onClick="sendCmd('b');" value="Volume Up"/>
+<input type="button" onClick="sendCmd('c');" value="Volume Down"/>
+<input type="button" onClick="sendCmd('d');" value="Channel Up"/>
+<input type="button" onClick="sendCmd('e');" value="Channel Down"/>
+</div></body>
+</html>
