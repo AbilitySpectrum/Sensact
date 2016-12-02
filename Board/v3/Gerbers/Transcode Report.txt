@@ -1,0 +1,72 @@
+
+
+   ---- Transcoding 'C:\Users\Bruce\Documents\eagle\Sensact v 3.0 a\Gerbers\Sensact v3.0 a_backup.GBS' ----   Thu Dec 01 10:43:48 2016
+
+D10   --> D100
+D11   --> D101
+D12   --> D102
+D13   --> D103
+D14   --> D104
+D15   --> D105
+D16   --> D106
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\Bruce\Documents\eagle\Sensact v 3.0 a\Gerbers\Sensact v3.0 a_backup.GKO' ----   Thu Dec 01 10:43:48 2016
+
+D10   --> D107
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\Bruce\Documents\eagle\Sensact v 3.0 a\Gerbers\Sensact v3.0 a_backup.GTL' ----   Thu Dec 01 10:43:49 2016
+
+D10   --> D108
+D11   --> D109
+D12   --> D110
+D13   --> D111
+D14   --> D112
+D15   --> D113
+D16   --> D114
+D17   --> D115
+D18   --> D116
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\Bruce\Documents\eagle\Sensact v 3.0 a\Gerbers\Sensact v3.0 a_backup.GTO' ----   Thu Dec 01 10:43:49 2016
+
+D10   --> D117
+D11   --> D118
+D12   --> D119
+D13   --> D120
+D14   --> D121
+D15   --> D122
+D16   --> D123
+D17   --> D124
+D18   --> D125
+D19   --> D126
+-----------------------------------------------------------------
+
+
+   ---- Transcoding 'C:\Users\Bruce\Documents\eagle\Sensact v 3.0 a\Gerbers\Sensact v3.0 a_backup.GTS' ----   Thu Dec 01 10:43:49 2016
+
+D10   --> D127
+D11   --> D128
+D12   --> D129
+D13   --> D130
+D14   --> D131
+D15   --> D132
+D16   --> D133
+D17   --> D134
+D18   --> D135
+D19   --> D136
+D20   --> D137
+D21   --> D138
+D22   --> D139
+D23   --> D140
+D24   --> D141
+D25   --> D142
+D26   --> D143
+D27   --> D144
+D28   --> D145
+D29   --> D146
+-----------------------------------------------------------------
