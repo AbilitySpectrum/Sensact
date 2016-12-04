@@ -700,16 +700,17 @@ function setAllNodesEqual( tDiv, val ) {
 
 // Update the meter so that it will change color when sensor value would trigger it.
 function updateMeter(meter, slider, hiBtn) {
-	var svalue = slider.value;
+	var svalue = parseInt(slider.value);
 	if (svalue == slider.max) svalue -= 2;
 	if (hiBtn.checked) {		
 		meter.high = svalue;
 		meter.optimum = svalue - 1;
+		meter.low = meter.min;
 	} else {
-		meter.high = svalue;
+		meter.high = meter.max;
+		meter.low = svalue;
 		meter.optimum = svalue + 1;
 	}
-	meter.low = meter.min;
 }
 
 function updateMeterValues(stream) {
