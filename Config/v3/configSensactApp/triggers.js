@@ -62,8 +62,12 @@ function createSensorList() {
 	sensors.push( new Sensor(1, "Input 1", 0, 1023, true) );
 	sensors.push( new Sensor(2, "Input 2", 0, 1023, true) );
 	sensors.push( new Sensor(3, "Keyboard", 0, 255, false) );
-	sensors.push( new Sensor(4, "Joystick-X", -100, 100, true) );
-	sensors.push( new Sensor(5, "Joystick-Y", -100, 100, true) );
+	sensors.push( new Sensor(4, "Accel-X", -16000, 16000, true) );
+	sensors.push( new Sensor(5, "Accel-Y", -16000, 16000, true) );
+	sensors.push( new Sensor(6, "Accel-Z", -16000, 16000, true) );
+	sensors.push( new Sensor(7, "Gyro-X", -5000, 5000, true) );
+	sensors.push( new Sensor(8, "Gyro-Y", -5000, 5000, true) );
+	sensors.push( new Sensor(9, "Gyro-Z", -5000, 5000, true) );
 }
 
 function getSensorByID(id) {

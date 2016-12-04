@@ -12,7 +12,7 @@ int InputStream::getChar() {
   int val;
   do {
     val = _getChar();
-  } while (val == '\n' || val == '\r');
+  } while (val == '\n' || val == '\r' || val == ' ');
   return val;
 }
 
@@ -24,7 +24,7 @@ long InputStream::_getNumber(int nbytes) {
   for(i=0; i<nbytes; i++) {
     ch = getChar() - NUMBER_MASK;
     if (ch < 0 || ch > 15) { // ERROR
-      return IO_ERROR;
+      return IO_NUMERROR;
     }
     val = (val << 4) + ch;
     if ( (i == 0) && (ch & 0x8) ) {
@@ -35,14 +35,12 @@ long InputStream::_getNumber(int nbytes) {
   if (negative) {
     if (nbytes == 4) {
       val = val - 0x10000L;
-    } else {
-      return IO_ERROR;
-    }
+    } 
   }
   return val;
 }
 
-char InputStream::_getChar(int nbytes){
+int InputStream::_getChar(int nbytes){
   char val = 0;
   int ch, i;
   
@@ -56,7 +54,7 @@ char InputStream::_getChar(int nbytes){
   return val;
 }
 
-char InputStream::getCondition(){
+int InputStream::getCondition(){
   char val = 0;
   
   val = getChar() - CONDITION_MASK;
@@ -66,7 +64,7 @@ char InputStream::getCondition(){
   return val;
 }
 
-char InputStream::getBool(){
+int InputStream::getBool(){
   int ch = getChar();
   if (ch == BOOL_TRUE) return 1;
   else if (ch == BOOL_FALSE) return 0;

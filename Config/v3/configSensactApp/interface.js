@@ -73,6 +73,10 @@ function restoreTriggers() {
 	restoreDiv.style.display = "block";
 }
 
+function disconnect() {
+	webSocket.restart();
+}
+
 // --- CREATE SENSOR BLOCKS --- //
 function createSensorBlocks() {
 	var trigDiv = document.getElementById("mainContent");
@@ -761,14 +765,19 @@ function createDiscreteValueSelector(t) {
 	var maxval = t.sensor.maxval;
 	var items = createNumericSelector("Value:", minval, maxval, "discrete" + t.id);
 	var widget = items.Widget;
-	widget.className = "largenum";
-	widget.value = t.triggerValue;
+	widget.type = "text";				// Override the type setting.  Hack for now.
+	widget.className = "smallnum";
+	if (t.triggerValue == minval) {
+		widget.value = '';
+	} else {
+		widget.value = String.fromCharCode(t.triggerValue);
+	}
 	widget.onchange = function() {
-		var val = this.value;
+		var val = this.value.charCodeAt(0);
 		if (val >= minval && val <= maxval) {
 			t.triggerValue = val;
 		} else {
-			this.value = t.triggerValue;
+			this.value = String.fromCharCode(t.triggerValue);
 		}
 	}
 	return items;
@@ -859,6 +868,7 @@ function createRepeatCheckbox(t) {
 	repeat.id = "repeat" + t.id;
 	repeat.value = t.repeat;
 	repeat.className = "repeat";
+	if (t.repeat) repeat.checked = true;
 	repeat.onchange = function() {
 		t.repeat = this.checked;
 	}
@@ -871,7 +881,7 @@ function createRepeatCheckbox(t) {
 }
 		
 // Basic numeric selector creation.
-// Calls needs to provide custom className and onchange code
+// Caller needs to provide custom className and onchange code
 // and custom assignment to/from appropriate trigger member.
 function createNumericSelector(labeltxt, themin, themax, labelid) {
 	var num = document.createElement("input");

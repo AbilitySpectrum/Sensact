@@ -2,7 +2,7 @@
 // Sensact code - Version 3.
 // This is a complete re-think of the project.
 // The class structure has been redefined.  Sensors, triggers and actions
-// are not in isolated blocks of code which share only the information they have to share.
+// are in isolated blocks of code which share only the information they have to share.
 //
 // Previously the system was centered on sensors which could have associated actions.
 // This version is centered on triggers, which are associated with a sensor and an action.
@@ -18,11 +18,13 @@
 #include <EEPROM.h>
 #include <SoftwareSerial.h>
 #include <IRLib.h>
+#include <Wire.h>
 
 enum rMode{RUN, REPORT};
 rMode runMode;
 
 extern Sensors sensors;
+extern PCInputSensor *pcInput;  // Needed here so we can push commands to it.
 Triggers triggers;
 extern Actors actors;
 SerialInputStream serialInput;
@@ -79,18 +81,25 @@ void loop() {
       runMode = REPORT;
       setLED();
       break;
+    
+    case KEYBOARD_CMD:
+      int cmd = Serial.read();
+      pcInput->setNextCmd(cmd);
+      break;
   }
   
-  const SensorData *pSensorData = sensors.getData();
+  const SensorData *pSensorData;
   
   if (runMode == REPORT) {
     if ((lastActionTime + REPORTING_INTERVAL) < millis()) {
+      pSensorData = sensors.getData();
       report(pSensorData);
       lastActionTime = millis();
     }
     
   } else {
     if ((lastActionTime + READING_INTERVAL) < millis()) {
+      pSensorData = sensors.getData();
       const ActionData *pActionData = triggers.getActions(pSensorData);
       actors.doActions(pActionData);
       lastActionTime = millis();
