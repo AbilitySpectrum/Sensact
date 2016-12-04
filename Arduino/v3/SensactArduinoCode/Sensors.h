@@ -103,29 +103,28 @@ class PCInputSensor: public Sensor {
 }; 
    
 
-// GyroSensor - hypothetical gyro sensor.  Not fully implemented as yet.
-// This is her just to illustrate how these classes may work.
+// GyroSensor - first cut.  Very raw measurements.
 class GyroSensor: public Sensor {
   private:
-    int x_id;
-    int y_id;
-    int z_id;
+    int acclX;
+    int acclY;
+    int acclZ;
+    int gyroX;
+    int gyroY;
+    int gyroZ;
   
   public:
-    GyroSensor(int x, int y, int z) {
-      x_id = x;
-      y_id = y;
-      z_id = z;
+    GyroSensor(int x, int y, int z, int gx, int gy, int gz) {
+      acclX = x;
+      acclY = y;
+      acclZ = z;
+      gyroX = gx;
+      gyroY = gy;
+      gyroZ = gz;
     }
-    void init() { /* TBD */ }
-    void getValues(SensorData *pData) {
-      int xValue, yValue, zValue;
-      // Get xValue, yValue, zValue ... somehow
-      pData->addValue(x_id, xValue);
-      pData->addValue(y_id, yValue);
-      pData->addValue(z_id, zValue);
-    }
-    int nDataUnits() { return 3; }
+    void init();
+    void getValues(SensorData *pData);
+    int nDataUnits() { return 6; }
 };
   
 // Sensors - a container for all sensors.

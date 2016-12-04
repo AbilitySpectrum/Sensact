@@ -149,7 +149,7 @@ unsigned long code_VolumeDown   = 0x20DFC03F;
 unsigned long code_ChannelUp    = 0;
 unsigned long code_ChannelDown  = 0;
 #else
-// Codes for Bruyere Toshiba
+// Codes for Bruyere TVs
 IRTYPES IRProtocol         = NECX;
 unsigned long code_OnOff        = 0xE0E040BF;
 unsigned long code_VolumeUp     = 0xE0E0E01F;
