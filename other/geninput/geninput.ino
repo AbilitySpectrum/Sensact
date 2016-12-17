@@ -40,13 +40,13 @@
    #define SEE_TOUCHPAD to output touchpad (I2C) data
    #define USE_MOUSE use mouse control - must turn off SERIAL_OUTPUT
 */
-//#define SERIAL_OUTPUT
-//#define SEE_ANALOG
+#define SERIAL_OUTPUT
+#define SEE_ANALOG
 #define SEE_DIGITAL
+#define SEE_TOUCHPAD
+//#define USE_MOUSE
 //#define SEE_TOUCHPAD
-#define USE_MOUSE
-//#define SEE_TOUCHPAD
-#define SPECIAL_MELANIE
+//#define SPECIAL_MELANIE
 
 const uint32_t CHECK_INTERVAL = 20;
 const uint32_t REFRACTORY = 400;
@@ -179,6 +179,8 @@ void digitalPinsLoop() {
     }
   }
 }
+
+#ifdef SPECIAL_MELANIE
 void melanieDown( int j) {
   keyPressed = 1;
   if ( j == 0 ) {
@@ -251,6 +253,7 @@ void melanieUp(int j) {
     Keyboard.release(KEY_TAB);
   }
 }
+#endif
 
 #ifdef SEE_TOUCHPAD
 void touchSetup() {

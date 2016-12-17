@@ -1,3 +1,5 @@
+#ifdef USE_MOUSE
+
 #include <Mouse.h>
 
 const int xAxis = A1;         //analog sensor for X axis
@@ -82,6 +84,8 @@ void mouseLoop() {
   Mouse.move(-xReading, -yReading, 0);
   delay(responseDelay);
 }
+
+#endif 
 
 /* original code
 
