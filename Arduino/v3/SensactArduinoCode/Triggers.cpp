@@ -64,17 +64,27 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
     for(int j=0; j<nTriggers; j++) {
       Trigger *pTrigger = &aTriggers[j];
       boolean matchCondition = true;  // Assume a match until we prove otherwise
-      
+
+      // Check sensor ID
       if (ID != (int) pTrigger->sensorID) {
         continue; // Wrong sensor ID - forget it.
       }
-      
-      if ( ((int)pTrigger->reqdState != 0) 
-            && (paSensorStates[ID] != (int) pTrigger->reqdState) ) {
-        matchCondition = false; // Still need to fall through, to turn off any matched conditions.
+
+      // Check states
+      if ((int)pTrigger->reqdState == 0)  {
+        // Match ANY condition - match only if not already in target state.
+        if (paSensorStates[ID] == (int) pTrigger->actionState) {
+          matchCondition = false;
+        }
+      } else if (paSensorStates[ID] != (int) pTrigger->reqdState) {
+        // Normal case - match only if states match.
+        matchCondition = false; 
       }
+      // Note: Even if matchCondition is false at this point
+      // still need to fall through, to turn off any matched conditions.
       
       if (matchCondition) {
+        // State matches - now check to see if value is correct.
         switch(pTrigger->condition) {
           case TRIGGER_ON_LOW:
             if (pTrigger->triggerValue < value) matchCondition = false;
