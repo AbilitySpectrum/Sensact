@@ -93,6 +93,8 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
         long now = millis();
         if (pTrigger->onTime == 0) {  // Not triggered previously
           pTrigger->onTime = now; // Record time of initial trigger match
+          pTrigger->repeatInterval = REPEAT_INTERVAL;  // Repeat at slow default.
+          pTrigger->repeatCount = 0;
           
           if (pTrigger->delayMs == 0) { // No delay? Do action immediately.
             aTmpStates[ID] = pTrigger->actionState;
@@ -110,9 +112,16 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           }
           
         } else if (pTrigger->repeat) {
-          if ( (now - pTrigger->lastActionTime) > REPEAT_INTERVAL) {
+          if ( (now - pTrigger->lastActionTime) > pTrigger->repeatInterval) {
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->lastActionTime = now;
+            pTrigger->repeatCount++;
+            if (pTrigger->repeatCount > 40) {
+              pTrigger->repeatInterval = REPEAT_INTERVAL / 4;
+            } else if (pTrigger->repeatCount > 10) { 
+              pTrigger->repeatInterval = REPEAT_INTERVAL / 2; 
+            } 
+            
           } 
         }          
         

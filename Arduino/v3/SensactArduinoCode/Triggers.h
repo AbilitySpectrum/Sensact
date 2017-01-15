@@ -32,6 +32,8 @@ class Trigger {
     boolean actionTaken;
     long onTime;
     long lastActionTime;
+    int repeatInterval;
+    int repeatCount;
   
     Trigger() {
       actionTaken = false;
