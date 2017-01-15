@@ -2,6 +2,8 @@
 // Actions.cpp
 // -------------------------------------
 
+#include <Keyboard.h>
+#include <Mouse.h>
 #include <IRLib.h>
 #include "Actions.h"
 
@@ -81,29 +83,29 @@ void HIDKeyboard::doAction(long param) {
 }
 
 // === HID Mouse === //
-#define MOUSE_UP    1
-#define MOUSE_DOWN  2
-#define MOUSE_LEFT  3
-#define MOUSE_RIGHT 4
-#define MOUSE_CLICK 5
-#define MOUSE_SPEED 6
+#define SA_MOUSE_UP    1
+#define SA_MOUSE_DOWN  2
+#define SA_MOUSE_LEFT  3
+#define SA_MOUSE_RIGHT 4
+#define SA_MOUSE_CLICK 5
+#define SA_MOUSE_SPEED 6
 
 void HIDMouse::doAction(long param) {
   int option = param & 0xffff;
   switch(option) {
-    case MOUSE_UP:
-      Mouse.move(0, -MOUSE_SPEED);
+    case SA_MOUSE_UP:
+      Mouse.move(0, -SA_MOUSE_SPEED);
       break;
-    case MOUSE_DOWN:
-      Mouse.move(0, MOUSE_SPEED);
+    case SA_MOUSE_DOWN:
+      Mouse.move(0, SA_MOUSE_SPEED);
       break;
-    case MOUSE_LEFT:
-      Mouse.move(-MOUSE_SPEED, 0);
+    case SA_MOUSE_LEFT:
+      Mouse.move(-SA_MOUSE_SPEED, 0);
       break;
-    case MOUSE_RIGHT:
-      Mouse.move(MOUSE_SPEED, 0);
+    case SA_MOUSE_RIGHT:
+      Mouse.move(SA_MOUSE_SPEED, 0);
       break;
-    case MOUSE_CLICK:
+    case SA_MOUSE_CLICK:
       Mouse.click();
       break;
   }
