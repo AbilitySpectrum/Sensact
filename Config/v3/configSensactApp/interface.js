@@ -352,6 +352,21 @@ function forceDefaults(modal, triggerDiv) {
 }
 // -- End of turnBasicViewOn & related code -- //
 
+// Check to see which sensors have triggers and change the sensor text
+// to show this.  Called whenever triggers are changed.
+// Currently the text of active sensors is underlined - might try something else later.
+function showActiveSensors() {
+	var nodes = document.getElementsByClassName("sensorHead");
+	for(var i=0; i<nodes.length; i++) {
+		var parent = nodes[i].parentNode;
+		var tnodes = parent.getElementsByClassName("trigger");
+		if (tnodes.length > 0) {
+			nodes[i].style.textDecoration = "underline";
+		} else {
+			nodes[i].style.textDecoration = "none";
+		}
+	}
+}
 
 // -- createTriggerUI --- //
 
@@ -476,6 +491,7 @@ function createTriggerUI(tdiv, t, fullView) {
 	form.appendChild(actionFieldset);
 	
 	tdiv.appendChild(form);
+	showActiveSensors();
 }
 
 function cancelDelete(modal) {
@@ -486,6 +502,7 @@ function completeDelete(modal, tdiv, tform, t) {
 	tdiv.removeChild(tform);
 	Triggers.deleteTrigger(t);
 	modal.style.display = "none";
+	showActiveSensors();
 }
 
 // --- Widget Creation Routines --//
@@ -933,6 +950,8 @@ function reloadTriggers() {
 		var fullBtn = document.getElementById("fullRadio" + sensor.id);
 		createTriggerUI(tdiv, trig, fullBtn.checked);
 	}
+	
+	showActiveSensors();
 }
 
 
