@@ -191,6 +191,37 @@ Trigger.prototype.fromStream = function(stream) {
 		throw "Invalid end of trigger";
 	}
 }
+
+// Trigger functions for handling value and inverted value
+// getValue() and setValue() get and set the actual value.
+// getSliderValue() and setSliderValue() invert the value if the condition is TRIGGER_ON_LOW
+Trigger.prototype.getValue = function() {
+	return this.triggerValue;
+}
+
+Trigger.prototype.setValue = function(value) {
+	this.triggerValue = value;
+}
+
+Trigger.prototype.getSliderValue = function() {
+	if (this.condition == TRIGGER_ON_LOW) {
+		var min = this.sensor.minval;
+		var max = this.sensor.maxval;
+		return (min + (max - this.triggerValue));
+	} else {
+		return this.triggerValue;
+	}
+}
+
+Trigger.prototype.setSliderValue = function(value) {
+	if (this.condition == TRIGGER_ON_LOW) {
+		var min = this.sensor.minval;
+		var max = this.sensor.maxval;
+		this.triggerValue = (min + (max - value));
+	} else {
+		this.triggerValue = value;
+	}
+}
 	
 // The Triggers object controls all access to the list of triggers.
 // Well - there is no real enforcement of this in Javascript, but this

@@ -385,12 +385,7 @@ function createTriggerUI(tdiv, t, fullView) {
 	sfLegend.innerHTML = "Sensor Settings";
 	
 	sensorFieldset.appendChild(sfLegend);
-	
-	// Sensor - pick list
-//	var items = createSensorSelector(t);
-//	sensorFieldset.appendChild(items.Label);
-//	sensorFieldset.appendChild(items.Widget);
-	
+		
 	if (t.sensor.isContinuous) {
 		// Create a div for continuous values
 		// Needed for positioning of active high/low buttons.
@@ -508,49 +503,6 @@ function completeDelete(modal, tdiv, tform, t) {
 // --- Widget Creation Routines --//
 //   These each create a widget and a label and return them
 //   in an object labelled "Label" and "Widget"
-// --- Create Sensor Selector drop-down --- //
-function createSensorSelector(t) {
-	// The selector
-	var sel = document.createElement("select");
-	sel.id = "senSelect" + t.id;
-	sel.className = "value";
-	
-	var senLen = sensors.length;
-	for( var i = 0; i < senLen; i++) {
-		var sen = sensors[i];
-		var op = document.createElement("option");
-		op.innerHTML = sen.name;
-		op.value = sen.name;
-		op.xxSensor = sen;
-		if (sen === t.sensor) {
-			op.selected = true;
-		} else {
-			op.selected = false;
-		}
-		sel.appendChild(op);
-	}
-	
-	sel.onchange = function() {
-		var choice = this.options[this.selectedIndex];
-		t.sensor = choice.xxSensor;
-		
-		// Adjust condition to match sensor type.
-		if (t.sensor.isContinuous && t.condition == TRIGGER_ON_EQUAL) {
-			t.condition = TRIGGER_ON_HIGH;
-		}
-		if (!t.sensor.isContinuous && t.condition != TRIGGER_ON_EQUAL) {
-			t.condition = TRIGGER_ON_EQUAL;
-		}
-		displayCorrectValueField(t);
-	};
-	
-	// The label
-	var sslabel = document.createElement("label");
-	sslabel.htmlFor = "senSelect" + t.id;
-	sslabel.innerHTML = "Sensor:";
-	
-	return {"Label": sslabel, "Widget": sel}; 
-}
 
 // --- Create Required State number box --- //
 function createRequiredStateSelector(t) {
@@ -597,56 +549,70 @@ function createContinuousDiv(t) {
 	// Meter for showing reported sensor values
 	var meter = createMeter(t);
 	
-	// Active-Low button & label
-	items = createHighLowButton(t, "low");
-	var lowBtnLabel = items.Label;
-	var lowBtn = items.Widget;
-	
-	// Active-High button & label
-	items = createHighLowButton(t, "high");
-	var hiBtnLabel = items.Label;
-	var hiBtn = items.Widget;
-	
+	// Invert checkbox & label
+	items = createInvertCheckbox(t);
+	var invertLabel = items.Label;
+	var invertBox = items.Widget;
+		
 	// Step 2. Assemble the parts
 	continuousDiv.appendChild(sliderLabel);
 	continuousDiv.appendChild(innerDiv);
 		innerDiv.appendChild(meter);
 		innerDiv.appendChild(slider); // Slider must be 2nd so it goes on top of the meter.
-	continuousDiv.appendChild(lowBtnLabel);
-	continuousDiv.appendChild(lowBtn);
-	continuousDiv.appendChild(hiBtnLabel);
-	continuousDiv.appendChild(hiBtn);
+	continuousDiv.appendChild(invertLabel);
+	continuousDiv.appendChild(invertBox);
 	
 	// Step 3. Handle the actions
 	slider.onchange = function() {
-		t.triggerValue = this.value;
-		updateMeter(meter, slider, hiBtn);
+		t.setSliderValue(this.value);
+		updateMeter(meter, slider);
 		if (blockRecursion) return;
 		var lockbox = document.getElementById("lockbox" + t.sensor.id);
 		if (lockbox.checked == true) {
 			var tDiv = document.getElementById("triggerDiv" + t.sensor.id);
 			blockRecursion = true;
-			setAllNodesEqual( tDiv, this.value );
+			setAllNodesEqual( tDiv, t.getValue() );
 			blockRecursion = false;
 		}
 	}
-	lowBtn.onchange = function() {
-		updateMeter(meter, slider, hiBtn);
-		t.condition = TRIGGER_ON_LOW;
+	invertBox.onchange = function() {
+		if (invertBox.checked) {
+			t.condition = TRIGGER_ON_LOW;
+		} else {
+			t.condition = TRIGGER_ON_HIGH;
+		}
+		slider.value = t.getSliderValue();
+		updateMeter(meter, slider);
 	}
-	hiBtn.onchange = function() {
-		updateMeter(meter, slider, hiBtn);
-		t.condition = TRIGGER_ON_HIGH;
-	}
-	updateMeter(meter, slider, hiBtn); // Do initial meter setting.
+	updateMeter(meter, slider); // Do initial meter setting.
 	
 	return continuousDiv;
 }
-	
+
+function createInvertCheckbox(t) {
+	var invertBox = document.createElement("input");
+	invertBox.type = "checkbox";
+	invertBox.id = "invert" + t.id;
+	invertBox.className = "invertBox";
+	if (t.condition == TRIGGER_ON_LOW) {
+		invertBox.checked = true;
+	} else {
+		invertBox.checked = false;
+	}
+
+	var invertLabel = document.createElement("label");
+	invertLabel.htmlFor = "invert" + t.id;
+	invertLabel.className = "invert";
+	invertLabel.innerHTML = "invert";
+		
+	return {"Label" : invertLabel , "Widget" : invertBox };
+}
+
 function createMeter(t) {
 	var cvalMeter = document.createElement("meter");
 	cvalMeter.min = t.sensor.minval;
 	cvalMeter.max = t.sensor.maxval;
+	cvalMeter.xxTrigger = t;
 	cvalMeter.className = "meter sliderGroup";
 	cvalMeter.value = "0";
 	if (metersAreHidden) {
@@ -663,8 +629,9 @@ function createValueSlider(t) {
 	cvalSlider.className = "slider sliderGroup";
 	cvalSlider.min = t.sensor.minval;
 	cvalSlider.max = t.sensor.maxval;
-	cvalSlider.value = t.triggerValue;
+	cvalSlider.value = t.getSliderValue();
 	cvalSlider.id = "valSlider" + t.id;
+	cvalSlider.xxTrigger = t;
 	
 	var cvalLabel = document.createElement("label");
 	cvalLabel.htmlFor = "valSlider" + t.id;
@@ -673,61 +640,27 @@ function createValueSlider(t) {
 	return {"Label" : cvalLabel, "Widget" : cvalSlider};;
 }
 
-// --- Create a radio button for active high or active low --- //
-function createHighLowButton(t, hl) {
-	var theID, setOnChange, baseClass, labelTxt;
-	if (hl == "low") {
-		theID = "lowCondition" + t.id;
-		setOnChange = TRIGGER_ON_LOW;
-		baseClass = "activeLow";
-		labelTxt = "Active Low";
-	} else { // high
-		theID = "highCondition" + t.id;
-		setOnChange = TRIGGER_ON_HIGH;
-		baseClass = "activeHigh";
-		labelTxt = "Active High";
-	}
-	
-	var condition = document.createElement("input");
-	condition.type = "radio";
-	condition.name = "condition";
-	condition.id = theID;
-	condition.className = baseClass + "Dot";
-	if (t.condition == setOnChange) {
-		condition.checked = true;
-	}
-	
-	var lcTxt = document.createElement("label");
-	lcTxt.className = baseClass;
-	lcTxt.htmlFor = theID;
-	lcTxt.innerHTML = labelTxt;
-	
-	return {"Label" : lcTxt , "Widget" : condition };
-}
 
 // If lockbox is checked this routine finds all sliders for the same sensor
-// and sets all of them to 'val'
-function setAllNodesEqual( tDiv, val ) {
+// and sets all of them to 'val'.  Value is the true value, which may need to be
+// inverted for some triggers.
+function setAllNodesEqual( tDiv, trueValue ) {
 	var nodes = tDiv.querySelectorAll("input[type=range]");
 	for (var i=0; i<nodes.length; i++) {
-		nodes[i].value = val;
-		nodes[i].onchange();
+		var t = nodes[i].xxTrigger;
+		t.setValue(trueValue);
+		nodes[i].value = t.getSliderValue();
+		nodes[i].onchange();  // This will update the meter for this slider.
 	}
 }
 
 // Update the meter so that it will change color when sensor value would trigger it.
-function updateMeter(meter, slider, hiBtn) {
+function updateMeter(meter, slider) {
 	var svalue = parseInt(slider.value);
 	if (svalue == slider.max) svalue -= 2;
-	if (hiBtn.checked) {		
-		meter.high = svalue;
-		meter.optimum = svalue - 1;
-		meter.low = meter.min;
-	} else {
-		meter.high = meter.max;
-		meter.low = svalue;
-		meter.optimum = svalue + 1;
-	}
+	meter.high = svalue;
+	meter.optimum = svalue - 1;
+	meter.low = meter.min;
 }
 
 function updateMeterValues(stream) {
@@ -745,7 +678,11 @@ function updateMeterValues(stream) {
 			if (!tdiv) return;  // tdiv may disappear if page is refreshed.
 			var nodes = tdiv.getElementsByClassName("meter");
 			for(var j=0; j < nodes.length; j++) {
-				nodes[j].value = value;
+				if (nodes[j].xxTrigger.condition == TRIGGER_ON_LOW) {
+					nodes[j].value = nodes[j].min + (nodes[j].max - value);
+				} else {
+					nodes[j].value = value;
+				}
 			}
 		}
 		

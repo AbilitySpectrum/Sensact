@@ -211,7 +211,7 @@ form .innerDiv {
 form .sliderGroup {
 	width: 180px;
 	position: absolute;
-	top: 0px;
+	top: 5px;
 	left: 0;
 	margin: 3px 0 0 0;
 	padding: 0;
@@ -242,29 +242,18 @@ input.repeat[type=checkbox] {  /* A nudge for the repeat checkbox. */
 /* within the continuous values div */
 .continuous {
 	position: relative;
-	height: 45px;
 }
 
-.activeLow {
+.invert {
 	position: absolute;
-	top: 18px;
-	left: 10px;
+	top: -20px;
+	left: 190px;
+	font-size: 80%;
 }
-.activeLowDot {
+.invertBox {
 	position: absolute;
-	top: 21px;
-	left: 95px;
-}
-
-.activeHigh {
-	position: absolute;
-	top: 18px;
-	left: 125px;
-}
-.activeHighDot {
-	position: absolute;
-	top: 21px;
-	left: 210px;
+	top: -17px;
+	left: 230px;
 }
 
 /* ------------------------------------------------------ */
