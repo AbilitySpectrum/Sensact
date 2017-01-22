@@ -153,6 +153,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
 int Triggers::readTriggers(InputStream *is) {
   long tCount = is->getNum();
   if (tCount == IO_NUMERROR) return IO_ERROR;
+  if (tCount > MAX_TRIGGERS) return IO_ERROR;
   
   for(int i=0; i<tCount; i++) {
     if (aTriggers[i].readTrigger(is) == IO_ERROR) {
