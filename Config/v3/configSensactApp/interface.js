@@ -1,7 +1,8 @@
 // JavaScript Document
+// interface.js
 
 function startup() {
-	var bypassConnection = false; // Make it true to bypass the connection phase.
+	var bypassConnection = true; // Make it true to bypass the connection phase.
 								  // Useful when in testing/development mode.
 	if (bypassConnection) {  
 		// Turn off transitions - to speed things up.
@@ -79,135 +80,181 @@ function disconnect() {
 
 // --- CREATE SENSOR BLOCKS --- //
 function createSensorBlocks() {
-	var trigDiv = document.getElementById("mainContent");
+	var mainContentDiv = document.getElementById("mainContent");
 	var senLen = sensors.length;
 	for(var i=0; i<senLen; i++) {
-		trigDiv.appendChild(newSensorBlock(sensors[i]));	
+		mainContentDiv.appendChild( newSensorBlock(sensors[i]) );	
 	}
 }
 
-// <enclosingDiv>
-//    <head class="sensorHead">
-//    <groupDiv class="sensorGroup">
-//        <buttonDiv class="sensorButtons">
-//            <button><p class="sensControl">Text <div class="sensControl"> <radio > <radio>
-//        <triggerDiv class="triggerDiv" id="triggerDiv#s">
 function newSensorBlock(s) {
+	
+	// === Create the Elements ===
 	var enclosingDiv = document.createElement("div");
 	
-	// icon is a triangle showing whether the div is opened or not
-	var icon = document.createElement("div");
-	icon.className = "icon";
-	enclosingDiv.appendChild(icon);
+	// iconDiv div will hold a triangle showing whether the div is opened or not
+	var iconDiv = newDiv("icon");
 	
-	var head = document.createElement("h1");
-	head.innerHTML = s.name;
-	head.className = "sensorHead";
-	enclosingDiv.appendChild(head);
+	var sensorHead = newH1("sensorHead", 0, s.name);s
+	sensorHead.xxHasTriggers = false;
 	
-	var groupDiv = document.createElement("div");
-	groupDiv.className = "sensorGroup";
-	groupDiv.style.display = "none";
-	enclosingDiv.appendChild(groupDiv);
+	var sensorGroup = newDiv("sensorGroup");
+	sensorGroup.style.display = "none";
 	
-	// On click toggle the div contents visible or not
+	var triggerDiv = newDiv("triggerDiv", "triggerDiv" + s.id);
+
+	var buttonDiv = newButtonDiv(s, triggerDiv, sensorHead);
+	
+
+	// === Create the Structure ===
+	// <enclosingDiv>
+	//		<iconDiv>
+	//		<sensorHead>
+	//		<sensorGroup>
+	//			<buttonDiv>
+	//				...
+	//			<triggerDiv>
+	
+	enclosingDiv.appendChild(iconDiv);
+	enclosingDiv.appendChild(sensorHead);
+	enclosingDiv.appendChild(sensorGroup);
+	
+	sensorGroup.appendChild(buttonDiv);
+	sensorGroup.appendChild(triggerDiv);
+	
+	// === Define the Actions ===
+	// On click toggle the div contents from invisible to visible
 	// and change the triangle
-	head.onclick = function() {
-		if (groupDiv.style.display == "block") {
-			groupDiv.style.display = "none";
-			icon.style.background = "url(triangles.png) -15px -15px";
+	sensorHead.onclick = function() {
+		if (sensorGroup.style.display == "block") {
+			sensorGroup.style.display = "none";
+			if (sensorHead.xxHasTriggers) {
+				iconDiv.style.background = "url(triangles.png) -15px -45px";
+			} else {
+				iconDiv.style.background = "url(triangles.png) -15px -15px";
+			}
 		} else {
-			groupDiv.style.display = "block";
-			icon.style.background = "url(triangles.png) 0px -15px";
-		}
+			sensorGroup.style.display = "block";
+			if (sensorHead.xxHasTriggers) {
+				iconDiv.style.background = "url(triangles.png) 0px -45px";
+			} else {
+				iconDiv.style.background = "url(triangles.png) 0px -15px";
+			}
+		}			
 	}
 	
 	// On hover change the colors of the text and triangle.
-	head.onmouseenter = function() {
-		head.style.color = "#0066FF";
-		if (groupDiv.style.display == "block") {
-			icon.style.background = "url(triangles.png) 0px -15px";
+	sensorHead.onmouseenter = function() {
+		if (sensorHead.xxHasTriggers) {
+			sensorHead.style.color = "#003300";
+			if (sensorGroup.style.display == "block") {
+				iconDiv.style.background = "url(triangles.png) 0px -45px";
+			} else {
+				iconDiv.style.background = "url(triangles.png) -15px -45px";
+			}
 		} else {
-			icon.style.background = "url(triangles.png) -15px -15px";
+			sensorHead.style.color = "#0066FF";
+			if (sensorGroup.style.display == "block") {
+				iconDiv.style.background = "url(triangles.png) 0px -15px";
+			} else {
+				iconDiv.style.background = "url(triangles.png) -15px -15px";
+			}
 		}
 	}
 	
-	head.onmouseleave = function() {
-		head.style.color = "white";
-		if (groupDiv.style.display == "block") {
-			icon.style.background = "url(triangles.png) 0px 0px";
+	sensorHead.onmouseleave = function() {
+		if (sensorHead.xxHasTriggers) {
+			sensorHead.style.color = "#006600";
+			if (sensorGroup.style.display == "block") {
+				iconDiv.style.background = "url(triangles.png) 0px -30px";
+			} else {
+				iconDiv.style.background = "url(triangles.png) -15px -30px";
+			}
 		} else {
-			icon.style.background = "url(triangles.png) -15px 0px";
+			sensorHead.style.color = "white";
+			if (sensorGroup.style.display == "block") {
+				iconDiv.style.background = "url(triangles.png) 0px 0px";
+			} else {
+				iconDiv.style.background = "url(triangles.png) -15px 0px";
+			}
 		}
 	}
 	
-	// Icon click and hover actions are the same as for text.
-	icon.onclick = head.onclick;
-	icon.onmouseenter = head.onmouseenter;
-	icon.onmouseleave = head.onmouseleave;
+	// iconDiv click and hover actions are the same as for text.
+	iconDiv.onclick = sensorHead.onclick;
+	iconDiv.onmouseenter = sensorHead.onmouseenter;
+	iconDiv.onmouseleave = sensorHead.onmouseleave;
+		
+	return enclosingDiv;
+}
+
+// Create the controls for a sensor
+function newButtonDiv(s, triggerDiv, sensorHead) {
+	// === Create the Elements ===
+	var buttonDiv = newDiv("buttonGroup");
 	
-	var buttonDiv = document.createElement("div");
-	buttonDiv.className = "buttonGroup";
-	groupDiv.appendChild(buttonDiv);
+	var addTriggerBtn = newButton ("sensControl", 0, "Add Trigger");
+
+	var viewp = newPara("sensControl", 0, "View:");
+	var viewDiv = newDiv("sensControl");
 	
-	var newBtn = document.createElement("input");
-	newBtn.type = "button";
-	newBtn.className = "sensControl";
-	newBtn.value = "Add Trigger";
-	buttonDiv.appendChild(newBtn);
+	var basicLabel = newLabel("sensControl", "basicRadio" + s.id, "Basic");
+	var basicRadioBtn = newRadio("sensControl", "basicRadio" + s.id, "view" + s.id, true);
+	var fullLabel = newLabel("sensControl", "fullRadio" + s.id, "Full");
+	var fullRadioBtn = newRadio("sensControl", "fullRadio" + s.id, "view" + s.id, false);
 	
-	var viewp = document.createElement("p");
-	viewp.className = "sensControl";
-	viewp.innerHTML = "View:";
+	// === Create the Structure ===
+	//	<buttonDiv>
+	//		<addTriggerBtn>
+	//		<viewp>
+	//		<viewDiv>
+	//			<basicLabel>
+	//			<basicRadioBtn>
+	//			<fullLabel>
+	//			<fullRadioBtn>
+	//		<lockValuesLabel>  - optional
+	//		<lockBox>		   - optional
+	buttonDiv.appendChild(addTriggerBtn);
 	buttonDiv.appendChild(viewp);
-	
-	var viewDiv = document.createElement("div");
-	viewDiv.className = "sensControl";
 	buttonDiv.appendChild(viewDiv);
-	
-	var basicLabel = document.createElement("label");
-	basicLabel.className = "sensControl";
-	basicLabel.htmlFor = "basicRadio" + s.id;
-	basicLabel.innerHTML = "Basic";
+
 	viewDiv.appendChild(basicLabel);
+	viewDiv.appendChild(basicRadioBtn);	
+	viewDiv.appendChild(fullLabel);	
+	viewDiv.appendChild(fullRadioBtn);	
 	
-	var basicRadio = document.createElement("input");
-	basicRadio.type = "radio";
-	basicRadio.id = "basicRadio" + s.id;
-	basicRadio.className = "sensControl";
-	basicRadio.name = "view" + s.id;
-	basicRadio.checked = true;
-	viewDiv.appendChild(basicRadio);
+	// === Define the Actions ===
+	// Create a new trigger.
+	addTriggerBtn.onclick = function() {
+		var trigger = Triggers.newTrigger(s);
+		var newTrigger = createTriggerUI(triggerDiv, trigger, fullRadioBtn.checked);
+		triggerDiv.appendChild(newTrigger);
+		sensorHead.xxHasTriggers = true;
+		sensorHead.onmouseleave();
+	}
 	
-	var fullLabel = document.createElement("label");
-	fullLabel.className = "sensControl";
-	fullLabel.htmlFor = "fullRadio" + s.id;
-	fullLabel.innerHTML = "Full";
-	viewDiv.appendChild(fullLabel);
+	// Turn on basic view
+	basicRadioBtn.onchange = function() {
+		turnBasicViewOn(triggerDiv, fullRadioBtn);
+	}
 	
-	var fullRadio = document.createElement("input");
-	fullRadio.type = "radio";
-	fullRadio.id = "fullRadio" + s.id;
-	fullRadio.className = "sensControl";
-	fullRadio.name = "view" + s.id;
-	viewDiv.appendChild(fullRadio);
-	
-	var triggerDiv = document.createElement("div");
-	triggerDiv.className = "triggerDiv";
-	triggerDiv.id = "triggerDiv" + s.id;
-	groupDiv.appendChild(triggerDiv);
-	
+	// Turn on full view
+	fullRadioBtn.onchange = function() {
+		var nodes = triggerDiv.getElementsByClassName("extras");
+		for(var i=0; i<nodes.length; i++) {
+			nodes[i].style.display = "block";
+		}
+	}
+		
+	// === Optional Elements ===	
+	// If continuous add elements to lock values.
 	if (s.isContinuous) {
-		var lockLabel = document.createElement("label");
-		lockLabel.htmlFor = "lockbox" + s.id;
-		lockLabel.className = "lockLabel sensControl";
-		lockLabel.innerHTML = "Lock Values:";
+		var lockLabel = newLabel( "lockLabel sensControl", "lockbox" + s.id, "Lock Values:");	
+		var lockBox = newCheckbox("lockBox sensControl", "lockbox" + s.id, false); 
+
 		buttonDiv.appendChild(lockLabel);
-	
-		var lockBox = document.createElement("input");
-		lockBox.type = "checkbox";
-		lockBox.id = "lockbox" + s.id;
-		lockBox.className = "lockBox sensControl";
+		buttonDiv.appendChild(lockBox);
+		
 		lockBox.onchange = function() {
 			if (this.checked == true) {
 				var nodes = triggerDiv.querySelectorAll("input[type=range]");
@@ -216,31 +263,11 @@ function newSensorBlock(s) {
 				}
 			}
 		}
-		buttonDiv.appendChild(lockBox);
 	}
 	
-	// Sens Control Functions
-	// Create a new trigger.
-	newBtn.onclick = function() {
-		var trigger = Triggers.newTrigger(s);
-		createTriggerUI(triggerDiv, trigger, fullRadio.checked);
-	}
-	
-	// Turn on basic view
-	basicRadio.onchange = function() {
-		turnBasicViewOn(triggerDiv, fullRadio);
-	}
-	
-	// Turn on full view
-	fullRadio.onchange = function() {
-		var nodes = triggerDiv.getElementsByClassName("extras");
-		for(var i=0; i<nodes.length; i++) {
-			nodes[i].style.display = "block";
-		}
-	}
-	
-	return enclosingDiv;
+	return buttonDiv;
 }
+
 
 // -- Start of turnBasicViewOn -- //
 function turnBasicViewOn(triggerDiv, fullRadio) {
@@ -266,8 +293,6 @@ function turnBasicViewOn(triggerDiv, fullRadio) {
 		nodes = triggerDiv.getElementsByClassName("delay");
 		for(var i=0; i<nodes.length; i++) {
 			if (nodes[i].value != 0) {
-				nodes[i].value = 0;
-				nodes[i].onchange();
 				nodesAreDefaults = false;
 				break;
 			}
@@ -360,60 +385,42 @@ function showActiveSensors() {
 	for(var i=0; i<nodes.length; i++) {
 		var parent = nodes[i].parentNode;
 		var tnodes = parent.getElementsByClassName("trigger");
-		if (tnodes.length > 0) {
-			nodes[i].style.textDecoration = "underline";
-		} else {
-			nodes[i].style.textDecoration = "none";
-		}
+		nodes[i].xxHasTriggers = (tnodes.length > 0);
+		nodes[i].onmouseleave();
 	}
 }
 
 // -- createTriggerUI --- //
 
-// The next 300 or so lines of code create all the labels and input
+// The next 400 or so lines of code create all the labels and input
 // widgets needed to support a trigger, and connect the trigger actions
 // to the trigger object.
-// tdiv - the form to which the trigger should be attached.
-// t - the Trigge object
+// tdiv - the <div> to which the trigger will be attached.
+// t - the Trigger object
 // fullView - boolean.  True if it should be created in full view.
 function createTriggerUI(tdiv, t, fullView) {
 
+	var form = newForm("trigger");
+	var deleteBtn = newSpan("deleteBtn", 0, 'x');
+
 	// --- SENSOR SETTINGS --- //
 	// A fieldset for sensor-related elements.
-	var sensorFieldset = document.createElement("fieldset");
-	var sfLegend = document.createElement("legend");
-	sfLegend.innerHTML = "Sensor Settings";
-	
-	sensorFieldset.appendChild(sfLegend);
+	var sensorFieldset = newFieldset("Sensor Settings");
 		
 	if (t.sensor.isContinuous) {
 		// Create a div for continuous values
-		// Needed for positioning of active high/low buttons.
 		var continuousDiv = createContinuousDiv(t);
 		sensorFieldset.appendChild(continuousDiv);
 		
 	} else {  // Sensor supplies discrete values.	
 		// Create a div for discrete values 
-		var discreteDiv = document.createElement("div");
-		discreteDiv.id = "discrete" + t.id;
-	
-		items = createDiscreteValueSelector(t);
-		discreteDiv.appendChild(items.Label);
-		discreteDiv.appendChild(items.Widget);
+		var discreteDiv = createDiscreteDiv(t);
 		sensorFieldset.appendChild(discreteDiv);
 	}	
 
-	var sensExtraDiv = document.createElement("div");
-	sensExtraDiv.className = "extras";
+	var sensExtraDiv = newSensorExtras(t);
 	sensExtraDiv.style.display = fullView ? "block" : "none";
-	
-	// Required State (0-15)
-	items = createRequiredStateSelector(t);
-	var label = addToolTip(items.Label, "A setting of 0 means any state will match.");
-	
-	sensExtraDiv.appendChild(label);
-	sensExtraDiv.appendChild(items.Widget);
-	
+		
 	sensorFieldset.appendChild(sensExtraDiv);
 	
 	// --- End of Sensor Fieldset
@@ -421,49 +428,34 @@ function createTriggerUI(tdiv, t, fullView) {
 		
 	// --- Action Settings --- //
 	// A fieldset for action-related elements.
-	var actionFieldset = document.createElement("fieldset");
-	var afLegend = document.createElement("legend");
-	afLegend.innerHTML = "Action Settings";	
-	actionFieldset.appendChild(afLegend);
+	var actionFieldset = newFieldset("Action Settings");
 	
 	// Action - pick list
-	items = actionSelect(t);
-	actionFieldset.appendChild(items.Label);
-	actionFieldset.appendChild(items.Widget);
+	var actionLabel = newLabel(0, "actSelect" + t.id, "Action:");	
+	var actionSelect = newActionSelect(t);
 	
 	// Action parameters - depends on Action
 	// The UI for action parameters is created by the action.optionFunc()
-	var actionParamDiv = document.createElement("div");
-	actionParamDiv.id = "actionParamDiv" + t.id;
-	actionParamDiv.appendChild(t.action.optionFunc(t));
-	actionFieldset.appendChild(actionParamDiv);
-
-	var actExtraDiv = document.createElement("div");
-	actExtraDiv.className = "extras";
+	var actionParamDiv = newDiv(0, "actionParamDiv" + t.id);
+	var actionParamUI = t.action.optionFunc(t);
+	
+	var actExtraDiv = newActionExtrasDiv(t);
 	actExtraDiv.style.display = fullView ? "block" : "none";
 
-	// Action State (0-15)
-	items = createActionStateSelector(t);
-	actExtraDiv.appendChild(items.Label);
-	actExtraDiv.appendChild(items.Widget);
-	
-	// Delay - number (0-30000)
-	items = createDelaySelector(t);
-	actExtraDiv.appendChild(items.Label);
-	actExtraDiv.appendChild(items.Widget);
-	
-	// Repeat - checkbox 
-	items = createRepeatCheckbox(t);
-	actExtraDiv.appendChild(items.Label);
-	actExtraDiv.appendChild(items.Widget);
-	
+	//	<actionFieldSet>
+	//		<actionLabel>
+	//		<actionSelect>
+	//		<actionParamDiv>
+	//			<actionParamUI>
+	//		<actionExtraDiv>
+	actionFieldset.appendChild(actionLabel);
+	actionFieldset.appendChild(actionSelect);
+	actionFieldset.appendChild(actionParamDiv);
+	actionParamDiv.appendChild(actionParamUI);
 	actionFieldset.appendChild(actExtraDiv);
 	
-	// Delete button //
-	var deletep = document.createElement("span");
-	deletep.innerHTML = 'x';
-	deletep.className = "deleteBtn";
-	deletep.onclick = function() {
+	// Delete button action //
+	deleteBtn.onclick = function() {
 		var modal = document.getElementById("twoBtnModal");
 		var modalp = document.getElementById("twoBtnModalp");
 		var okBtn = document.getElementById("twoBtnOK");
@@ -479,14 +471,11 @@ function createTriggerUI(tdiv, t, fullView) {
 	}
 	
 	// Enclose all in a form	
-	var form = document.createElement("form");
-	form.className = "trigger";
-	form.appendChild(deletep);
+	form.appendChild(deleteBtn);
 	form.appendChild(sensorFieldset);
 	form.appendChild(actionFieldset);
 	
-	tdiv.appendChild(form);
-	showActiveSensors();
+	return form;
 }
 
 function cancelDelete(modal) {
@@ -500,28 +489,6 @@ function completeDelete(modal, tdiv, tform, t) {
 	showActiveSensors();
 }
 
-// --- Widget Creation Routines --//
-//   These each create a widget and a label and return them
-//   in an object labelled "Label" and "Widget"
-
-// --- Create Required State number box --- //
-function createRequiredStateSelector(t) {
-	// Required State (0-15)
-	var items = createNumericSelector("Required State:", 0, 15, "rstate" + t.id);
-	var widget = items.Widget;
-	widget.className = "value smallnum reqstate";
-	widget.value = t.reqdState;
-	widget.onchange = function() {
-		var val = this.value;  
-		if (val >= 0 && val <= 15) {
-			t.reqdState = val;
-		} else {
-			this.value = t.reqdState;
-		}
-	}
-		
-	return items;
-}
 
 // === CONTINUOUS DIV === //
 // This section assembles the continuous values area.
@@ -533,26 +500,32 @@ var blockRecursion = false;  // Used to prevent infinite recursion when lockbox 
 
 function createContinuousDiv(t) {
 	// Step 1.  Gather the parts
-	var continuousDiv = document.createElement("div");
-	continuousDiv.id = "continuous" + t.id;
-	continuousDiv.className = "continuous";
+	var continuousDiv = newDiv("continuous", "continuous" + t.id);
 
 	// InnerDiv is used to align the slider and the meter
-	var innerDiv = document.createElement("div");
-	innerDiv.className = "innerDiv";
+	var innerDiv = newDiv("innerDiv");
 		
 	// Slider for continuous values & label
-	var items = createValueSlider(t);
-	var sliderLabel = items.Label;
-	var slider = items.Widget
+	var sliderLabel = newLabel(0, "valSlider" + t.id, "Value:");
+	var slider = newSlider("slider sliderGroup", "valSlider" + t.id, 
+						   t.sensor.minval, t.sensor.maxval, t.getSliderValue());
+	slider.xxTrigger = t;
 	
 	// Meter for showing reported sensor values
-	var meter = createMeter(t);
-	
+	var meter = newMeter("meter sliderGroup", 0, t.sensor.minval, t.sensor.maxval, 0);
+	meter.xxTrigger = t;
+	if (metersAreHidden) {
+		meter.style.display = "none";
+	}
+		
 	// Invert checkbox & label
-	items = createInvertCheckbox(t);
-	var invertLabel = items.Label;
-	var invertBox = items.Widget;
+	var invertLabel = newLabel("invert", "invert" + t.id, "Invert");
+	var invertBox = newCheckbox("invertBox", "invert" + t.id, false);
+	if (t.condition == TRIGGER_ON_LOW) {
+		invertBox.checked = true;
+	} else {
+		invertBox.checked = false;
+	}
 		
 	// Step 2. Assemble the parts
 	continuousDiv.appendChild(sliderLabel);
@@ -588,58 +561,6 @@ function createContinuousDiv(t) {
 	
 	return continuousDiv;
 }
-
-function createInvertCheckbox(t) {
-	var invertBox = document.createElement("input");
-	invertBox.type = "checkbox";
-	invertBox.id = "invert" + t.id;
-	invertBox.className = "invertBox";
-	if (t.condition == TRIGGER_ON_LOW) {
-		invertBox.checked = true;
-	} else {
-		invertBox.checked = false;
-	}
-
-	var invertLabel = document.createElement("label");
-	invertLabel.htmlFor = "invert" + t.id;
-	invertLabel.className = "invert";
-	invertLabel.innerHTML = "invert";
-		
-	return {"Label" : invertLabel , "Widget" : invertBox };
-}
-
-function createMeter(t) {
-	var cvalMeter = document.createElement("meter");
-	cvalMeter.min = t.sensor.minval;
-	cvalMeter.max = t.sensor.maxval;
-	cvalMeter.xxTrigger = t;
-	cvalMeter.className = "meter sliderGroup";
-	cvalMeter.value = "0";
-	if (metersAreHidden) {
-		cvalMeter.style.display = "none";
-	}
-	
-	return cvalMeter;
-}
-
-// --- Create a slider to display continuous value --- //
-function createValueSlider(t) {	
-	var cvalSlider = document.createElement("input");
-	cvalSlider.type = "range";
-	cvalSlider.className = "slider sliderGroup";
-	cvalSlider.min = t.sensor.minval;
-	cvalSlider.max = t.sensor.maxval;
-	cvalSlider.value = t.getSliderValue();
-	cvalSlider.id = "valSlider" + t.id;
-	cvalSlider.xxTrigger = t;
-	
-	var cvalLabel = document.createElement("label");
-	cvalLabel.htmlFor = "valSlider" + t.id;
-	cvalLabel.innerHTML = "Value:";
-	
-	return {"Label" : cvalLabel, "Widget" : cvalSlider};;
-}
-
 
 // If lockbox is checked this routine finds all sliders for the same sensor
 // and sets all of them to 'val'.  Value is the true value, which may need to be
@@ -714,20 +635,30 @@ function hideMeters() {
 
 // === END OF CONTINUOUS DIV === //
 
-// --- Create Discrete Value Selector --- //
-function createDiscreteValueSelector(t) {
+// --- Create Discrete Div --- //
+function createDiscreteDiv(t) {
 	var minval = t.sensor.minval;
 	var maxval = t.sensor.maxval;
-	var items = createNumericSelector("Value:", minval, maxval, "discrete" + t.id);
-	var widget = items.Widget;
-	widget.type = "text";				// Override the type setting.  Hack for now.
-	widget.className = "smallnum";
+
+	// === Create Items ===
+	var discreteDiv = document.createElement("div");
+	
+	var numLabel = newLabel(0, "discrete" + t.id, "Value:");
+	
+	var value;
 	if (t.triggerValue == minval) {
-		widget.value = '';
+		value = '';
 	} else {
-		widget.value = String.fromCharCode(t.triggerValue);
-	}
-	widget.onchange = function() {
+		value = String.fromCharCode(t.triggerValue);
+	}	
+	var numInput = newTextInput("smallnum", "discrete" + t.id, value);
+	
+	// === Define Structure ===
+	discreteDiv.appendChild(numLabel);
+	discreteDiv.appendChild(numInput);
+		
+	// === Define Actions ===
+	numInput.onchange = function() {
 		var val = this.value.charCodeAt(0);
 		if (val >= minval && val <= maxval) {
 			t.triggerValue = val;
@@ -735,12 +666,41 @@ function createDiscreteValueSelector(t) {
 			this.value = String.fromCharCode(t.triggerValue);
 		}
 	}
-	return items;
+	
+	return discreteDiv;
+}
+
+// --- Sensor Extras --- //
+// Basically, just the required state field.
+function newSensorExtras(t) {
+	var sensExtraDiv = newDiv("extras");
+	
+	// Required State (0-15)
+	var reqdStateLabel = newLabel(0, "rstate" + t.id, "Required State:");
+	var label = addToolTip(reqdStateLabel, "A setting of 0 means any state will match.");
+	var reqdState = newNumericInput("value smallnum reqstate", "rstate" + t.id, 0, 15, t.reqdState);
+	
+	//	<sensExtraDiv>
+	//		<label>
+	//		<reqdState>
+	sensExtraDiv.appendChild(label);
+	sensExtraDiv.appendChild(reqdState);
+
+	reqdState.onchange = function() {
+		var val = this.value;  
+		if (val >= 0 && val <= 15) {
+			t.reqdState = val;
+		} else {
+			this.value = t.reqdState;
+		}
+	}
+	
+	return sensExtraDiv;
 }
 
 // --- ACTION ITEMS --- //
 
-function actionSelect(t) {
+function newActionSelect(t) {
 	var actSelect = document.createElement("select");
 	actSelect.id = "actSelect" + t.id;
 	
@@ -758,6 +718,7 @@ function actionSelect(t) {
 		}
 		actSelect.appendChild(op);
 	}
+	
 	actSelect.onchange = function() {
 		// Set action choice
 		var choice = this.options[this.selectedIndex];
@@ -774,37 +735,42 @@ function actionSelect(t) {
 		paramDiv.replaceChild(t.action.optionFunc(t), paramDiv.firstChild);
 	}
 	
-	var actlabel = document.createElement("label");
-	actlabel.htmlFor = "actSelect" + t.id;
-	actlabel.innerHTML = "Action:";
-	
-	return {"Label" : actlabel, "Widget" : actSelect};	
+	return actSelect;
 }
+		
+function newActionExtrasDiv(t) {
+	// === Create Elements ===
+	var actExtraDiv = newDiv("extras");
 
-// --- Create Action State number box --- //
-function createActionStateSelector(t) {
-	var items = createNumericSelector("Action State:", 1, 15, "astate" + t.id);
-	var widget = items.Widget;
-	widget.className = "smallnum actstate";
-	widget.value = t.actionState;
-	widget.onchange = function() {
+	// Action State (0-15)
+	var actionStateLbl = newLabel(0, "astate" + t.id, "Action State:");
+	var actionState = newNumericInput("smallnum actstate", "astate" + t.id, 1, 15, t.actionState);
+
+	var delayLbl = newLabel(0, "delay" + t.id, "Delay:");
+	var delayField = newNumericInput("largenum delay", "astate" + t.id, 0, 30000, t.delay);
+	
+	var repeatLbl = newLabel(0, "repeat" + t.id, "Repeat:");
+	var repeatBox = newCheckbox("repeat", "repeat" + t.id, t.repeat);
+
+	// === Define Structure ===
+	actExtraDiv.appendChild(actionStateLbl);
+	actExtraDiv.appendChild(actionState);
+	actExtraDiv.appendChild(delayLbl);
+	actExtraDiv.appendChild(delayField);
+	actExtraDiv.appendChild(repeatLbl);
+	actExtraDiv.appendChild(repeatBox);
+
+	// === Define Actions ===
+	actionState.onchange = function() {
 		var val = this.value;  
 		if (val >= 0 && val <= 15) {
 			t.actionState = val;
 		} else {
-			this.value = t.reqdactionStateState;
+			this.value = t.actionState;
 		}
 	}
-		
-	return items;
-}
 
-function createDelaySelector(t) {
-	var items = createNumericSelector("Delay:", 0, 30000, "delay" + t.id);
-	var widget = items.Widget;
-	widget.className = "largenum delay";
-	widget.value = t.delay;
-	widget.onchange = function() {
+	delayField.onchange = function() {
 		var val = this.value;  
 		if (val < 0) {
 			this.value = 0;
@@ -813,56 +779,12 @@ function createDelaySelector(t) {
 		}
 		t.delay = this.value;
 	}
-	
-	return items;
-}
 
-function createRepeatCheckbox(t) {
-	var repeat = document.createElement("input");
-	repeat.type = "checkbox";
-	repeat.id = "repeat" + t.id;
-	repeat.value = t.repeat;
-	repeat.className = "repeat";
-	if (t.repeat) repeat.checked = true;
-	repeat.onchange = function() {
+	repeatBox.onchange = function() {
 		t.repeat = this.checked;
 	}
 	
-	var rlabel = document.createElement("label");
-	rlabel.htmlFor = "repeat" + t.id;
-	rlabel.innerHTML = "Repeat:";
-	
-	return {"Label" : rlabel, "Widget" : repeat};
-}
-		
-// Basic numeric selector creation.
-// Caller needs to provide custom className and onchange code
-// and custom assignment to/from appropriate trigger member.
-function createNumericSelector(labeltxt, themin, themax, labelid) {
-	var num = document.createElement("input");
-	num.type = "number";
-	num.min = themin;
-	num.max = themax;
-	num.id = labelid;
-	
-	var label = document.createElement("label");
-	label.htmlFor = labelid;
-	label.innerHTML = labeltxt;
-	return { "Label": label, "Widget": num };
-}
-
-// Wraps an element in a tooltip and returns the tooltip div.
-function addToolTip(element, tiptext) {
-	var tipdiv = document.createElement("div");
-	tipdiv.className = "tooltip";
-	var tiptxt = document.createElement("span");
-	tiptxt.className = "tooltiptext";
-	tiptxt.innerHTML = tiptext;
-	
-	tipdiv.appendChild(element);
-	tipdiv.appendChild(tiptxt);
-
-	return tipdiv;
+	return actExtraDiv;
 }
 
 // --- Reload triggers.  --- //
@@ -885,7 +807,8 @@ function reloadTriggers() {
 		var sensor = trig.sensor;
 		var tdiv = document.getElementById("triggerDiv" + sensor.id);
 		var fullBtn = document.getElementById("fullRadio" + sensor.id);
-		createTriggerUI(tdiv, trig, fullBtn.checked);
+		var newTrigger = createTriggerUI(tdiv, trig, fullBtn.checked);
+		tdiv.appendChild(newTrigger);
 	}
 	
 	showActiveSensors();

@@ -247,8 +247,8 @@ input.repeat[type=checkbox] {  /* A nudge for the repeat checkbox. */
 .invert {
 	position: absolute;
 	top: -20px;
-	left: 190px;
-	font-size: 80%;
+	left: 187px;
+	font-size: 90%;
 }
 .invertBox {
 	position: absolute;
