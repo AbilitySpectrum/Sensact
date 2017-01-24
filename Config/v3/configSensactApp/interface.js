@@ -2,7 +2,7 @@
 // interface.js
 
 function startup() {
-	var bypassConnection = true; // Make it true to bypass the connection phase.
+	var bypassConnection = false; // Make it true to bypass the connection phase.
 								  // Useful when in testing/development mode.
 	if (bypassConnection) {  
 		// Turn off transitions - to speed things up.
