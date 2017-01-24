@@ -191,6 +191,37 @@ Trigger.prototype.fromStream = function(stream) {
 		throw "Invalid end of trigger";
 	}
 }
+
+// Trigger functions for handling value and inverted value
+// getValue() and setValue() get and set the actual value.
+// getSliderValue() and setSliderValue() invert the value if the condition is TRIGGER_ON_LOW
+Trigger.prototype.getValue = function() {
+	return this.triggerValue;
+}
+
+Trigger.prototype.setValue = function(value) {
+	this.triggerValue = value;
+}
+
+Trigger.prototype.getSliderValue = function() {
+	if (this.condition == TRIGGER_ON_LOW) {
+		var min = this.sensor.minval;
+		var max = this.sensor.maxval;
+		return (min + (max - this.triggerValue));
+	} else {
+		return this.triggerValue;
+	}
+}
+
+Trigger.prototype.setSliderValue = function(value) {
+	if (this.condition == TRIGGER_ON_LOW) {
+		var min = this.sensor.minval;
+		var max = this.sensor.maxval;
+		this.triggerValue = (min + (max - value));
+	} else {
+		this.triggerValue = value;
+	}
+}
 	
 // The Triggers object controls all access to the list of triggers.
 // Well - there is no real enforcement of this in Javascript, but this
@@ -309,23 +340,18 @@ var noOption = function(t) {
 // --- KEYBOARD PARAMETERS --- //
 // Parameter is a single character.
 var keyOption = function(t) {
-	var div = document.createElement("div");
-	div.className = "actionOption";
-	var txt = document.createElement("input");
-	txt.type = "text";
+	var div = newDiv("actionOption");
+	var txtLabel = newLabel(0, "keyTextArea" + t.id, "Character:");
+	var txt = newTextInput(0, "keyTextArea" + t.id, String.fromCharCode(t.actionParam));
 	txt.maxlength = 1;
-	txt.id = "keyTextArea" + t.id;
-	txt.value = String.fromCharCode(t.actionParam);
+	
+	div.appendChild(txtLabel);
+	div.appendChild(txt);	
+	
 	txt.onchange = function() {
 		t.actionParam = this.value.charCodeAt(0);
 	}
 	
-	var txtLabel = document.createElement("label");
-	txtLabel.htmlFor = "keyTextArea" + t.id;
-	txtLabel.innerHTML = "Character:";
-	
-	div.appendChild(txtLabel);
-	div.appendChild(txt);
 	return div;
 }
 
@@ -336,22 +362,23 @@ var MOUSE_LEFT = 3;
 var MOUSE_RIGHT = 4;
 var MOUSE_CLICK = 5;
 
-function MouseInfo(v, l) {
+function ValueLabelPair(v, l) {
 	this.value = v;
 	this.label = l;
 }
 
 var mice = [
-	new MouseInfo(MOUSE_UP, "Mouse Up"),
-	new MouseInfo(MOUSE_DOWN, "Mouse Down"),
-	new MouseInfo(MOUSE_LEFT, "Mouse Left"),
-	new MouseInfo(MOUSE_RIGHT, "Mouse Right"),
-	new MouseInfo(MOUSE_CLICK, "Mouse Click")
+	new ValueLabelPair(MOUSE_UP, "Mouse Up"),
+	new ValueLabelPair(MOUSE_DOWN, "Mouse Down"),
+	new ValueLabelPair(MOUSE_LEFT, "Mouse Left"),
+	new ValueLabelPair(MOUSE_RIGHT, "Mouse Right"),
+	new ValueLabelPair(MOUSE_CLICK, "Mouse Click")
 ];
 
 var mouseOption = function(t) {
-	var div = document.createElement("div");
-	div.className = "actionOption";
+	var div = newDiv("actionOption");
+	
+	var txtLabel = newLabel(0, "mousesel" + t.id, "Mouse Action:");
 	var sel = document.createElement("select");
 	sel.id = "mousesel" + t.id;
 	
@@ -363,17 +390,15 @@ var mouseOption = function(t) {
 		opt.selected = (t.actionParam == mice[i].value);
 		sel.appendChild(opt);
 	}
+	
+	div.appendChild(txtLabel);
+	div.appendChild(sel);
+	
 	sel.onchange = function() {
 		var choice = this.options[this.selectedIndex];
 		t.actionParam = parseInt(choice.value);
 	}
 	
-	var txtLabel = document.createElement("label");
-	txtLabel.htmlFor = "mousesel" + t.id;
-	txtLabel.innerHTML = "Mouse Action:";
-	
-	div.appendChild(txtLabel);
-	div.appendChild(sel);
 	return div;
 }
 
@@ -384,22 +409,18 @@ var VOLUME_DOWN = 3;
 var CHANNEL_UP = 4;
 var CHANNEL_DOWN = 5;
 
-function IRAction(v, l) {
-	this.value = v;
-	this.label = l;
-}
-
 var IRActions = [
-	new IRAction(TV_ON_OFF, "On/Off"),
-	new IRAction(VOLUME_UP, "Volume Up"),
-	new IRAction(VOLUME_DOWN, "Volume Down"),
-	new IRAction(CHANNEL_UP, "Channel Up"),
-	new IRAction(CHANNEL_DOWN, "Channel Down"),
+	new ValueLabelPair(TV_ON_OFF, "On/Off"),
+	new ValueLabelPair(VOLUME_UP, "Volume Up"),
+	new ValueLabelPair(VOLUME_DOWN, "Volume Down"),
+	new ValueLabelPair(CHANNEL_UP, "Channel Up"),
+	new ValueLabelPair(CHANNEL_DOWN, "Channel Down"),
 ];
 
 var IROption = function(t) {
-	var div = document.createElement("div");
-	div.className = "actionOption";
+	var div = newDiv("actionOption");
+
+	var selectLabel = newLabel(0, "irselect" + t.id, "IR Action:");
 	var sel = document.createElement("select");
 	sel.id = "irselect" + t.id;
 	
@@ -411,38 +432,37 @@ var IROption = function(t) {
 		opt.selected = (t.actionParam == IRActions[i].value);
 		sel.appendChild(opt);
 	}
+	
+	div.appendChild(selectLabel);
+	div.appendChild(sel);
+
 	sel.onchange = function() {
 		var choice = this.options[this.selectedIndex];
 		t.actionParam = parseInt(choice.value);
 	}
-	
-	var txtLabel = document.createElement("label");
-	txtLabel.htmlFor = "irselect" + t.id;
-	txtLabel.innerHTML = "IR Action:";
-	
-	div.appendChild(txtLabel);
-	div.appendChild(sel);
+		
 	return div;
 }
 
 // --- BUZZER PARAMETERS --- //
 // Frequency and duration.
 var BuzzOption = function(t) {
-	var div = document.createElement("div");
-	div.className = "actionOption";
+	var div = newDiv("actionOption");
+
+	var frequencyLabel = newLabel(0, "buzzfreq" + t.id, "Frequency (hz):");
+	var frequency = newNumericInput("largenum", "buzzfreq" + t.id, 50, 2000, 50);
+	frequency.value = (t.actionParam >> 16) & 0xffff;
 	
-	var frequency = createNumericSelector("Frequency (hz):", 50, 2000, "buzzfreq");
-	var duration = createNumericSelector("Duration (ms):", 0, 1000, "buzzdur");
+	var durationLabel = newLabel(0, "buzzdur" + t.id, "Duration (ms):");
+	var duration = newNumericInput("largenum", "buzzdur" + t.id, 0, 1000, 0);
+	duration.value = t.actionParam & 0xffff;
 	
-	var fw = frequency.Widget;
-	var dw = duration.Widget;
-	fw.value = (t.actionParam >> 16) & 0xffff;
-	dw.value = t.actionParam & 0xffff;
+	div.appendChild(frequencyLabel);
+	div.appendChild(frequency);
+	div.appendChild(durationLabel);
+	div.appendChild(duration);
 	
-	fw.className = "largenum";
-	dw.className = "largenum";
-	
-	fw.onchange = function() {
+	frequency.onchange = function() {
 		var val = this.value;
 		if (val < 0) {
 			this.value = 0;
@@ -452,7 +472,7 @@ var BuzzOption = function(t) {
 		newBuzzerValue(t, fw, dw);
 	}
 	
-	dw.onchange = function() {
+	duration.onchange = function() {
 		var val = this.value;
 		if (val < 0) {
 			this.value = 0;
@@ -462,19 +482,13 @@ var BuzzOption = function(t) {
 		newBuzzerValue(t, fw, dw);
 	}
 	
-	div.appendChild(frequency.Label);
-	div.appendChild(frequency.Widget);
-	div.appendChild(duration.Label);
-	div.appendChild(duration.Widget);
 	return div;
 }
 
 function newBuzzerValue(t, f, d) {
 	var fval = parseInt(f.value);
 	var dval = parseInt(d.value);
-//	alert("bv f = " + fval + " d = " + dval);
 	t.actionParam = (fval << 16) + dval;
-//	alert("actionParam = " + (t.actionParam).toString(16) );
 }
 
 

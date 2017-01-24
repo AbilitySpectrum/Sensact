@@ -64,17 +64,27 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
     for(int j=0; j<nTriggers; j++) {
       Trigger *pTrigger = &aTriggers[j];
       boolean matchCondition = true;  // Assume a match until we prove otherwise
-      
+
+      // Check sensor ID
       if (ID != (int) pTrigger->sensorID) {
         continue; // Wrong sensor ID - forget it.
       }
-      
-      if ( ((int)pTrigger->reqdState != 0) 
-            && (paSensorStates[ID] != (int) pTrigger->reqdState) ) {
-        matchCondition = false; // Still need to fall through, to turn off any matched conditions.
+
+      // Check states
+      if ((int)pTrigger->reqdState == 0)  {
+        // Match ANY condition - match only if not already in target state.
+        if (paSensorStates[ID] == (int) pTrigger->actionState) {
+          matchCondition = false;
+        }
+      } else if (paSensorStates[ID] != (int) pTrigger->reqdState) {
+        // Normal case - match only if states match.
+        matchCondition = false; 
       }
+      // Note: Even if matchCondition is false at this point
+      // still need to fall through, to turn off any matched conditions.
       
       if (matchCondition) {
+        // State matches - now check to see if value is correct.
         switch(pTrigger->condition) {
           case TRIGGER_ON_LOW:
             if (pTrigger->triggerValue < value) matchCondition = false;
@@ -93,6 +103,8 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
         long now = millis();
         if (pTrigger->onTime == 0) {  // Not triggered previously
           pTrigger->onTime = now; // Record time of initial trigger match
+          pTrigger->repeatInterval = REPEAT_INTERVAL;  // Repeat at slow default.
+          pTrigger->repeatCount = 0;
           
           if (pTrigger->delayMs == 0) { // No delay? Do action immediately.
             aTmpStates[ID] = pTrigger->actionState;
@@ -110,9 +122,16 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           }
           
         } else if (pTrigger->repeat) {
-          if ( (now - pTrigger->lastActionTime) > REPEAT_INTERVAL) {
+          if ( (now - pTrigger->lastActionTime) > pTrigger->repeatInterval) {
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->lastActionTime = now;
+            pTrigger->repeatCount++;
+            if (pTrigger->repeatCount > 40) {
+              pTrigger->repeatInterval = REPEAT_INTERVAL / 4;
+            } else if (pTrigger->repeatCount > 10) { 
+              pTrigger->repeatInterval = REPEAT_INTERVAL / 2; 
+            } 
+            
           } 
         }          
         
@@ -134,6 +153,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
 int Triggers::readTriggers(InputStream *is) {
   long tCount = is->getNum();
   if (tCount == IO_NUMERROR) return IO_ERROR;
+  if (tCount > MAX_TRIGGERS) return IO_ERROR;
   
   for(int i=0; i<tCount; i++) {
     if (aTriggers[i].readTrigger(is) == IO_ERROR) {
