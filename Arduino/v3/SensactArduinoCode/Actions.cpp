@@ -90,6 +90,12 @@ void HIDKeyboard::doAction(long param) {
 #define SA_MOUSE_CLICK 5
 #define SA_MOUSE_SPEED 6
 
+// Mouse nudge commands - for Gyro Accel motions
+#define NUDGE_UP      10
+#define NUDGE_DOWN    11
+#define NUDGE_LEFT    12
+#define NUDGE_RIGHT   13
+
 void HIDMouse::doAction(long param) {
   int option = param & 0xffff;
   switch(option) {
@@ -108,6 +114,50 @@ void HIDMouse::doAction(long param) {
     case SA_MOUSE_CLICK:
       Mouse.click();
       break;
+    case NUDGE_UP:
+      if (verticalMouseState == MOUSE_MOVING_DOWN) {
+        verticalMouseState = MOUSE_STILL;
+      } else if (verticalMouseState == MOUSE_STILL) {
+        verticalMouseState = MOUSE_MOVING_UP;
+      }
+      break;
+    case NUDGE_DOWN:
+      if (verticalMouseState == MOUSE_MOVING_UP) {
+        verticalMouseState = MOUSE_STILL;
+      } else if (verticalMouseState == MOUSE_STILL) {
+        verticalMouseState = MOUSE_MOVING_DOWN;
+      }
+      break;
+    case NUDGE_LEFT:
+      if (horizontalMouseState == MOUSE_MOVING_RIGHT) {
+        horizontalMouseState = MOUSE_STILL;
+      } else if (horizontalMouseState == MOUSE_STILL) {
+        horizontalMouseState = MOUSE_MOVING_LEFT;
+      }
+      break;
+    case NUDGE_RIGHT:
+      if (horizontalMouseState == MOUSE_MOVING_LEFT) {
+        horizontalMouseState = MOUSE_STILL;
+      } else if (horizontalMouseState == MOUSE_STILL) {
+        horizontalMouseState = MOUSE_MOVING_RIGHT;
+      }
+      break;
+  }
+}
+
+void HIDMouse::checkAction() {
+  if ( (lastMouseMoveTime + REPEAT_INTERVAL) < millis()) {
+    if (verticalMouseState == MOUSE_MOVING_UP) {
+      Mouse.move(0, -SA_MOUSE_SPEED); 
+    } else if (verticalMouseState == MOUSE_MOVING_DOWN) {
+      Mouse.move(0, SA_MOUSE_SPEED);
+    }
+    if (horizontalMouseState == MOUSE_MOVING_LEFT) {
+      Mouse.move(-SA_MOUSE_SPEED, 0); 
+    } else if (horizontalMouseState == MOUSE_MOVING_RIGHT) {
+      Mouse.move(SA_MOUSE_SPEED, 0);
+    }
+    lastMouseMoveTime = millis();
   }
 }
 

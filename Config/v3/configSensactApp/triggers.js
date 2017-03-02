@@ -65,9 +65,9 @@ function createSensorList() {
 	sensors.push( new Sensor(4, "Accel-X", -16000, 16000, true) );
 	sensors.push( new Sensor(5, "Accel-Y", -16000, 16000, true) );
 	sensors.push( new Sensor(6, "Accel-Z", -16000, 16000, true) );
-	sensors.push( new Sensor(7, "Gyro-X", -5000, 5000, true) );
-	sensors.push( new Sensor(8, "Gyro-Y", -5000, 5000, true) );
-	sensors.push( new Sensor(9, "Gyro-Z", -5000, 5000, true) );
+	sensors.push( new Sensor(7, "Gyro-X", -7000, 7000, true) );
+	sensors.push( new Sensor(8, "Gyro-Y", -7000, 7000, true) );
+	sensors.push( new Sensor(9, "Gyro-Z", -7000, 7000, true) );
 }
 
 function getSensorByID(id) {
@@ -361,6 +361,10 @@ var MOUSE_DOWN = 2;
 var MOUSE_LEFT = 3;
 var MOUSE_RIGHT = 4;
 var MOUSE_CLICK = 5;
+var NUDGE_UP = 10;
+var NUDGE_DOWN = 11;
+var NUDGE_LEFT = 12;
+var NUDGE_RIGHT = 13;
 
 function ValueLabelPair(v, l) {
 	this.value = v;
@@ -372,7 +376,11 @@ var mice = [
 	new ValueLabelPair(MOUSE_DOWN, "Mouse Down"),
 	new ValueLabelPair(MOUSE_LEFT, "Mouse Left"),
 	new ValueLabelPair(MOUSE_RIGHT, "Mouse Right"),
-	new ValueLabelPair(MOUSE_CLICK, "Mouse Click")
+	new ValueLabelPair(MOUSE_CLICK, "Mouse Click"),
+	new ValueLabelPair(NUDGE_UP, "Nudge Up"),
+	new ValueLabelPair(NUDGE_DOWN, "Nudge Down"),
+	new ValueLabelPair(NUDGE_LEFT, "Nudge Left"),
+	new ValueLabelPair(NUDGE_RIGHT, "Nudge Right")
 ];
 
 var mouseOption = function(t) {

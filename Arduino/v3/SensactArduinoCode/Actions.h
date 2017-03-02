@@ -41,6 +41,7 @@ class Actor {
     virtual void init() {}
     virtual void doAction(long param) = 0;
     // checkAction is used to turn actions off
+    // Also used for mouse nudge actions
     // e.g. to turn off a relay a short time after the action.
     virtual void checkAction() {}
 };
@@ -102,12 +103,29 @@ class HIDKeyboard: public Actor {
     void doAction(long param);
 };
 
+// Mouse movement states - for NUDGE actions
+#define MOUSE_MOVING_UP     1
+#define MOUSE_MOVING_DOWN   2
+#define MOUSE_MOVING_LEFT   3
+#define MOUSE_MOVING_RIGHT  4
+#define MOUSE_STILL         5
+
 class HIDMouse: public Actor {
+  private:
+    // Variables for managing nudge actions
+    int verticalMouseState;
+    int horizontalMouseState;
+    long lastMouseMoveTime;
+    
   public:
     HIDMouse(int i) {
       id = i;
+      verticalMouseState = MOUSE_STILL;
+      horizontalMouseState = MOUSE_STILL;
+      lastMouseMoveTime = 0;
     }
     void doAction(long param);
+    void checkAction();
 };
 
 class Bluetooth: public Actor {

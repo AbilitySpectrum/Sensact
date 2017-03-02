@@ -54,9 +54,9 @@
 #define REPEAT_INTERVAL     100  // Time between repeats of repeated actions.
 
 // ==== Some Limits === //
-#define MAX_TRIGGERS 25           // Maximum number of triggers allowed.
+#define MAX_TRIGGERS 20           // Maximum number of triggers allowed.
 #define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check.
 #define MAX_SENSORS 10
-#define MAX_ACTORS  10
+#define MAX_ACTORS  8
 
 #endif
