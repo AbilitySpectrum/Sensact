@@ -33,17 +33,18 @@
 
 // === LED Pins === //
 #define LED_RED    A3
-#define LED_GREEN  5
-#define LED_BLUE   4
+#define LED_GREEN  13 //5
+#define LED_BLUE   10 // 4
 
 // === Sensor Pins === //
-#define SENSACT_IN2   A2
-#define SENSACT_IN3   A1
+#define SENSACT_IN1   A0
+#define SENSACT_IN2   A1
+#define SENSACT_IN3   A2
 
 // === Action Pins === //
-#define SENSACT_IR_OUT  13
-#define SENSACT_BUZZER  10
-#define SENSACT_RELAY_1  9
+#define SENSACT_IR_OUT  11 //13
+#define SENSACT_BUZZER  5 // 10
+#define SENSACT_RELAY_1  11 //9
 #define SENSACT_RELAY_2 11
 
 // === Timing Constants - all in ms === //

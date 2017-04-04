@@ -1,7 +1,8 @@
+//
+#define SENSACT_V1
+//#define SENSACT_V3_additional
 
-#define SENSACT_V2
-
-//#define INCLUDE_MPU6050
+#define INCLUDE_MPU6050
 //#define INCLUDE_LGGYRO
 //#define INCLUDE_BLUETOOTH
 
@@ -69,6 +70,10 @@ const int map_in[] = {
    SENSACT_IN1A, SENSACT_IN1B, SENSACT_IN2, SENSACT_IN3 };
 #endif
 
+#ifdef SENSACT_V3_additional
+const int SENSACT_I2C_VCC = 0; // NOT USED
+#endif
+
 const int SENSACT_RUN = 9;
 const int SENSACT_CONFIG = 8;
 const int SENSACT_UNKNOWN = 99;
@@ -95,6 +100,10 @@ USB_HID_VAL = 2,
 JOY_VAL = 3,
 nValues = 4
 ;
+
+#ifdef INCLUDE_LGGYRO
+#include "mpu6050andLG.h"
+#endif
 
 /* EEPROM data structure - also stored in config[] - in bytes
  the first bytes are output controls corresponding to each input

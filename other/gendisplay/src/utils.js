@@ -94,8 +94,14 @@ var serialio = (function serialio() {
     }
 
     function parseJSPS(data) {
-//        console.log(data);
-        var jObj = JSON.parse(data);
+        //        console.log(">" + data + "<");
+
+        var jObj = tryParse(data);
+        if (jObj.valid == false) {
+            console.log("NOT json>" + data + "<");
+            return;
+        }
+        jObj = jObj.value;
         if (jObj.SerialPorts) { // port list received
             portsList = [];
             portsequence = 0;
@@ -132,6 +138,21 @@ var serialio = (function serialio() {
     };
 
 }());
+
+function tryParse(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return {
+            value: str,
+            valid: false
+        };
+    }
+    return {
+        value: JSON.parse(str),
+        valid: true
+    };
+}
 
 function matrix(rows, cols, defaultValue) {
     var arr = [];

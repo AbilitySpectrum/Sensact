@@ -1,6 +1,7 @@
 #ifdef USE_MOUSE
 
 #include <Mouse.h>
+#include <Keyboard.h>
 
 const int xAxis = A1;         //analog sensor for X axis
 const int yAxis = A0;         // analog sensor for Y axis

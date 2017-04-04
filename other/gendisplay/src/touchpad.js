@@ -537,11 +537,14 @@ function drawMeters() {
         j = starty + 80;
         startx = 400;
 
-        drawDial(startx + 50 + 100 * i, starty, diam, radians((wacc[i] / 2000) * 180));
+        //drawDial(startx + 50 + 100 * i, starty, diam, radians((wacc[i] / 2000) * 180));
+        
+        drawDial(startx + 50 + 100 * i, starty, diam, ypr[i+3] );
 
         fill(100, 180, 100);
         text('gyro', startx, j);
         text(gyro[i], startx + 40 + 100 * i, j);
+        //text(ypr[i+3], startx + 40 + 100 * i, j);
         j += 20;
         text('acc', startx, j);
         text(acc[i], startx + 40 + 100 * i, j);
@@ -636,13 +639,14 @@ function readData(data) {
 
         // mpu-6050-i2cdevlib
         if (res[pos] == 'YPR') {
-            for (var i = 0; i < 3; i++) {
+            for (var i = 0; i < 6; i++) {
                 ypr[i] = res[++pos];
             }
-            // ylh ******* swap yaw and roll
+            /*-- ylh ******* swap yaw and roll
             let x = ypr[2];
             ypr[2] = ypr[1];
             ypr[1] = x;
+            */
         } else if (res[pos] == 'GYRO') {
             for (var i = 0; i < 3; i++) {
                 gyro[i] = res[++pos];

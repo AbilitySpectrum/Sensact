@@ -4,7 +4,8 @@
 
 #include <IRLib.h>
 #include "Actions.h"
-
+#include <Keyboard.h>
+#include <Mouse.h>
 
 Actors actors;
 

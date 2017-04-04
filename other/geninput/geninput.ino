@@ -1,7 +1,3 @@
-
-#include <Mouse.h>
-#include <Keyboard.h>
-
 /*********************************************************
    2016-06-11 Sat : ylh
 
@@ -41,19 +37,23 @@
    #define USE_MOUSE use mouse control - must turn off SERIAL_OUTPUT
 */
 #define SERIAL_OUTPUT
+
 #define SEE_ANALOG
 #define SEE_DIGITAL
-#define SEE_TOUCHPAD
-//#define USE_MOUSE
 //#define SEE_TOUCHPAD
+
+//#define USE_MOUSE
 //#define SPECIAL_MELANIE
 
 const uint32_t CHECK_INTERVAL = 20;
 const uint32_t REFRACTORY = 400;
 uint32_t l_checked;
 
+#include <Mouse.h>
+#include <Keyboard.h>
 #include <Wire.h>
 #include "Adafruit_MPR121.h"
+
 
 // MPR touchpad
 // You can have up to 4 on one i2c bus but one is enough for testing!
@@ -66,18 +66,18 @@ uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
 
 // analogPins
-const int nAnalogPins = 3;
+const int nAnalogPins = 6;
 int analogPins[nAnalogPins] = {
-  A0, A1, A2
+  A0, A1, A2, A3, A4, A5
 };
 
 // digitalPins
 // when pushed, we output "-0", "-1", "-2", "-3"
-const int nDigitalPins = 8; //14;
+const int nDigitalPins = 14; // 8; //14;
 int digitalPins[nDigitalPins] = {
-  // 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
   // 3, 4, 5, 6
-  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
+//  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
 };
 
 int toggleLeft = 0; // for Drag
@@ -248,8 +248,7 @@ void melanieUp(int j) {
   if ( j == 6 ) {
     Keyboard.release(KEY_ESC);
   }
-  if ( j == 7 ) {
-    Keyboard.release(KEY_LEFT_ALT);
+  if ( j == 7 ) {    Keyboard.release(KEY_LEFT_ALT);
     Keyboard.release(KEY_TAB);
   }
 }

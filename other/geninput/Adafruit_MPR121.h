@@ -16,6 +16,10 @@
 
 #ifndef ADAFRUIT_MPR121_H
 #define ADAFRUIT_MPR121_H
+
+
+#include <Mouse.h>
+#include <Keyboard.h>
  
 #if (ARDUINO >= 100)
  #include "Arduino.h"
