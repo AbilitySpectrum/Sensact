@@ -39,13 +39,13 @@
 #define SERIAL_OUTPUT
 
 #define SEE_ANALOG
-#define SEE_DIGITAL
+//#define SEE_DIGITAL
 //#define SEE_TOUCHPAD
 
 //#define USE_MOUSE
 //#define SPECIAL_MELANIE
 
-const uint32_t CHECK_INTERVAL = 20;
+const uint32_t CHECK_INTERVAL = 50;
 const uint32_t REFRACTORY = 400;
 uint32_t l_checked;
 
@@ -75,15 +75,18 @@ int analogPins[nAnalogPins] = {
 // when pushed, we output "-0", "-1", "-2", "-3"
 const int nDigitalPins = 14; // 8; //14;
 int digitalPins[nDigitalPins] = {
-   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
   // 3, 4, 5, 6
-//  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
+  //  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
 };
 
 int toggleLeft = 0; // for Drag
 int keyPressed = 0;
 
 void setup() {
+
+  latch_setup();
+  setLatches(true, true, true, true);
 
 #ifdef SERIAL_OUTPUT
   while (!Serial);        // needed to keep leonardo/micro from starting too fast!
@@ -168,7 +171,7 @@ void digitalPinsLoop() {
 #endif
 
 #ifdef SPECIAL_MELANIE
-     melanieDown(j);
+      melanieDown(j);
 #endif
     }
     else {
@@ -248,7 +251,8 @@ void melanieUp(int j) {
   if ( j == 6 ) {
     Keyboard.release(KEY_ESC);
   }
-  if ( j == 7 ) {    Keyboard.release(KEY_LEFT_ALT);
+  if ( j == 7 ) {
+    Keyboard.release(KEY_LEFT_ALT);
     Keyboard.release(KEY_TAB);
   }
 }
