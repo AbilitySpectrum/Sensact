@@ -14,12 +14,25 @@ void Sensors::init() {
   // This code defines the set of sensors.
   // It must match the sensor definitions in the JavaScript control code.
   // ID values must be unique but do not _have_ to be sequential
+#ifdef VERSION_3_HW
+  addSensor( new AnalogSensor(1, SENSACT_IN1A) );
+  addSensor( new AnalogSensor(2, SENSACT_IN1B) );
+  addSensor( new AnalogSensor(3, SENSACT_IN2A) );
+  addSensor( new AnalogSensor(4, SENSACT_IN2B) );
+  addSensor( new AnalogSensor(5, SENSACT_IN3A) );
+  addSensor( new AnalogSensor(6, SENSACT_IN3B) );
+  pcInput = new PCInputSensor(7);
+  addSensor( pcInput );
+  addSensor( new GyroSensor(8, 9, 10, 11, 12, 13) );
+
+#elif VERSION_2_HW
   addSensor( new AnalogSensor(1, SENSACT_IN2) );
   addSensor( new AnalogSensor(2, SENSACT_IN3) );
   pcInput = new PCInputSensor(3);
   addSensor( pcInput );
   addSensor( new GyroSensor(4, 5, 6, 7, 8, 9) );
-  
+#endif
+
   int dataUnits = 0;
   for(int i=0; i<nSensors; i++) {
     paSensor[i]->init();
