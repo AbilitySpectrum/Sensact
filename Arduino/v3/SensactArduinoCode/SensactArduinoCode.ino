@@ -33,9 +33,18 @@ SerialOutputStream serialOutput;
 long lastActionTime = 0;
 
 void setup() {
+#ifdef VERSION_3_HW
+  pinMode(LATCH_PIN, OUTPUT);
+  pinMode(COUNTER_PIN, OUTPUT);
+  pinMode(COUNTER_RESET_PIN, OUTPUT);
+
+  setLatches(15);   // Turn on power to all inputs.
+  
+#elif VERSION_2_HW
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
+#endif
   
   sensors.init();
   actors.init();
@@ -118,6 +127,60 @@ int checkForCommand() {
   return 0;
 }
 
+#ifdef VERSION_3_HW
+void flashLED(int led) {
+  ledsOff();
+  delay(250);
+  doLED(led);
+  delay(250);
+  ledsOff();
+  delay(250);
+  setLED();
+}
+
+
+void setLED() {
+  ledsOff();
+  if (runMode == RUN) {
+     doLED(LED_GREEN);
+  } else {  // REPORT mode
+     doLED(LED_RED);
+  }
+} 
+  
+void ledsOff() {
+  doLED(0);
+}
+
+void setLatches(int latchBits) {
+  doLED(latchBits);
+
+  // Latch the counter output to the Latch_Qn outputs.
+  digitalWrite(LATCH_PIN, HIGH);
+  delay(LATCH_DELAY_TIME);
+  digitalWrite(LATCH_PIN, LOW); 
+
+  // Turn off LEDs
+  doLED(0);
+}
+
+void doLED(int val) {
+  digitalWrite(COUNTER_PIN, LOW); // Ensure the right start point
+
+  // Reset the counter
+  digitalWrite(COUNTER_RESET_PIN, HIGH);
+  delay(LATCH_DELAY_TIME);      
+  digitalWrite(COUNTER_RESET_PIN, LOW);
+
+  // Set the counter - each low-to-high transition adds 1 to the counter
+   for(int i=0; i<val; i++) {
+    digitalWrite(COUNTER_PIN, HIGH);
+    delay(LATCH_DELAY_TIME);
+    digitalWrite(COUNTER_PIN, LOW);
+    delay(LATCH_DELAY_TIME);
+  }
+}
+#elif VERSION_2_HW
 void flashLED(int led) {
   ledsOff();
   delay(250);
@@ -143,6 +206,7 @@ void ledsOff() {
   digitalWrite(LED_BLUE, LOW);
   digitalWrite(LED_GREEN, LOW);
 }  
+#endif  // VERSION_2_HW
 
 void sendVersionInfo() {
   // TBD

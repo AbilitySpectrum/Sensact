@@ -59,15 +59,19 @@ function Sensor(i, n, minval, maxval, c) {
 // createSensorList runs once -after the version number is discovered.
 // It creates the list of sensors.
 function createSensorList() {
-	sensors.push( new Sensor(1, "Input 1", 0, 1023, true) );
-	sensors.push( new Sensor(2, "Input 2", 0, 1023, true) );
-	sensors.push( new Sensor(3, "Keyboard", 0, 255, false) );
-	sensors.push( new Sensor(4, "Accel-X", -16000, 16000, true) );
-	sensors.push( new Sensor(5, "Accel-Y", -16000, 16000, true) );
-	sensors.push( new Sensor(6, "Accel-Z", -16000, 16000, true) );
-	sensors.push( new Sensor(7, "Gyro-X", -7000, 7000, true) );
-	sensors.push( new Sensor(8, "Gyro-Y", -7000, 7000, true) );
-	sensors.push( new Sensor(9, "Gyro-Z", -7000, 7000, true) );
+	sensors.push( new Sensor(1, "Input 1A", 0, 1023, true) );
+	sensors.push( new Sensor(2, "Input 1B", 0, 1023, true) );
+	sensors.push( new Sensor(3, "Input 2A", 0, 1023, true) );
+	sensors.push( new Sensor(4, "Input 2B", 0, 1023, true) );
+	sensors.push( new Sensor(5, "Input 3A", 0, 1023, true) );
+	sensors.push( new Sensor(6, "Input 3B", 0, 1023, true) );
+	sensors.push( new Sensor(7, "Keyboard", 0, 255, false) );
+	sensors.push( new Sensor(8, "Accel-X", -16000, 16000, true) );
+	sensors.push( new Sensor(9, "Accel-Y", -16000, 16000, true) );
+	sensors.push( new Sensor(10, "Accel-Z", -16000, 16000, true) );
+	sensors.push( new Sensor(11, "Gyro-X", -7000, 7000, true) );
+	sensors.push( new Sensor(12, "Gyro-Y", -7000, 7000, true) );
+	sensors.push( new Sensor(13, "Gyro-Z", -7000, 7000, true) );
 }
 
 function getSensorByID(id) {
