@@ -36,14 +36,15 @@
    #define SEE_TOUCHPAD to output touchpad (I2C) data
    #define USE_MOUSE use mouse control - must turn off SERIAL_OUTPUT
 */
-#define SERIAL_OUTPUT
+//#define SERIAL_OUTPUT
 
-#define SEE_ANALOG
+//#define SEE_ANALOG
 //#define SEE_DIGITAL
 //#define SEE_TOUCHPAD
+//#define USE_V3_LATCH
 
-//#define USE_MOUSE
-//#define SPECIAL_MELANIE
+#define USE_MOUSE
+#define SPECIAL_MELANIE
 
 const uint32_t CHECK_INTERVAL = 50;
 const uint32_t REFRACTORY = 400;
@@ -66,27 +67,28 @@ uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
 
 // analogPins
-const int nAnalogPins = 6;
+const int nAnalogPins = 3;
 int analogPins[nAnalogPins] = {
-  A0, A1, A2, A3, A4, A5
+  A0, A1, A2 // , A3, A4, A5
 };
 
 // digitalPins
 // when pushed, we output "-0", "-1", "-2", "-3"
-const int nDigitalPins = 14; // 8; //14;
+const int nDigitalPins = 4; //8; //14;
 int digitalPins[nDigitalPins] = {
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
-  // 3, 4, 5, 6
-  //  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
+//   0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+     6,5,4,3
+//  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
 };
 
 int toggleLeft = 0; // for Drag
 int keyPressed = 0;
 
 void setup() {
-
+#ifdef USE_V3_LATCH
   latch_setup();
   setLatches(true, true, true, true);
+#endif
 
 #ifdef SERIAL_OUTPUT
   while (!Serial);        // needed to keep leonardo/micro from starting too fast!
@@ -97,13 +99,13 @@ void setup() {
   touchSetup();
 #endif
 
-#ifdef SEE_DIGITAL
+//#ifdef SEE_DIGITAL
   digitalPinsSetup();
-#endif
+//#endif
 
-#ifdef SEE_ANALOG
+//#ifdef SEE_ANALOG
   analogPinsSetup();
-#endif
+//#endif
 
 #ifdef USE_MOUSE
   mouseSetup();
@@ -124,13 +126,9 @@ void loop() {
   touchLoop();
 #endif
 
-#ifdef SEE_DIGITAL
   digitalPinsLoop();
-#endif
 
-#ifdef SEE_ANALOG
   analogPinsLoop();
-#endif
 
 #ifdef USE_MOUSE
   mouseLoop();
@@ -184,22 +182,25 @@ void digitalPinsLoop() {
 }
 
 #ifdef SPECIAL_MELANIE
+
+// 8 buttons: 0,3,2,1,4,5,6,7
+// 4 buttons: 7,6,7,5,4,3,
 void melanieDown( int j) {
   keyPressed = 1;
-  if ( j == 0 ) {
+  if ( j == 7) { // 0 ) {
     Keyboard.press(KEY_PAGE_DOWN);
   }
-  if ( j == 3 ) {
+  if ( j == 0 ) { // 3 ) {
     Mouse.press(MOUSE_LEFT);
     toggleLeft = 0;
   }
-  if ( j == 2 ) {
+  if ( j == 7 ) { // 2 ) {
     Keyboard.press(KEY_PAGE_UP);
   }
-  if ( j == 1 ) {
+  if ( j == 1 ) { // 1 ) {
     Mouse.press(MOUSE_RIGHT);
   }
-  if ( j == 4 ) {
+  if ( j == 2 ) { // 4 ) {
     if ( toggleLeft == 0 ) {
       Mouse.press(MOUSE_LEFT);
     }
@@ -208,7 +209,7 @@ void melanieDown( int j) {
     }
     toggleLeft = 1 - toggleLeft;
   }
-  if ( j == 5 ) {
+  if ( j == 3) { // 5 ) {
     Keyboard.press('L');
     Keyboard.release('L');
     Keyboard.press('O');
@@ -217,7 +218,7 @@ void melanieDown( int j) {
     Keyboard.press(KEY_RETURN);
     Keyboard.releaseAll();
   }
-  if ( j == 6 ) {
+  if ( j == 7 ) { // 6 ) {
     Keyboard.press(KEY_ESC);
   }
   if ( j == 7 ) {
@@ -228,20 +229,21 @@ void melanieDown( int j) {
 
 
 void melanieUp(int j) {
-  if ( j == 0 ) {
+  if ( j == 7 ) { //  0 ) {
     Keyboard.release(KEY_PAGE_DOWN);
   }
-  if ( j == 3 ) {
+  if ( j == 0 ) { // 3 ) {
     if ( toggleLeft == 0 ) {  // release Left Click only when NOT being dragged
       Mouse.release(MOUSE_LEFT);
     }
   }
-  if ( j == 2 ) {
+  if ( j == 7 ) { // 2 ) {
     Keyboard.release(KEY_PAGE_UP);
   }
   if ( j == 1 ) {
     Mouse.release(MOUSE_RIGHT);
   }
+  /*
   if ( j == 4 ) {
 
   }
@@ -251,6 +253,7 @@ void melanieUp(int j) {
   if ( j == 6 ) {
     Keyboard.release(KEY_ESC);
   }
+  */
   if ( j == 7 ) {
     Keyboard.release(KEY_LEFT_ALT);
     Keyboard.release(KEY_TAB);
@@ -345,10 +348,6 @@ void touchLoop() {
 }
 
 #endif
-
-
-
-
 
 
 

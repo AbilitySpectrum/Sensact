@@ -3,8 +3,8 @@
 #include <Mouse.h>
 #include <Keyboard.h>
 
-const int xAxis = A1;         //analog sensor for X axis
-const int yAxis = A0;         // analog sensor for Y axis
+const int xAxis = A0;         //analog sensor for X axis
+const int yAxis = A1;         // analog sensor for Y axis
 
 int range = 12;               // output range of X or Y movement - was 24
 int responseDelay = 60;        // response delay of the mouse, in ms - Melanie: was 2
@@ -59,7 +59,7 @@ int readAxis(int axisNumber) {
 
   // the Y axis needs to be inverted in order to
   // map the movemment correctly:
-  if (axisNumber == 1) {
+  if (axisNumber == 0) {  // old emartee: 1
     distance = -distance;
   }
 
@@ -83,7 +83,7 @@ void mouseLoop() {
 
   // move the mouse:
   Mouse.move(-xReading, -yReading, 0);
-  delay(responseDelay);
+// delay(responseDelay);
 }
 
 #endif 
@@ -143,6 +143,6 @@ void mouseLoop() {
   // return the distance for this axis:
   return distance;
   }
-
-  //*/
   
+  //*/
+   
