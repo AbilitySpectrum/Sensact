@@ -143,7 +143,5 @@ void mouseLoop() {
   // return the distance for this axis:
   return distance;
   }
-1
-ÒØÒ⁄
   //*/
   

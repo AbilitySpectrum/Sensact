@@ -66,18 +66,18 @@ uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
 
 // analogPins
-const int nAnalogPins = 6;
+const int nAnalogPins = 3;
 int analogPins[nAnalogPins] = {
-  A0, A1, A2, A3, A4, A5
+  A0, A1, A2 // , A3, A4, A5
 };
 
 // digitalPins
 // when pushed, we output "-0", "-1", "-2", "-3"
-const int nDigitalPins = 14; // 8; //14;
+const int nDigitalPins = 8; //14;
 int digitalPins[nDigitalPins] = {
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+//  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
   // 3, 4, 5, 6
-  //  6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
+    6, 7, 8, 9, A2, A3, A4, 0   // Emartee joystick+4 keys AND Sparkfun 4 pads: Melanie
 };
 
 int toggleLeft = 0; // for Drag
@@ -85,8 +85,8 @@ int keyPressed = 0;
 
 void setup() {
 
-  latch_setup();
-  setLatches(true, true, true, true);
+//  latch_setup();
+//  setLatches(true, true, true, true);
 
 #ifdef SERIAL_OUTPUT
   while (!Serial);        // needed to keep leonardo/micro from starting too fast!
@@ -124,13 +124,9 @@ void loop() {
   touchLoop();
 #endif
 
-#ifdef SEE_DIGITAL
   digitalPinsLoop();
-#endif
 
-#ifdef SEE_ANALOG
   analogPinsLoop();
-#endif
 
 #ifdef USE_MOUSE
   mouseLoop();
