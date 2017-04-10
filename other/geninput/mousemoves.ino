@@ -59,7 +59,7 @@ int readAxis(int axisNumber) {
 
   // the Y axis needs to be inverted in order to
   // map the movemment correctly:
-  if (axisNumber == 0) {  // old emartee: 1
+  if (axisNumber == 1) {
     distance = -distance;
   }
 

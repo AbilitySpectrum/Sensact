@@ -516,7 +516,8 @@ function drawMeters() {
         let startx = 0,
             starty = C_HEIGHT + 80;
 
-        drawDial(startx + 50 + 100 * i, starty, diam, radians(ypr[i] - oypr[i]));
+        //drawDial(startx + 50 + 100 * i, starty, diam, radians(ypr[i] - oypr[i]));
+        drawDial(startx + 50 + 100 * i, starty, diam, radians(ypr[i]));
 
         fill(100, 100, 255); //rgb(100,100,255)
         strokeWeight(0);
@@ -537,14 +538,16 @@ function drawMeters() {
         j = starty + 80;
         startx = 400;
 
+        // use the second set of dials for ypr[3-5]
         //drawDial(startx + 50 + 100 * i, starty, diam, radians((wacc[i] / 2000) * 180));
         
-        drawDial(startx + 50 + 100 * i, starty, diam, ypr[i+3] );
+        if (ypr[i+3] < -90) ypr[i+3] += 180;
+        drawDial(startx + 50 + 100 * i, starty, diam, radians(ypr[i+3]));
 
         fill(100, 180, 100);
         text('gyro', startx, j);
-        text(gyro[i], startx + 40 + 100 * i, j);
-        //text(ypr[i+3], startx + 40 + 100 * i, j);
+        //text(gyro[i], startx + 40 + 100 * i, j);
+        text(parseFloat(Math.round(ypr[i+3] * 100) / 100).toFixed(2), startx + 40 + 100 * i, j);
         j += 20;
         text('acc', startx, j);
         text(acc[i], startx + 40 + 100 * i, j);
