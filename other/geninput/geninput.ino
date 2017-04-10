@@ -36,14 +36,14 @@
    #define SEE_TOUCHPAD to output touchpad (I2C) data
    #define USE_MOUSE use mouse control - must turn off SERIAL_OUTPUT
 */
-#define SERIAL_OUTPUT
+//#define SERIAL_OUTPUT
 
-#define SEE_ANALOG
+//#define SEE_ANALOG
 //#define SEE_DIGITAL
 //#define SEE_TOUCHPAD
 
-//#define USE_MOUSE
-//#define SPECIAL_MELANIE
+#define USE_MOUSE
+#define SPECIAL_MELANIE
 
 const uint32_t CHECK_INTERVAL = 50;
 const uint32_t REFRACTORY = 400;
@@ -187,14 +187,14 @@ void digitalPinsLoop() {
 void melanieDown( int j) {
   keyPressed = 1;
   if ( j == 0 ) {
-    Keyboard.press(KEY_PAGE_DOWN);
+//    Keyboard.press(KEY_PAGE_DOWN);
   }
   if ( j == 3 ) {
     Mouse.press(MOUSE_LEFT);
     toggleLeft = 0;
   }
   if ( j == 2 ) {
-    Keyboard.press(KEY_PAGE_UP);
+//    Keyboard.press(KEY_PAGE_UP);
   }
   if ( j == 1 ) {
     Mouse.press(MOUSE_RIGHT);
@@ -218,18 +218,18 @@ void melanieDown( int j) {
     Keyboard.releaseAll();
   }
   if ( j == 6 ) {
-    Keyboard.press(KEY_ESC);
+//    Keyboard.press(KEY_ESC);
   }
   if ( j == 7 ) {
-    Keyboard.press(KEY_LEFT_ALT);
-    Keyboard.press(KEY_TAB);
+//    Keyboard.press(KEY_LEFT_ALT);
+//    Keyboard.press(KEY_TAB);
   }
 }
 
 
 void melanieUp(int j) {
   if ( j == 0 ) {
-    Keyboard.release(KEY_PAGE_DOWN);
+//    Keyboard.release(KEY_PAGE_DOWN);
   }
   if ( j == 3 ) {
     if ( toggleLeft == 0 ) {  // release Left Click only when NOT being dragged
@@ -237,7 +237,7 @@ void melanieUp(int j) {
     }
   }
   if ( j == 2 ) {
-    Keyboard.release(KEY_PAGE_UP);
+//    Keyboard.release(KEY_PAGE_UP);
   }
   if ( j == 1 ) {
     Mouse.release(MOUSE_RIGHT);
@@ -249,11 +249,11 @@ void melanieUp(int j) {
 
   }
   if ( j == 6 ) {
-    Keyboard.release(KEY_ESC);
+//    Keyboard.release(KEY_ESC);
   }
   if ( j == 7 ) {
-    Keyboard.release(KEY_LEFT_ALT);
-    Keyboard.release(KEY_TAB);
+//    Keyboard.release(KEY_LEFT_ALT);
+//    Keyboard.release(KEY_TAB);
   }
 }
 #endif

@@ -83,7 +83,7 @@ void mouseLoop() {
 
   // move the mouse:
   Mouse.move(-xReading, -yReading, 0);
-  delay(responseDelay);
+//  delay(responseDelay);
 }
 
 #endif 
@@ -143,6 +143,7 @@ void mouseLoop() {
   // return the distance for this axis:
   return distance;
   }
-
+1
+ÒØÒ⁄
   //*/
   
