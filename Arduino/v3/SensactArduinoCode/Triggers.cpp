@@ -170,6 +170,12 @@ int Triggers::readTriggers(InputStream *is) {
   // If triggers are read successfully - save them.
   EEOut.init();
   sendTriggers(&EEOut);
+
+  // Reset sensor states to 1 after a trigger re-load.
+  for(int i=0; i<=maxSensorID; i++) {
+    paSensorStates[i] = 1;
+  }  
+  
   return 0;
 }
 
