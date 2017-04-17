@@ -228,9 +228,11 @@ form .sliderGroup {
 }
 
 .actionOption input[type=text] {   /* For HID Keyboard action parameter */
-	width: 20px;
+	width: 50px;
 	height: 22px;
-	text-align: center;
+	text-align: left;
+	font-family: "Courier New", Courier, monospace;
+	font-size: 120%;
 }
 
 input.repeat[type=checkbox] {  /* A nudge for the repeat checkbox. */

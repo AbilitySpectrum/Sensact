@@ -342,18 +342,34 @@ var noOption = function(t) {
 }
 
 // --- KEYBOARD PARAMETERS --- //
-// Parameter is a single character.
+// Parameter is 1 to 4 characters packed into a long.
 var keyOption = function(t) {
 	var div = newDiv("actionOption");
 	var txtLabel = newLabel(0, "keyTextArea" + t.id, "Character:");
-	var txt = newTextInput(0, "keyTextArea" + t.id, String.fromCharCode(t.actionParam));
-	txt.maxlength = 1;
+	
+	// Unpack the actionParam (a long) into a string.
+	var string = "";
+	for (var i=0; i<4; i++) {
+		var byte = (t.actionParam >> 8 * (3-i)) & 0xff;
+		if (byte != 0) {
+			string += String.fromCharCode(byte);
+		}
+	}				
+	var txt = newTextInput(0, "keyTextArea" + t.id, string);
+	
+	txt.maxLength = 4;
 	
 	div.appendChild(txtLabel);
 	div.appendChild(txt);	
 	
 	txt.onchange = function() {
-		t.actionParam = this.value.charCodeAt(0);
+		// Pack the string in 'value' into actionParam (a long)
+		var val = 0;
+		for(var i=0; i < this.value.length; i++) {
+			val <<= 8;
+			val += this.value.charCodeAt(i);
+		}
+		t.actionParam = val;
 	}
 	
 	return div;

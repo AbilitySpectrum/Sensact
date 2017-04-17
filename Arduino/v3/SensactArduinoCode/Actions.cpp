@@ -78,8 +78,13 @@ void Buzzer::doAction(long param) {
 
 // === HID Keyboard === //
 void HIDKeyboard::doAction(long param) {
-  int character = param & 0xff;
-  Keyboard.write(character);
+  int i;
+  for(i=0; i<4; i++){
+    int character = (param >> 8 * (3-i)) & 0xff;
+    if (character != 0) {
+      Keyboard.write(character);
+    }
+  }
 }
 
 // === HID Mouse === //
