@@ -11,6 +11,8 @@
  * 'r' 1 to 6      Reads the value of a particular input pin.
  */
 
+#include "Gyro.h"
+
 #define INPUT_1   A0 
 #define INPUT_2   A1 
 #define INPUT_3   A2 
@@ -29,6 +31,8 @@
 #define DELAY_TIME  5 // Time in MS to wait for chips to reset, latch etc.  
                       // Probably can be much shorter.  Chips response times are given on ns on spec sheet.
 
+GyroSensor gyro;
+
 void setup() {
   pinMode(COUNTER_RESET_PIN, OUTPUT);
   pinMode(COUNTER_PIN, OUTPUT);
@@ -43,16 +47,25 @@ void setup() {
   
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);  
-  
+
   Serial.begin(9600);
   while(!Serial);
 }
 
+int readVal = 0;
+long lastReadTime;
+#define READ_INTERVAL_MS 1000
+
 void loop() {
   int cmd;
   int val;
-    
+
+  if (readVal && ((millis() - lastReadTime) > READ_INTERVAL_MS) ) {
+    doRead(readVal);
+    lastReadTime = millis();
+  }
   if (Serial.available()) {
+    readVal = 0;
     cmd =  Serial.read();
     switch(cmd) {
       // Ignore white space
@@ -104,10 +117,22 @@ void loop() {
           doRead(0);
         } else if (val >= 1 && val <= 6) {
           Serial.print("Read " ); Serial.println(val);   
-          doRead(val);       
+          doRead(val);   
+          readVal = val;
+          lastReadTime = millis();    
         } else {
           Serial.println("Bad read value.");
         }
+        break;
+
+      case 'g':
+        setLatches(0);  // Turn off power to gyro
+        delay(100);     // Wait for it to shut down completely.
+        setLatches(8);  // Power on gyro
+        delay(10);
+        gyro.init();
+        delay(10);     
+        gyro.readValues();
         break;
         
       case 'h':
@@ -220,5 +245,8 @@ void doHelp() {
   Serial.println(" 'l' + 0 to 7.   Sets the value of LED outputs.");
   Serial.println(" 'b'             Sounds the buzzer.");
   Serial.println(" 'r'             Reads the value of all input pins.");
-  Serial.println(" 'r' 1 to 6      Reads the value of a particular input pin.");
+  Serial.println(" 'r' 1 to 6      Reads the value of a particular input port ");
+  Serial.println("                 repeating until another command is entered.");
+  Serial.println("                 (1 = A0, 2 = A1 ... 6 = A5)");
+  Serial.println(" 'g'             Reads I2C Gyroscope. (Leaves non-I2C inputs powered off)");
 }
