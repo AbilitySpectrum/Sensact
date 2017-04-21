@@ -22,6 +22,7 @@
 
 #define RELAY_1 11
 #define RELAY_2 12
+#define IR_PIN 9
 
 #define BUZZER  10
 #define LATCH_PIN 4
@@ -44,9 +45,10 @@ void setup() {
   pinMode(INPUT_4, INPUT);
   pinMode(INPUT_5, INPUT);
   pinMode(INPUT_6, INPUT);
-  
-  pinMode(11, OUTPUT);
-  pinMode(12, OUTPUT);  
+
+  pinMode(IR_PIN, OUTPUT);
+  pinMode(RELAY_1, OUTPUT);
+  pinMode(RELAY_2, OUTPUT);  
 
   Serial.begin(9600);
   while(!Serial);
@@ -133,6 +135,16 @@ void loop() {
         gyro.init();
         delay(10);     
         gyro.readValues();
+        break;
+
+      case 't':
+      Serial.println("TV IR");
+        for(int i=0; i<8; i++) {
+          analogWrite(IR_PIN, 80);  // ~30% duty cycle
+          delay(250);
+          digitalWrite(IR_PIN, 0);
+          delay(250);
+        }
         break;
         
       case 'h':
@@ -249,4 +261,6 @@ void doHelp() {
   Serial.println("                 repeating until another command is entered.");
   Serial.println("                 (1 = A0, 2 = A1 ... 6 = A5)");
   Serial.println(" 'g'             Reads I2C Gyroscope. (Leaves non-I2C inputs powered off)");
+  Serial.println(" 't'             Runs the TV IR.  On/Off cycling every 1/4 second for two seconds.");
+  Serial.println("                 Watch with a cell phone camera or with a multi-tester.");
 }
