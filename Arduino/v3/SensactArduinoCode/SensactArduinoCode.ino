@@ -165,6 +165,8 @@ void setLatches(int latchBits) {
 }
 
 void doLED(int val) {
+  val = 7 - val;  // LEDs work on reverse logic.  
+                  // When a pin is HIGH the light is off, and when LOW it is on.
   digitalWrite(COUNTER_PIN, LOW); // Ensure the right start point
 
   // Reset the counter
