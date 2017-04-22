@@ -60,6 +60,7 @@ class Triggers {
     }
     
     void init();
+    void reset();
     const ActionData* getActions(const SensorData *);
     int readTriggers(InputStream *);
     void sendTriggers(OutputStream *);

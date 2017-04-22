@@ -69,6 +69,9 @@ void loop() {
         flashLED(LED_RED);
       } else {
         flashLED(LED_GREEN);
+        triggers.reset();
+        actors.reset();
+        sensors.reset();
       }
       break;
       

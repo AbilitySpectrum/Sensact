@@ -42,6 +42,12 @@ void Sensors::init() {
   data.init(dataUnits);
 }
 
+void Sensors::reset() {
+  for(int i=0; i<nSensors; i++) {
+    paSensor[i]->reset();
+  }  
+}
+
 const SensorData* Sensors::getData() const {
   int i;
   data.reset();

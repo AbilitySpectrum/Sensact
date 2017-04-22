@@ -39,6 +39,9 @@ class Actor {
     
   public:
     virtual void init() {}
+    // Reset is called when new triggers are set.
+    // An actor should reset stored variable values to initial state when reset is called.
+    virtual void reset() {}
     virtual void doAction(long param) = 0;
     // checkAction is used to turn actions off
     // Also used for mouse nudge actions
@@ -55,6 +58,7 @@ class Actors {
   public:
     Actors() {nActors = 0;}
     void init();
+    void reset();
     
     void addActor(Actor *pActor) {
       if (nActors < MAX_ACTORS) {
@@ -78,6 +82,9 @@ class Relay: public Actor {
       actionStartTime = 0;
     }
     void init();
+    void reset() {
+      actionStartTime = 0;
+    }
     void doAction(long param);
     void checkAction();
 };
@@ -123,6 +130,11 @@ class HIDMouse: public Actor {
       verticalMouseState = MOUSE_STILL;
       horizontalMouseState = MOUSE_STILL;
       lastMouseMoveTime = 0;
+    }
+    void reset() {
+      verticalMouseState = MOUSE_STILL;
+      horizontalMouseState = MOUSE_STILL;
+      lastMouseMoveTime = 0;      
     }
     void doAction(long param);
     void checkAction();

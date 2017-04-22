@@ -25,6 +25,12 @@ void Actors::init() {
   }
 }
 
+void Actors::reset() {
+  for(int i=0; i<nActors; i++) {
+    apActors[i]->reset();
+  }  
+}
+
 void Actors::doActions(const ActionData *pData) {
   int nActions = pData->length();
   for(int i=0; i<nActions; i++) {

@@ -17,6 +17,12 @@ void Triggers::init() {
   }  
 }
 
+void Triggers::reset() {
+  for(int i=0; i<=maxSensorID; i++) {
+    paSensorStates[i] = 1;
+  }  
+}
+
 // The first time the Triggers object gets sensor data 
 // this code is run to set up the sensor state array.
 void Triggers::setupStates(const SensorData *pData) {
@@ -33,9 +39,7 @@ void Triggers::setupStates(const SensorData *pData) {
   
   // Initialize sensor states.
   paSensorStates = new int[maxSensorID+1];
-  for(int i=0; i<=maxSensorID; i++) {
-    paSensorStates[i] = 1;
-  }
+  reset();
 }
 
 const ActionData* Triggers::getActions(const SensorData *pData) {
@@ -170,11 +174,6 @@ int Triggers::readTriggers(InputStream *is) {
   // If triggers are read successfully - save them.
   EEOut.init();
   sendTriggers(&EEOut);
-
-  // Reset sensor states to 1 after a trigger re-load.
-  for(int i=0; i<=maxSensorID; i++) {
-    paSensorStates[i] = 1;
-  }  
   
   return 0;
 }

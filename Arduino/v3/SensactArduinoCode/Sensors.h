@@ -49,6 +49,7 @@ class Sensor {
   public:
     Sensor() {}
     virtual void init() = 0;
+    virtual void reset() {}
 
     // This call structure allows a single physical sensor 
     // to add multiple logical sensor values.
@@ -89,6 +90,10 @@ class PCInputSensor: public Sensor {
     }
     
     void init() {}
+
+    void reset() {
+      nextCmd = 0;
+    }
     
     void getValues(SensorData *pData) {
         pData->addValue(id, nextCmd);
@@ -142,6 +147,7 @@ class Sensors {
   public:
     Sensors() { nSensors = 0; }
     void init();
+    void reset();
     const SensorData* getData() const;
 };
 
