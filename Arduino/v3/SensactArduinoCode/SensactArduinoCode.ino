@@ -134,7 +134,7 @@ int checkForCommand() {
 void flashLED(int led) {
   ledsOff();
   delay(250);
-  doLED(led);
+  doLED(7 - led);
   delay(250);
   ledsOff();
   delay(250);
@@ -144,15 +144,18 @@ void flashLED(int led) {
 
 void setLED() {
   ledsOff();
+  // LEDs work on reverse logic.  
+  // When a pin is HIGH the light is off, and when LOW it is on.
+  // Thus the "7 - " in the following code.
   if (runMode == RUN) {
-     doLED(LED_GREEN);
+     doLED(7 - -LED_GREEN);
   } else {  // REPORT mode
-     doLED(LED_RED);
+     doLED(7 - LED_RED);
   }
 } 
   
 void ledsOff() {
-  doLED(0);
+  doLED(7);
 }
 
 void setLatches(int latchBits) {
@@ -164,12 +167,10 @@ void setLatches(int latchBits) {
   digitalWrite(LATCH_PIN, LOW); 
 
   // Turn off LEDs
-  doLED(0);
+  doLED(7);
 }
 
 void doLED(int val) {
-  val = 7 - val;  // LEDs work on reverse logic.  
-                  // When a pin is HIGH the light is off, and when LOW it is on.
   digitalWrite(COUNTER_PIN, LOW); // Ensure the right start point
 
   // Reset the counter
