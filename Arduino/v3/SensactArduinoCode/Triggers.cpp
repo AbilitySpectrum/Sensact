@@ -8,6 +8,23 @@
 EEPROMInputStream EEIn;
 EEPROMOutputStream EEOut;
 
+/*
+ *  Memory Saving Trick #1
+ *  Save times in unsigned int values.  This will hold times up to 65 seconds.
+ *  Use timeDiff to calculate the time interval between 'now' and a previous time 'prev'.
+ *  'now' should always be greater than 'prev'.  If it isn't it is because our counter
+ *  rolled over - and the difference calculation is adjusted to take this into account.
+ *  
+ *  Since we never care about time intervals bigger than a couple of seconds this works just fine.
+ *  Using unsigned int rather than a long saves 4 bytes per trigger structure.
+ *  With MAX_TRIGGERS set to 20 this is a savings of 80 bytes.
+ */
+unsigned int timeDiff(unsigned int now, unsigned int prev) {
+  if (now > prev) return (now - prev);
+  // else
+  return (0xffff - prev + now + 1);  // Counter rolled over.
+}
+
 void Triggers::init() {
   // See if there are triggers stored in EEPROM and read them.
   EEIn.init();
@@ -30,19 +47,21 @@ void Triggers::setupStates(const SensorData *pData) {
   
   // Find the highest sensor ID
   int dataCount = pData->length();
+
   for(int i=0; i<dataCount; i++) {
     int ID = pData->getValue(i)->sensorID;
     if (ID > maxSensorID) {
       maxSensorID = ID;
     }
   }
-  
+    
   // Initialize sensor states.
   paSensorStates = new int[maxSensorID+1];
   reset();
 }
 
 const ActionData* Triggers::getActions(const SensorData *pData) {
+      
   if (maxSensorID == 0) { // First time we setup sensor states
     setupStates(pData);
   }
@@ -52,12 +71,11 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
   
   // Create a temporary place to hold state changes.
   // This keeps state changes from having a changed effect 
-  // in the middle of process the sensor data.
+  // in the middle of processing the sensor data.
   int aTmpStates[maxSensorID+1];
   for(int i=0; i<=maxSensorID; i++) {
     aTmpStates[i] = paSensorStates[i];
   }  
-  
   // Check each sensor against each trigger, looking for matches 
   // and associated actions.
   int nSensors = pData->length();
@@ -104,7 +122,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
       
       if (matchCondition) {       
         // We have a trigger match!
-        long now = millis();
+        unsigned int now = millis() & 0xffff;  // See Memory Saving Trick #1
         if (pTrigger->onTime == 0) {  // Not triggered previously
           pTrigger->onTime = now; // Record time of initial trigger match
           pTrigger->repeatInterval = REPEAT_INTERVAL;  // Repeat at slow default.
@@ -118,7 +136,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           }
           
         } else if (pTrigger->actionTaken == false) { // Waiting for delay
-          if ((now - pTrigger->onTime) > pTrigger->delayMs) {
+          if (timeDiff(now, pTrigger->onTime) > pTrigger->delayMs) {
             aTmpStates[ID] = pTrigger->actionState;
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->actionTaken = true;
@@ -126,7 +144,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           }
           
         } else if (pTrigger->repeat) {
-          if ( (now - pTrigger->lastActionTime) > pTrigger->repeatInterval) {
+          if ( timeDiff(now, pTrigger->lastActionTime) > pTrigger->repeatInterval) {
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->lastActionTime = now;
             pTrigger->repeatCount++;

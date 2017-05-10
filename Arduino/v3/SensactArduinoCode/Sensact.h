@@ -72,7 +72,7 @@
 #define SENSACT_RELAY_2 12
 
 // ==== Some Limits === //
-#define MAX_TRIGGERS 18           // Maximum number of triggers allowed.
+#define MAX_TRIGGERS 20           // Maximum number of triggers allowed.
 #define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check.
 #define MAX_SENSORS 8
 #define MAX_ACTORS  8

@@ -25,13 +25,13 @@ class Trigger {
     char actionID;
     char actionState;
     long actionParameters;
-    int  delayMs;
+    unsigned int  delayMs;
     char repeat;
     
     // Dynamic elements
     boolean actionTaken;
-    long onTime;
-    long lastActionTime;
+    unsigned int onTime;
+    unsigned int lastActionTime;
     int repeatInterval;
     int repeatCount;
   

@@ -44,8 +44,8 @@ class Actor {
     virtual void reset() {}
     virtual void doAction(long param) = 0;
     // checkAction is used to turn actions off
-    // Also used for mouse nudge actions
     // e.g. to turn off a relay a short time after the action.
+    // Also used for mouse nudge actions
     virtual void checkAction() {}
 };
 

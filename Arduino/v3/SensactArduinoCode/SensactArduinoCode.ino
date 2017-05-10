@@ -51,7 +51,7 @@ void setup() {
   triggers.init();
   
   Serial.begin(9600);
-  
+
   runMode = RUN;
   setLED();
 }
@@ -61,14 +61,18 @@ void loop() {
   int val;
   
 //  Serial.print(F("ram: ")); Serial.println(freeRam());
+//  delay(1000);
+
   switch(cmd) {
     case START_OF_TRIGGER_BLOCK:
       serialInput.init();
       val = triggers.readTriggers(&serialInput);
       if (val == IO_ERROR) {
-        flashLED(LED_RED);
+//        flashLED(LED_RED);
+          tone(SENSACT_BUZZER, 400, 250);
       } else {
-        flashLED(LED_GREEN);
+//        flashLED(LED_GREEN);
+        tone(SENSACT_BUZZER, 200, 500);
         triggers.reset();
         actors.reset();
         sensors.reset();
