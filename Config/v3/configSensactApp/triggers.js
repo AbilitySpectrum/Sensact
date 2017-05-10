@@ -497,7 +497,7 @@ var BuzzOption = function(t) {
 		} else if (val > 2000) {
 			this.value = 2000;
 		}
-		newBuzzerValue(t, fw, dw);
+		newBuzzerValue(t, frequency, duration);
 	}
 	
 	duration.onchange = function() {
@@ -507,7 +507,7 @@ var BuzzOption = function(t) {
 		} else if (val > 1000) {
 			this.value = 1000;
 		}
-		newBuzzerValue(t, fw, dw);
+		newBuzzerValue(t, frequency, duration);
 	}
 	
 	return div;
