@@ -93,12 +93,12 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
       }
 
       // Check states
-      if ((int)pTrigger->reqdState == 0)  {
+      if ((int) REQD_STATE(pTrigger->stateValues) == 0)  {  
         // Match ANY condition - match only if not already in target state.
-        if (paSensorStates[ID] == (int) pTrigger->actionState) {
+        if (paSensorStates[ID] == (int) ACTION_STATE(pTrigger->stateValues)) { 
           matchCondition = false;
         }
-      } else if (paSensorStates[ID] != (int) pTrigger->reqdState) {
+      } else if (paSensorStates[ID] != (int) REQD_STATE(pTrigger->stateValues)) { 
         // Normal case - match only if states match.
         matchCondition = false; 
       }
@@ -107,7 +107,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
       
       if (matchCondition) {
         // State matches - now check to see if value is correct.
-        switch(pTrigger->condition) {
+        switch(CONDITION(pTrigger->conditions)) {
           case TRIGGER_ON_LOW:
             if (pTrigger->triggerValue < value) matchCondition = false;
             break;
@@ -129,7 +129,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           pTrigger->repeatCount = 0;
           
           if (pTrigger->delayMs == 0) { // No delay? Do action immediately.
-            aTmpStates[ID] = pTrigger->actionState;
+            aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->actionTaken = true;
             pTrigger->lastActionTime = now;
@@ -137,19 +137,20 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           
         } else if (pTrigger->actionTaken == false) { // Waiting for delay
           if (timeDiff(now, pTrigger->onTime) > pTrigger->delayMs) {
-            aTmpStates[ID] = pTrigger->actionState;
+            aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues); 
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->actionTaken = true;
             pTrigger->lastActionTime = now;
           }
           
-        } else if (pTrigger->repeat) {
+        } else if (ISREPEAT(pTrigger->conditions)) {
           if ( timeDiff(now, pTrigger->lastActionTime) > pTrigger->repeatInterval) {
             actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
             pTrigger->lastActionTime = now;
             pTrigger->repeatCount++;
             if (pTrigger->repeatCount > 40) {
               pTrigger->repeatInterval = REPEAT_INTERVAL / 4;
+              pTrigger->repeatCount = 41; // Hold at 41 since it is held in a char.
             } else if (pTrigger->repeatCount > 10) { 
               pTrigger->repeatInterval = REPEAT_INTERVAL / 2; 
             } 
@@ -206,28 +207,31 @@ void Triggers::sendTriggers(OutputStream *os) {
 }
 
 int Trigger::readTrigger(InputStream *is) {
+  int actionState;
+  int reqdState;
   int tmpint;
   long tmplong;
   
   if (is->getChar() != TRIGGER_START) return IO_ERROR;
   if ((tmpint       = is->getID())        == IO_ERROR) return IO_ERROR;
   sensorID = tmpint;
-  if ((tmpint  = is->getState())     == IO_ERROR) return IO_ERROR;
-  reqdState = tmpint;
+  if ((reqdState  = is->getState())     == IO_ERROR) return IO_ERROR;
   if ((tmplong = is->getNum())    == IO_NUMERROR) return IO_ERROR;
   triggerValue = tmplong;
   if ((tmpint  = is->getCondition()) == IO_ERROR) return IO_ERROR;
-  condition = tmpint;
+  conditions = tmpint;
   if ((tmpint  = is->getID())        == IO_ERROR) return IO_ERROR;
   actionID = tmpint;
-  if ((tmpint = is->getState())      == IO_ERROR) return IO_ERROR;
-  actionState = tmpint;
+  if ((actionState = is->getState())      == IO_ERROR) return IO_ERROR;
+  stateValues = (reqdState << 4) | actionState; // Pack both states into one char.
   if ((tmplong = is->getLong())   == IO_NUMERROR) return IO_ERROR;
   actionParameters = tmplong;
   if ((tmplong = is->getNum())    == IO_NUMERROR) return IO_ERROR;
   delayMs = tmplong;
   if ((tmpint  = is->getBool())      == IO_ERROR) return IO_ERROR;
-  repeat = tmpint;
+  if (tmpint) {
+    conditions += 0x10;  // Repeat
+  }
   if (is->getChar() != TRIGGER_END) return IO_ERROR;
   return 0;
 }
@@ -235,14 +239,14 @@ int Trigger::readTrigger(InputStream *is) {
 void Trigger::sendTrigger(OutputStream *os) {
   os->putChar(TRIGGER_START);
   os->putID(sensorID);
-  os->putState(reqdState);
+  os->putState( REQD_STATE(stateValues) ); 
   os->putNum(triggerValue);
-  os->putCondition(condition);
+  os->putCondition(CONDITION(conditions));
   os->putID(actionID);
-  os->putState(actionState);
+  os->putState( ACTION_STATE(stateValues) );  
   os->putLong(actionParameters);
   os->putNum(delayMs);
-  os->putBool(repeat);
+  os->putBool(ISREPEAT(conditions));
   os->putChar(TRIGGER_END);
 }
 

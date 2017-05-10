@@ -14,26 +14,32 @@
 #define TRIGGER_ON_HIGH   2
 #define TRIGGER_ON_EQUAL  3
 
+// Memory saving trick #3.  Pack data with values in the 0 - 15 range into one nibble.
+// Action state and required state are packed into stateValues.
+// condition and repeat are packed into conditions.
+#define REQD_STATE(x)  ((x >> 4) & 0xf)
+#define ACTION_STATE(x)   (x & 0xf)
+#define CONDITION(x)  (x & 0xf)
+#define ISREPEAT(x)     (x & 0x10)
+
 // Trigger - holds values for one trigger
 class Trigger {
   public:
     // Static elements
     char sensorID;
-    char reqdState;
+    char stateValues; // Required state in high bits.  Action state in low bits.
     int  triggerValue;
-    char condition;
+    char conditions;  // condition & repeat
     char actionID;
-    char actionState;
     long actionParameters;
     unsigned int  delayMs;
-    char repeat;
     
     // Dynamic elements
     boolean actionTaken;
     unsigned int onTime;
     unsigned int lastActionTime;
     int repeatInterval;
-    int repeatCount;
+    char repeatCount;
   
     Trigger() {
       actionTaken = false;
