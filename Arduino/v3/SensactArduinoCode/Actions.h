@@ -9,7 +9,7 @@
 
 // Action - Identifies a single action.
 struct Action {
-  int actionID;
+  char actionID;
   long actionParameter;
 };
 

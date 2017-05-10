@@ -5,7 +5,7 @@
 
 // SensorDatum - Holds data from a single logical sensor
 struct SensorDatum {  
-  int sensorID;
+  char sensorID;
   int sensorValue;
 };
 
