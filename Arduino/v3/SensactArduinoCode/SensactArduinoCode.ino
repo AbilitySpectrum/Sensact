@@ -69,6 +69,7 @@ void loop() {
       val = triggers.readTriggers(&serialInput);
       if (val == IO_ERROR) {
         flashLED(LED_RED);
+        tone(SENSACT_BUZZER, 800, 250);
       } else {
         flashLED(LED_GREEN);
         tone(SENSACT_BUZZER, 200, 500);
