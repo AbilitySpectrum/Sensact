@@ -12,6 +12,7 @@
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
+#define VERSION         "3.1"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'

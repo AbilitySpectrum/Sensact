@@ -1,5 +1,6 @@
 // JavaScript Document
 // interface.js
+var sensActVersion = "unknown";
 
 function startup() {
 	var bypassConnection = false; // Make it true to bypass the connection phase.
@@ -23,9 +24,23 @@ function startup() {
 };
 
 // Called from WebSocket when the connection is complete.
+// Requests version information.
 function connectionComplete() {
-	getVersion();   // After the version is determined this will 
-					// also set up the sensor and action lists.
+	webSocket.send(GET_VERSION);	// Request version #
+	setTimeout(versionComplete, 500); // Triggers if there is no response to GET_VERSION	
+}
+
+function setVersion(data) {
+	clearTimeout();
+	// data is Version # prefixed by 'V' and followed by 'Z'
+	sensActVersion = data.substring(1, data.length-1);
+	versionComplete();
+}
+
+
+// Called when version request is complete - or times out.
+function versionComplete() {
+	setupLists(sensActVersion);   
 
 	// A transition in CSS will make the connection box slide up out of the window
 	// after a short delay.
@@ -33,6 +48,7 @@ function connectionComplete() {
 	var move = "-" + (h + 50) + "px";
 	document.getElementById("connection").style.top = move;
 	// After that the buttons panel will appear.
+	document.getElementById("version").innerHTML = "Version: " + sensActVersion;
 	document.getElementById("buttons").style.left = "3px";
 	document.getElementById("mainContent").style.opacity = "1";
 	

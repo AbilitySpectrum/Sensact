@@ -219,7 +219,9 @@ void ledsOff() {
 #endif  // VERSION_2_HW
 
 void sendVersionInfo() {
-  // TBD
+  Serial.print(GET_VERSION);  // V
+  Serial.print(VERSION);  // version #
+  Serial.print(END_OF_BLOCK); // Z
 }
 
 // Report sensor values

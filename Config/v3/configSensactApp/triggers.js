@@ -31,13 +31,10 @@ var CONDITION_MASK = '0';
 var BOOL_TRUE	= 'p';
 var BOOL_FALSE	= 'q';
 
-
-var sensActVersion;
 var sensors = [];
 var actions = [];
 
-function getVersion() {
-	// TBD
+function setupLists(version) {	
 	createSensorList();
 	createActionList();
 }
