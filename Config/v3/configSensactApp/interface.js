@@ -29,7 +29,9 @@ function connectionComplete() {
 
 	// A transition in CSS will make the connection box slide up out of the window
 	// after a short delay.
-	document.getElementById("connection").style.top = "-200px";
+	var h = document.getElementById("connection").clientHeight;
+	var move = "-" + (h + 50) + "px";
+	document.getElementById("connection").style.top = move;
 	// After that the buttons panel will appear.
 	document.getElementById("buttons").style.left = "3px";
 	document.getElementById("mainContent").style.opacity = "1";
