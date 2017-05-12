@@ -7,15 +7,15 @@
 #include <IRLib.h>
 #include "Actions.h"
 
-
 Actors actors;
 
 void Actors::init() {
   // Add actors
   addActor( new Relay(1, SENSACT_RELAY_1) );
   addActor( new Relay(2, SENSACT_RELAY_2) );
-  addActor( new Bluetooth(3) );
+  addActor( new BTKeyboard(3) );
   addActor( new HIDKeyboard(4) );
+  addActor( new BTMouse(9) );
   addActor( new HIDMouse(5) );
   addActor( new Buzzer(7, SENSACT_BUZZER) );
   addActor( new IRTV(8) );
@@ -93,12 +93,16 @@ void HIDKeyboard::doAction(long param) {
   }
 }
 
-// === HID Mouse === //
+// === Mouse Control === //
 #define SA_MOUSE_UP    1
 #define SA_MOUSE_DOWN  2
 #define SA_MOUSE_LEFT  3
 #define SA_MOUSE_RIGHT 4
 #define SA_MOUSE_CLICK 5
+#define SA_MOUSE_PRESS 6
+#define SA_MOUSE_RELEASE 7
+#define SA_MOUSE_RIGHT_CLICK 8
+
 #define SA_MOUSE_SPEED 6
 
 // Mouse nudge commands - for Gyro Accel motions
@@ -107,23 +111,38 @@ void HIDKeyboard::doAction(long param) {
 #define NUDGE_LEFT    12
 #define NUDGE_RIGHT   13
 
-void HIDMouse::doAction(long param) {
+unsigned int MouseControl::timeDiff(unsigned int now, unsigned int prev) {
+  if (now > prev) return (now - prev);
+  // else
+  return (0xffff - prev + now + 1);  // Counter rolled over.
+}
+
+void MouseControl::doAction(long param) {
   int option = param & 0xffff;
   switch(option) {
     case SA_MOUSE_UP:
-      Mouse.move(0, -SA_MOUSE_SPEED);
+      mc_move(0, -SA_MOUSE_SPEED);
       break;
     case SA_MOUSE_DOWN:
-      Mouse.move(0, SA_MOUSE_SPEED);
+      mc_move(0, SA_MOUSE_SPEED);
       break;
     case SA_MOUSE_LEFT:
-      Mouse.move(-SA_MOUSE_SPEED, 0);
+      mc_move(-SA_MOUSE_SPEED, 0);
       break;
     case SA_MOUSE_RIGHT:
-      Mouse.move(SA_MOUSE_SPEED, 0);
+      mc_move(SA_MOUSE_SPEED, 0);
       break;
     case SA_MOUSE_CLICK:
-      Mouse.click();
+      mc_button(MC_LEFT_CLICK);
+      break;
+    case SA_MOUSE_RIGHT_CLICK:
+      mc_button(MC_RIGHT_CLICK);
+      break;
+    case SA_MOUSE_PRESS:
+      mc_button(MC_PRESS);
+      break;
+    case SA_MOUSE_RELEASE:
+      mc_button(MC_RELEASE);
       break;
     case NUDGE_UP:
       if (verticalMouseState == MOUSE_MOVING_DOWN) {
@@ -156,19 +175,41 @@ void HIDMouse::doAction(long param) {
   }
 }
 
-void HIDMouse::checkAction() {
-  if ( (lastMouseMoveTime + REPEAT_INTERVAL) < millis()) {
+void MouseControl::checkAction() {
+  unsigned int now = millis() & 0xffff;
+  if ( timeDiff(now, lastMouseMoveTime) > REPEAT_INTERVAL ) {
     if (verticalMouseState == MOUSE_MOVING_UP) {
-      Mouse.move(0, -SA_MOUSE_SPEED); 
+      mc_move(0, -SA_MOUSE_SPEED); 
     } else if (verticalMouseState == MOUSE_MOVING_DOWN) {
-      Mouse.move(0, SA_MOUSE_SPEED);
+      mc_move(0, SA_MOUSE_SPEED);
     }
     if (horizontalMouseState == MOUSE_MOVING_LEFT) {
-      Mouse.move(-SA_MOUSE_SPEED, 0); 
+      mc_move(-SA_MOUSE_SPEED, 0); 
     } else if (horizontalMouseState == MOUSE_MOVING_RIGHT) {
-      Mouse.move(SA_MOUSE_SPEED, 0);
+      mc_move(SA_MOUSE_SPEED, 0);
     }
-    lastMouseMoveTime = millis();
+    lastMouseMoveTime = now;
+  }
+}
+
+void HIDMouse::mc_move(int x, int y) {
+    Mouse.move(x, y);
+}
+
+void HIDMouse::mc_button(int val) {
+  switch(val) {
+    case MC_LEFT_CLICK:
+      Mouse.click();
+      break;
+    case MC_RIGHT_CLICK:
+      Mouse.click(MOUSE_RIGHT);
+      break;
+    case MC_PRESS:
+      Mouse.press();
+      break;
+    case MC_RELEASE:
+      Mouse.release();
+      break;
   }
 }
 
@@ -176,24 +217,66 @@ void HIDMouse::checkAction() {
 #define BT_TX_PIN 0
 #define BT_RX_PIN 1
 
-void Bluetooth::init() {
-  pBlueHID = new SoftwareSerial(BT_TX_PIN, BT_RX_PIN);
-  delay(1000);
-  pBlueHID->begin(115200);  // Bluetooth defaults to 115200bps
-  
-  pBlueHID->print("$");    // Print three times individually
-  pBlueHID->print("$");
-  pBlueHID->print("$");    // Enter command mode
-  delay(100);    // Short delay
-  pBlueHID->println("U,9600,N"); //Change baud rate to 9600 - no parity
-  pBlueHID->begin(9600);  // Start bluetooth at 9600
+// Make the bluetooth pointer a singleton.
+// shared by BTKeyboard and BTMouse.
+static SoftwareSerial *pBlueHID = 0;
+SoftwareSerial *getBT() {
+  if (pBlueHID == 0) {
+    pBlueHID = new SoftwareSerial(BT_TX_PIN, BT_RX_PIN);
+    delay(1000);
+    pBlueHID->begin(115200);  // Bluetooth defaults to 115200bps
+    
+    pBlueHID->print("$");    // Print three times individually
+    pBlueHID->print("$");
+    pBlueHID->print("$");    // Enter command mode
+    delay(100);    // Short delay
+    pBlueHID->println("U,9600,N"); //Change baud rate to 9600 - no parity
+    pBlueHID->begin(9600);  // Start bluetooth at 9600    
+  }
+  return pBlueHID;
 }
 
-void Bluetooth::doAction(long param) {
-  int character = param & 0xff;
-  
-  pBlueHID->write(character);
+// === Bluetooth Keyboard ===
+void BTKeyboard::init() {
+  pBlueHID = getBT();
 }
+
+void BTKeyboard::doAction(long param) {
+  int i;
+  for(i=0; i<4; i++){
+    int character = (param >> 8 * (3-i)) & 0xff;
+    if (character != 0) {
+      pBlueHID->write(character);
+    }
+  }  
+}
+
+// === Bluetooth Mouse === //
+void BTMouse::init() {
+  pMouse = new BTMouseCtl( getBT() );
+}
+
+void BTMouse::mc_move(int x, int y) {
+    pMouse->move(x, y);
+}
+
+void BTMouse::mc_button(int val) {
+  switch(val) {
+    case MC_LEFT_CLICK:
+      pMouse->click(BT_LEFT_BUTTON);
+      break;
+    case MC_RIGHT_CLICK:
+      pMouse->click(BT_RIGHT_BUTTON);
+      break;
+    case MC_PRESS:
+      pMouse->press(BT_LEFT_BUTTON);
+      break;
+    case MC_RELEASE:
+      pMouse->release(BT_LEFT_BUTTON);
+      break;
+  }
+}
+
 
 // === IR TV === //
 #define TV_ON_OFF    1

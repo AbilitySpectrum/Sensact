@@ -1,6 +1,7 @@
 // JavaScript Document
 // interface.js
-var sensActVersion = "unknown";
+var sensActVersion = "unknown";  // e.g. 3.1
+var sensActVersionID = 0;		 // High # * 100 + Low number - thus "3.1" becomes 301.
 
 function startup() {
 	var bypassConnection = false; // Make it true to bypass the connection phase.
@@ -25,22 +26,24 @@ function startup() {
 
 // Called from WebSocket when the connection is complete.
 // Requests version information.
+var timeoutVar;
 function connectionComplete() {
 	webSocket.send(GET_VERSION);	// Request version #
-	setTimeout(versionComplete, 500); // Triggers if there is no response to GET_VERSION	
+	timeoutVar = setTimeout(versionComplete, 500); // Triggers if there is no response to GET_VERSION	
 }
 
 function setVersion(data) {
-	clearTimeout();
+	clearTimeout(timeoutVar);
 	// data is Version # prefixed by 'V' and followed by 'Z'
 	sensActVersion = data.substring(1, data.length-1);
+	var parts = sensActVersion.split('.');
+	sensActVersionID = Number(parts[0]) * 100 + Number(parts[1]);
 	versionComplete();
 }
 
-
 // Called when version request is complete - or times out.
 function versionComplete() {
-	setupLists(sensActVersion);   
+	setupLists();   
 
 	// A transition in CSS will make the connection box slide up out of the window
 	// after a short delay.

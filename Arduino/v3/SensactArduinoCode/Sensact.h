@@ -76,7 +76,7 @@
 #define MAX_TRIGGERS 20           // Maximum number of triggers allowed.
 #define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check.
 #define MAX_SENSORS 8
-#define MAX_ACTORS  8
+#define MAX_ACTORS  9
 
 // -------------------------- V2 Hardware -----------------------------------------------
 #elif VERSION_2_HW
