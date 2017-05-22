@@ -10,6 +10,13 @@ body {
 
 /* ------------------------------------------------------ */
 /* Main Control Buttons */
+p#version {
+	margin-top: 5 px;
+	text-align: center;
+	font-family: Geneva, Arial, Helvetica, sans-serif
+	font-size: 80%;
+}
+
 div#buttons {
 	background: lightblue;
 	border: thin solid;

@@ -6,6 +6,7 @@
 #define ActionData_H
 #include "Sensact.h"
 #include <SoftwareSerial.h>
+#include "BTMouseCtl.h"
 
 // Action - Identifies a single action.
 struct Action {
@@ -117,19 +118,25 @@ class HIDKeyboard: public Actor {
 #define MOUSE_MOVING_RIGHT  4
 #define MOUSE_STILL         5
 
-class HIDMouse: public Actor {
+// MouseControl button options
+#define MC_LEFT_CLICK  1
+#define MC_RIGHT_CLICK 2
+#define MC_PRESS       3
+#define MC_RELEASE     4
+
+class MouseControl: public Actor {
   private:
     // Variables for managing nudge actions
     int verticalMouseState;
     int horizontalMouseState;
-    long lastMouseMoveTime;
-    
+    unsigned int lastMouseMoveTime;
+    unsigned int timeDiff(unsigned int now, unsigned int prev);
+
   public:
-    HIDMouse(int i) {
-      id = i;
+    MouseControl() {
       verticalMouseState = MOUSE_STILL;
       horizontalMouseState = MOUSE_STILL;
-      lastMouseMoveTime = 0;
+      lastMouseMoveTime = 0;      
     }
     void reset() {
       verticalMouseState = MOUSE_STILL;
@@ -138,18 +145,44 @@ class HIDMouse: public Actor {
     }
     void doAction(long param);
     void checkAction();
+    virtual void mc_move(int x, int y) = 0;
+    virtual void mc_button(int val) = 0;
 };
 
-class Bluetooth: public Actor {
+class HIDMouse: public MouseControl {
+  private:
+    
+  public:
+    HIDMouse(int i) {
+      id = i;
+    }
+    void mc_move(int x, int y);
+    void mc_button(int val); 
+};
+
+class BTKeyboard: public Actor {
   private:
     SoftwareSerial *pBlueHID;
     
   public:
-    Bluetooth(int i) {
+    BTKeyboard(int i) {
       id = i;
     }
     void init();
     void doAction(long param);
+};
+
+class BTMouse: public MouseControl {
+  private: 
+    BTMouseCtl *pMouse;
+    
+  public:
+    BTMouse(int i) {
+      id = i;
+    }
+    void init();
+    void mc_move(int x, int y);
+    void mc_button(int val); 
 };
 
 class IRTV: public Actor {

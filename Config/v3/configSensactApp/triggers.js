@@ -31,13 +31,10 @@ var CONDITION_MASK = '0';
 var BOOL_TRUE	= 'p';
 var BOOL_FALSE	= 'q';
 
-
-var sensActVersion;
 var sensors = [];
 var actions = [];
 
-function getVersion() {
-	// TBD
+function setupLists() {	
 	createSensorList();
 	createActionList();
 }
@@ -98,17 +95,58 @@ function createActionList() {
 	actions.push( new Action(0, "None",         noOption) );
 	actions.push( new Action(1, "Relay A",      noOption) );
 	actions.push( new Action(2, "Relay B",      noOption) );
-	actions.push( new Action(3, "Bluetooth",    keyOption, 65) ); // 'A'
+	actions.push( new Action(3, "BT Keyboard",  keyOption, 65) ); // 'A'
+	if (sensActVersionID >= 301) {
+		actions.push( new Action(3, "BT Special",  BTSpecial, 10) ); // KEY_RETURN
+		actions.push( new Action(9, "BT Mouse", mouseOption, MOUSE_UP) ); 
+	}
 	actions.push( new Action(4, "HID Keyboard", keyOption, 65) ); // 'A'
+	if (sensActVersionID >= 301) {
+		actions.push( new Action(4, "HID Special",  HIDSpecial, 0xB0) ); // KEY_RETURN
+	}
 	actions.push( new Action(5, "HID Mouse",    mouseOption, MOUSE_UP) );
 	actions.push( new Action(6, "Joystick",     noOption) );
 	actions.push( new Action(7, "Buzzer",       BuzzOption, (400 << 16) + 250 ) );
 	actions.push( new Action(8, "IR",           IROption, TV_ON_OFF) );
 }
 
-function getActionByID(id) {
+// getActionByID uses param to determine whether the
+// 'Keyboard' or 'Special' gui is need for keyboard actions.
+// This requires a mess of hard-coded special-case logic here.
+// However, this approach requires no special or additional code on the Sensact.
+function getActionByID(id, param) {
 	for(var i=0; i<actions.length; i++) {
 		if (actions[i].id == id) {
+			if (sensActVersionID >= 301) {
+				if (actions[i].name == "HID Keyboard") {
+					if (param < 0x100 && param > 0x7f) {
+						continue;	// Not a match
+					} else {
+						return  actions[i];
+					}
+				}
+				if (actions[i].name == "HID Special") {
+					if (param < 0x100 && param > 0x7f) {
+						return  actions[i];
+					} else {
+						continue;
+					}
+				}
+				if (actions[i].name == "BT Keyboard") {
+					if (param < 32) {
+						continue;	// Not a match
+					} else {
+						return  actions[i];
+					}
+				}
+				if (actions[i].name == "BT Special") {
+					if (param < 32) {
+						return  actions[i];
+					} else {
+						continue;
+					}
+				}
+			}
 			return actions[i];
 		}
 	}
@@ -183,12 +221,12 @@ Trigger.prototype.fromStream = function(stream) {
 	this.triggerValue = stream.getNum(4);
 	this.condition = stream.getCondition();
 	var actionID = stream.getID(2);
-	this.action = getActionByID(actionID);
+	this.actionState = stream.getID(1);
+	this.actionParam = stream.getNum(8);
+	this.action = getActionByID(actionID, this.actionParam);
 	if (this.action == null) {
 		throw ("Invalid Action ID");
 	}
-	this.actionState = stream.getID(1);
-	this.actionParam = stream.getNum(8);
 	this.delay = stream.getNum(4);
 	this.repeat = stream.getBoolean();
 	if (stream.getChar() != TRIGGER_END) {
@@ -375,12 +413,88 @@ var keyOption = function(t) {
 	return div;
 }
 
+// Key mapping for USB-HID
+var HIDKeys = [
+	new ValueLabelPair( 0xDA, "UP ARROW" ),   
+	new ValueLabelPair( 0xD9, "DOWN ARROW" ),    
+	new ValueLabelPair( 0xD8, "LEFT ARROW" ),    
+	new ValueLabelPair( 0xD7, "RIGHT ARROW" ),   
+	new ValueLabelPair( 0xB2, "BACKSPACE" ), 
+	new ValueLabelPair( 0xB3, "TAB" ),   
+	new ValueLabelPair( 0xB0, "RETURN" ),    
+	new ValueLabelPair( 0xB1, "ESC" ),    
+	new ValueLabelPair( 0xD1, "INSERT" ),     
+	new ValueLabelPair( 0xD4, "DELETE" ),     
+	new ValueLabelPair( 0xD3, "PAGE UP" ),     
+	new ValueLabelPair( 0xD6, "PAGE DOWN" ),  
+	new ValueLabelPair( 0xD2, "HOME" ),      
+	new ValueLabelPair( 0xD5, "END" )      
+];
+
+// Key mapping for Roving Networks Bluetooth card.
+var BTKeys = [
+	new ValueLabelPair( 14, "UP ARROW" ),   
+	new ValueLabelPair( 12, "DOWN ARROW" ),    
+	new ValueLabelPair( 11, "LEFT ARROW" ),    
+	new ValueLabelPair(  7, "RIGHT ARROW" ),   
+	new ValueLabelPair(  8, "BACKSPACE" ), 
+	new ValueLabelPair(  9, "TAB" ),   
+	new ValueLabelPair( 10, "RETURN" ),    
+	new ValueLabelPair( 27, "ESC" ),    
+	new ValueLabelPair(  1, "INSERT" ),     
+	new ValueLabelPair(  4, "DELETE" ),     
+	new ValueLabelPair(  3, "PAGE UP" ),     
+	new ValueLabelPair(  6, "PAGE DOWN" ),  
+	new ValueLabelPair(  2, "HOME" ),      
+	new ValueLabelPair(  5, "END" )      
+];
+
+var HIDSpecial = function(t) {
+	return specialKeys(t, HIDKeys);
+}
+
+var BTSpecial = function(t) {
+	return specialKeys(t, BTKeys);
+}
+
+// --- HID Special Keys --- //
+function specialKeys(t, keymap) {
+	var div = newDiv("actionOption");
+	
+	var txtLabel = newLabel(0, "hidSpecial" + t.id, "Key:");
+	var sel = document.createElement("select");
+	sel.id = "hidSpecial" + t.id;
+	
+	var nkeys = keymap.length;
+	var param = t.actionParam & 0xff;
+	for(var i=0; i<nkeys; i++) {
+		var opt = document.createElement("option");
+		opt.innerHTML = keymap[i].label;
+		opt.value = keymap[i].value;
+		opt.selected = (param == keymap[i].value);
+		sel.appendChild(opt);
+	}
+	
+	div.appendChild(txtLabel);
+	div.appendChild(sel);
+	
+	sel.onchange = function() {
+		var choice = this.options[this.selectedIndex];
+		t.actionParam = choice.value;
+	}
+	
+	return div;
+}
+
 // --- MOUSE PARAMETERS --- //
 var MOUSE_UP = 1;
 var MOUSE_DOWN = 2;
 var MOUSE_LEFT = 3;
 var MOUSE_RIGHT = 4;
 var MOUSE_CLICK = 5;
+var MOUSE_PRESS = 6;
+var MOUSE_RELEASE = 7;
+var MOUSE_RIGHT_CLICK = 8;
 var NUDGE_UP = 10;
 var NUDGE_DOWN = 11;
 var NUDGE_LEFT = 12;
@@ -391,7 +505,7 @@ function ValueLabelPair(v, l) {
 	this.label = l;
 }
 
-var mice = [
+var mice1 = [
 	new ValueLabelPair(MOUSE_UP, "Mouse Up"),
 	new ValueLabelPair(MOUSE_DOWN, "Mouse Down"),
 	new ValueLabelPair(MOUSE_LEFT, "Mouse Left"),
@@ -403,7 +517,29 @@ var mice = [
 	new ValueLabelPair(NUDGE_RIGHT, "Nudge Right")
 ];
 
+var mice2 = [
+	new ValueLabelPair(MOUSE_UP, "Mouse Up"),
+	new ValueLabelPair(MOUSE_DOWN, "Mouse Down"),
+	new ValueLabelPair(MOUSE_LEFT, "Mouse Left"),
+	new ValueLabelPair(MOUSE_RIGHT, "Mouse Right"),
+	new ValueLabelPair(MOUSE_CLICK, "Mouse Click"),
+	new ValueLabelPair(MOUSE_RIGHT_CLICK, "Mouse Right Click"),
+	new ValueLabelPair(MOUSE_PRESS, "Mouse Press"),
+	new ValueLabelPair(MOUSE_RELEASE, "Mouse Release"),
+	new ValueLabelPair(NUDGE_UP, "Nudge Up"),
+	new ValueLabelPair(NUDGE_DOWN, "Nudge Down"),
+	new ValueLabelPair(NUDGE_LEFT, "Nudge Left"),
+	new ValueLabelPair(NUDGE_RIGHT, "Nudge Right")
+];
+
+var mice;
+
 var mouseOption = function(t) {
+	if (sensActVersionID >= 301) {
+		mice = mice2;
+	} else {
+		mice = mice1;
+	}
 	var div = newDiv("actionOption");
 	
 	var txtLabel = newLabel(0, "mousesel" + t.id, "Mouse Action:");

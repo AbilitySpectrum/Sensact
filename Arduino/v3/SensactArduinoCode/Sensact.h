@@ -12,6 +12,7 @@
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
+#define VERSION         "3.1"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
@@ -75,7 +76,7 @@
 #define MAX_TRIGGERS 20           // Maximum number of triggers allowed.
 #define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check.
 #define MAX_SENSORS 8
-#define MAX_ACTORS  8
+#define MAX_ACTORS  9
 
 // -------------------------- V2 Hardware -----------------------------------------------
 #elif VERSION_2_HW

@@ -204,6 +204,10 @@ var webSocket = {
 				inputStream.init(this.receivedData);				
 				updateMeterValues(inputStream);
 			}
+			if (this.receivedData[0] == 'V') {
+				setVersion(this.receivedData);
+			}
+			
 			// processData(receivedData);
 			this.receivedData = '';
 		}
