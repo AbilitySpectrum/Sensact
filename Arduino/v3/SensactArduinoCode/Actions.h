@@ -8,9 +8,13 @@
 #include <SoftwareSerial.h>
 #include "BTMouseCtl.h"
 
+unsigned int timeDiff(unsigned int now, unsigned int prev);
+
 // Action - Identifies a single action.
+#define ACTION_ID_MASK   0x7F
+#define REPEAT_BIT  0x80
 struct Action {
-  char actionID;
+  char actionID;    // ID and repeat bit.
   long actionParameter;
 };
 
@@ -21,9 +25,9 @@ class ActionData {
   
   public:
     void reset() {nActions = 0;}
-    void addAction(int id, long param) {
+    void addAction(int id, long param, boolean repeat) {
       if (nActions < MAX_ACTIONS) {
-        aActions[nActions].actionID = id;
+        aActions[nActions].actionID = id | (repeat ? REPEAT_BIT : 0);
         aActions[nActions].actionParameter = param;
         nActions++;
       }
@@ -37,12 +41,24 @@ class ActionData {
 class Actor { 
   public:
     int id;
+    // lastActionTime tracks the last time an action was performed
+    // for the purpose of tracking repeated actions.
+    // The first action of a repeated group will always arrive without 
+    // the repeat bit set - so lastActionTime can be properly initialized
+    // at that time.
+    int lastActionTime;
     
   public:
     virtual void init() {}
     // Reset is called when new triggers are set.
     // An actor should reset stored variable values to initial state when reset is called.
     virtual void reset() {}
+    // assessAction determines whether or not the action should be performed.
+    // If repeat is false the action is always performed (by calling doAction).
+    // If repeat is true the action is only performed if the repeat interval
+    // since the last performance of the action has passed.
+    // This structure allows individual actions to have unique repeat-interval logic.
+    virtual void assessAction(long param, int repeat);
     virtual void doAction(long param) = 0;
     // checkAction is used to turn actions off
     // e.g. to turn off a relay a short time after the action.
@@ -129,20 +145,23 @@ class MouseControl: public Actor {
     // Variables for managing nudge actions
     int verticalMouseState;
     int horizontalMouseState;
-    unsigned int lastMouseMoveTime;
-    unsigned int timeDiff(unsigned int now, unsigned int prev);
+
+    // Mouse vertical and horizontal motion can be happening at
+    // the same time - so we need two repeat timers.
+    unsigned int lastMouseVerticalMove;
+    unsigned int lastMouseHorizontalMove;
+    unsigned int repeatCount;
 
   public:
     MouseControl() {
       verticalMouseState = MOUSE_STILL;
       horizontalMouseState = MOUSE_STILL;
-      lastMouseMoveTime = 0;      
     }
     void reset() {
       verticalMouseState = MOUSE_STILL;
       horizontalMouseState = MOUSE_STILL;
-      lastMouseMoveTime = 0;      
     }
+    void assessAction(long param, int repeat);
     void doAction(long param);
     void checkAction();
     virtual void mc_move(int x, int y) = 0;

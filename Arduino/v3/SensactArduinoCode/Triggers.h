@@ -37,9 +37,6 @@ class Trigger {
     // Dynamic elements
     boolean actionTaken;
     unsigned int onTime;
-    unsigned int lastActionTime;
-    int repeatInterval;
-    char repeatCount;
   
     Trigger() {
       actionTaken = false;

@@ -38,9 +38,10 @@
 // === Timing Constants - all in ms === //
 #define REPORTING_INTERVAL  200  // Interval between reports of signal levels
 #define READING_INTERVAL     10  // Interval between reading signals in run mode
-#define REFRACTORY          800  // Interval within which the output will not re-trigger.
-#define PULSE_WIDTH          50  // Output pulse width
-#define REPEAT_INTERVAL     100  // Time between repeats of repeated actions.
+#define REFRACTORY          800  // Interval within which the output will not re-trigger. (unused in this version)
+#define PULSE_WIDTH          50  // Output pulse width - for relays
+#define DEFAULT_REPEAT_INTERVAL 250 // Repeat interval for most things.
+#define MOUSE_REPEAT_INTERVAL   100 // Time between repeats of mouse move actions.
 
 // -------------------------- V3 Hardware -----------------------------------------------
 #ifdef VERSION_3_HW

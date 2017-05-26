@@ -8,23 +8,6 @@
 EEPROMInputStream EEIn;
 EEPROMOutputStream EEOut;
 
-/*
- *  Memory Saving Trick #1
- *  Save times in unsigned int values.  This will hold times up to 65 seconds.
- *  Use timeDiff to calculate the time interval between 'now' and a previous time 'prev'.
- *  'now' should always be greater than 'prev'.  If it isn't it is because our counter
- *  rolled over - and the difference calculation is adjusted to take this into account.
- *  
- *  Since we never care about time intervals bigger than a couple of seconds this works just fine.
- *  Using unsigned int rather than a long saves 4 bytes per trigger structure.
- *  With MAX_TRIGGERS set to 20 this is a savings of 80 bytes.
- */
-unsigned int timeDiff(unsigned int now, unsigned int prev) {
-  if (now > prev) return (now - prev);
-  // else
-  return (0xffff - prev + now + 1);  // Counter rolled over.
-}
-
 void Triggers::init() {
   // See if there are triggers stored in EEPROM and read them.
   EEIn.init();
@@ -125,43 +108,30 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
         unsigned int now = millis() & 0xffff;  // See Memory Saving Trick #1
         if (pTrigger->onTime == 0) {  // Not triggered previously
           pTrigger->onTime = now; // Record time of initial trigger match
-          pTrigger->repeatInterval = REPEAT_INTERVAL;  // Repeat at slow default.
-          pTrigger->repeatCount = 0;
           
           if (pTrigger->delayMs == 0) { // No delay? Do action immediately.
             aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
-            actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
+            actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             pTrigger->actionTaken = true;
-            pTrigger->lastActionTime = now;
           }
           
         } else if (pTrigger->actionTaken == false) { // Waiting for delay
           if (timeDiff(now, pTrigger->onTime) > pTrigger->delayMs) {
             aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues); 
-            actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
+            actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             pTrigger->actionTaken = true;
-            pTrigger->lastActionTime = now;
-          }
+         }
           
         } else if (ISREPEAT(pTrigger->conditions)) {
-          if ( timeDiff(now, pTrigger->lastActionTime) > pTrigger->repeatInterval) {
-            actions.addAction(pTrigger->actionID, pTrigger->actionParameters);
-            pTrigger->lastActionTime = now;
-            pTrigger->repeatCount++;
-            if (pTrigger->repeatCount > 40) {
-              pTrigger->repeatInterval = REPEAT_INTERVAL / 4;
-              pTrigger->repeatCount = 41; // Hold at 41 since it is held in a char.
-            } else if (pTrigger->repeatCount > 10) { 
-              pTrigger->repeatInterval = REPEAT_INTERVAL / 2; 
-            } 
-            
-          } 
+          // Requests for repeated actions are sent to action processing.
+          // There the decision of whether actually to do the action or not 
+          // is made (in assessAction) - based on the time since the last action.
+          actions.addAction(pTrigger->actionID, pTrigger->actionParameters, true);
         }          
         
       } else { 
           pTrigger->onTime = 0;
           pTrigger->actionTaken = false;
-          pTrigger->lastActionTime = 0;          
       }
     }
   }
