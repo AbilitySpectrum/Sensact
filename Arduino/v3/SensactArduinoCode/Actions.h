@@ -119,13 +119,7 @@ class Buzzer: public Actor {
     void doAction(long param);
 };
 
-class HIDKeyboard: public Actor {
-  public:
-    HIDKeyboard(int i) {
-      id = i;
-    }
-    void doAction(long param);
-};
+
 
 // Mouse movement states - for NUDGE actions
 #define MOUSE_MOVING_UP     1
@@ -143,14 +137,14 @@ class HIDKeyboard: public Actor {
 class MouseControl: public Actor {
   private:
     // Variables for managing nudge actions
-    int verticalMouseState;
-    int horizontalMouseState;
+    char verticalMouseState;
+    char horizontalMouseState;
 
     // Mouse vertical and horizontal motion can be happening at
     // the same time - so we need two repeat timers.
     unsigned int lastMouseVerticalMove;
     unsigned int lastMouseHorizontalMove;
-    unsigned int repeatCount;
+    unsigned char repeatCount;
 
   public:
     MouseControl() {
@@ -168,6 +162,13 @@ class MouseControl: public Actor {
     virtual void mc_button(int val) = 0;
 };
 
+class KeyboardControl: public Actor {
+  public:
+    KeyboardControl() {}
+    void doAction(long param);
+    virtual void kc_write(char character) = 0;
+};
+
 class HIDMouse: public MouseControl {
   private:
     
@@ -179,17 +180,14 @@ class HIDMouse: public MouseControl {
     void mc_button(int val); 
 };
 
-class BTKeyboard: public Actor {
-  private:
-    SoftwareSerial *pBlueHID;
-    
+class HIDKeyboard: public KeyboardControl {
   public:
-    BTKeyboard(int i) {
+    HIDKeyboard(int i) {
       id = i;
     }
-    void init();
-    void doAction(long param);
+    void kc_write(char character);
 };
+
 
 class BTMouse: public MouseControl {
   private: 
@@ -202,6 +200,18 @@ class BTMouse: public MouseControl {
     void init();
     void mc_move(int x, int y);
     void mc_button(int val); 
+};
+
+class BTKeyboard: public KeyboardControl {
+  private:
+    SoftwareSerial *pBlueHID;
+    
+  public:
+    BTKeyboard(int i) {
+      id = i;
+    }
+    void init();
+    void kc_write(char character);
 };
 
 class IRTV: public Actor {

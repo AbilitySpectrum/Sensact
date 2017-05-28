@@ -71,7 +71,7 @@ void Actors::doActions(const ActionData *pData) {
 
 // Default Repeat Logic - repeat every 1/2 second //
 void Actor::assessAction(long param, int repeat) {
-  int now = millis() & 0xfff;
+  unsigned int now = millis() & 0xffff;
   if (repeat) {
     if ( timeDiff(now, lastActionTime) < DEFAULT_REPEAT_INTERVAL ) {
       return; // Not long enough since the last action.  
@@ -110,17 +110,6 @@ void Buzzer::doAction(long param) {
   int duration = param & 0xffff;
   
   tone(pin, pitch, duration);
-}
-
-// === HID Keyboard === //
-void HIDKeyboard::doAction(long param) {
-  int i;
-  for(i=0; i<4; i++){
-    int character = (param >> 8 * (3-i)) & 0xff;
-    if (character != 0) {
-      Keyboard.write(character);
-    }
-  }
 }
 
 // === Mouse Control === //
@@ -168,7 +157,7 @@ void MouseControl::assessAction(long param, int repeat) {
       // Repeat for all other mouse actions is not allowed
       return;
     }
-    repeatCount++; // We only get here if we are repeating.
+    if (repeatCount <= 40) repeatCount++; // We only get here if we are repeating.
   } else {
     // Initial action - not a repeat
     repeatCount = 0;
@@ -258,6 +247,19 @@ void MouseControl::checkAction() {
     }
 }
 
+// === Keyboard Control === //
+void KeyboardControl::doAction(long param) {
+  int i;
+  for(i=0; i<4; i++){
+    int character = (param >> 8 * (3-i)) & 0xff;
+    if (character != 0) {
+      kc_write(character);
+    }
+  }  
+}
+
+// === HID === //
+// --- HID Mouse --- //
 void HIDMouse::mc_move(int x, int y) {
     Mouse.move(x, y);
 }
@@ -277,6 +279,11 @@ void HIDMouse::mc_button(int val) {
       Mouse.release();
       break;
   }
+}
+
+// --- HID Keyboard --- //
+void HIDKeyboard::kc_write(char character) {
+  Keyboard.write(character);
 }
 
 // === Bluetooth === //
@@ -302,22 +309,8 @@ SoftwareSerial *getBT() {
   return pBlueHID;
 }
 
-// === Bluetooth Keyboard ===
-void BTKeyboard::init() {
-  pBlueHID = getBT();
-}
 
-void BTKeyboard::doAction(long param) {
-  int i;
-  for(i=0; i<4; i++){
-    int character = (param >> 8 * (3-i)) & 0xff;
-    if (character != 0) {
-      pBlueHID->write(character);
-    }
-  }  
-}
-
-// === Bluetooth Mouse === //
+// --- Bluetooth Mouse --- //
 void BTMouse::init() {
   pMouse = new BTMouseCtl( getBT() );
 }
@@ -343,6 +336,14 @@ void BTMouse::mc_button(int val) {
   }
 }
 
+// --- Bluetooth Keyboard --- //
+void BTKeyboard::init() {
+  pBlueHID = getBT();
+}
+
+void BTKeyboard::kc_write(char character) {
+  pBlueHID->write(character);
+}
 
 // === IR TV === //
 #define TV_ON_OFF    1
