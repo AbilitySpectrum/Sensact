@@ -171,6 +171,7 @@ int getInt() {
       return val;
     }
   }
+  return val;
 }
 
 void doBeep() {
@@ -259,7 +260,7 @@ void doHelp() {
   Serial.println(" 'r'             Reads the value of all input pins.");
   Serial.println(" 'r' 1 to 6      Reads the value of a particular input port ");
   Serial.println("                 repeating until another command is entered.");
-  Serial.println("                 (1 = A0, 2 = A1 ... 6 = A5)");
+  Serial.println("                 (1 = I1A, 2 = I1B, 3 = I2A ... 6 = I3B)");
   Serial.println(" 'g'             Reads I2C Gyroscope. (Leaves non-I2C inputs powered off)");
   Serial.println(" 't'             Runs the TV IR.  On/Off cycling every 1/4 second for two seconds.");
   Serial.println("                 Watch with a cell phone camera or with a multi-tester.");
