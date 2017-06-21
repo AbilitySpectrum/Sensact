@@ -55,8 +55,8 @@
                       // Probably can be much shorter.  Chips response times are given on ns on spec sheet.
 
 // === LED Values === //
-#define LED_RED    1
-#define LED_GREEN  2
+#define LED_RED    2
+#define LED_GREEN  1
 #define LED_BLUE   4
 
 // === Sensor Pins === //

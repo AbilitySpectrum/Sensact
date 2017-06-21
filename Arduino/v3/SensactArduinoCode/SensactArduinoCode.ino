@@ -152,7 +152,7 @@ void setLED() {
   // When a pin is HIGH the light is off, and when LOW it is on.
   // Thus the "7 - " in the following code.
   if (runMode == RUN) {
-     doLED(7 - -LED_GREEN);
+     doLED(7 - LED_GREEN);
   } else {  // REPORT mode
      doLED(7 - LED_RED);
   }
