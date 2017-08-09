@@ -66,12 +66,12 @@ class SolutionUI(Toplevel):
 		return
 		
 	def hidBtn(self):
-		self.mouseType = "HID"
+		self.mouseType = SAModel.getActionByName("HID Mouse")
 		self.clearButtons()
 		gSyncEvent.set()
 		
 	def btBtn(self):
-		self.mouseType = "BT"
+		self.mouseType = SAModel.getActionByName("Bt Mouse")
 		self.clearButtons()
 		gSyncEvent.set()
 			
@@ -175,12 +175,16 @@ class SolutionBtn(ttk.Button):
 # 
 # --- Calibration Support --- #
 #		
+# MinMax - a class for gathering min & max values for a sensor.
 class MinMax:
-	def __init__(self, allowance):
+	def __init__(self, sensor):
 		self.valsSet = False
-		self.allowance = allowance
+		self.sensor = sensor
+		self.allowance = int((sensor.maxval - sensor.minval) / 10)
 	
-	def nextValue(self, val):
+	# Gather max and min values for this sensor
+	def checkValue(self):
+		val = self.sensor.currentValue
 		if (self.valsSet):
 			if (val < self.min):
 				self.min = val
@@ -189,45 +193,54 @@ class MinMax:
 		else:
 			self.min = self.max = val
 			
-	def inRange(self, val):
-		if (self.min - self.allowance) <= val <= (self.max+self.allowance):
+	# Is this sensor within the recorded max/min (+ allowance) range?
+	def inRange(self):
+		val = self.sensor.currentValue
+		if (self.min - self.allowance) <= val <= (self.max + self.allowance):
 			return True
 		else:
 			return False
 			
-			
+# TLocation - A holder for trigger location information
+class TLocation:
+	def __init__ (self, s, v, c):
+		self.sensor = s
+		self.value = v
+		self.condition = c
+					
 class Calibration:
 	def __init__(self, group):
 		self.groupList = group.getList()
-		self.allowance = int((self.groupList[0].maxval - self.groupList[0].minval) / 10)
-		self.startValues = []
-		# Create a list of min/max counters the same length and order as the group
-		for sens in self.groupList:
-			self.startValues.append(MinMax(self.allowance))
 		
-	def run(self):
-		# get initial values
+	def startCalibration(self):
 		SASensorUI.showValues(False)
 		SASensorUI.calibrating = True
 		SASerial.write(SAModel.REPORT_MODE)
 		
-		retval = self.doDetails()
-		
+	def endCalibration(self):
 		SASerial.write(SAModel.RUN_SENSACT)
-		SASensorUI.calibrating = False
+		SASensorUI.calibrating = False		
 		
-		return retval
+	def getInitialValues(self):
+		# Create a list of min/max counters the same length and order as the group
+		self.startValues = []
+		for sens in self.groupList:
+			self.startValues.append(MinMax(sens))
 		
-	def doDetails(self):
+		# Gather start max/min values
 		for i in range(5):
 			time.sleep(100.0/1000.0)
-			for j in range(len(self.startValues)):
-				self.startValues[j].nextValue( self.groupList[j].currentValue )
-			
-		updateMessage("Calibration", "Please press the button")
+			for minmax in self.startValues:
+				minmax.checkValue()
+
+	def getLocation(self, prompt):
+		# Ask the user to activate the sensor
+		updateMessage("Calibration", prompt)
+		time.sleep(1)
 		if gCancelAction:
-			return False
-		
+			return None
+			
+		# Detect the activated sensor
 		found = False
 		count = 0
 		while(not found):
@@ -236,42 +249,58 @@ class Calibration:
 				break
 			time.sleep(100.0/1000.0)
 			
-			for j in range(len(self.startValues)):
-				if (not self.startValues[j].inRange( self.groupList[j].currentValue )):
-					self.targetSensor = self.groupList[j]
-					self.offValue = self.startValues[j]
+			for minmax in self.startValues:
+				if not minmax.inRange():
+					target = MinMax(minmax.sensor)
+					restValue = minmax
 					found = True
 					break
 			
 		if  not found:
-			return False
+			return None
 			
-		self.onValue = MinMax(self.allowance)
+		# Get max/min values on the activated sensor
 		for i in range(5):
 			time.sleep(100.0/1000.0)
-			self.onValue.nextValue( self.targetSensor.currentValue )
-					
-		updateMessage("Calibration", "Thank you")
-		time.sleep(2)
-		if gCancelAction:
-			return False
-						
-		if self.onValue.min < self.offValue.min:
-			# On is the smaller value
-			self.activeAt = self.onValue.max + self.allowance
-			self.inactiveAt = self.offValue.min - self.allowance
-			self.activeInv = True
-		else:
-			self.activeAt = self.onValue.min - self.allowance
-			self.inactiveAt = self.offValue.max + self.allowance
-			self.activeInv = False
+			target.checkValue()
 			
-#		print ("Sensor:", self.targetSensor.name)
-#		print ("Active At:", self.activeAt)
-#		print ("Inactive At:", self.inactiveAt)
-#		print ("Active Inv:", self.activeInv)
+		updateMessage("Calibration", "Thank you")
+		time.sleep(1)
+		if gCancelAction:
+			return None
+						
+		# Check for appropriate separation in signals
+		# and then return location info
+		if target.min < restValue.min:
+			# Active location is the smaller value
+			if (target.max + target.allowance >= restValue.min - restValue.allowance):
+				return None # Insufficient separation
+			return TLocation(target.sensor, target.max + target.allowance, 
+				SAModel.TRIGGER_ON_LOW)
+		else:
+			if (target.min - target.allowance <= restValue.max + restValue.allowance):
+				return None # Insufficient separation
+			return TLocation(target.sensor, target.min - target.allowance, 
+				SAModel.TRIGGER_ON_HIGH)
+	
+	# Return the trigger point for a return-to-rest location from a trigger point
+	def getRestPositionRelativeTo(self, location):
+		# find corresponding rest sensor
+		for minmax in self.startValues:
+			if location.sensor == minmax.sensor:
+				restValue = minmax
+				break
+		else:
+			return None
+			
+		if (location.condition == SAModel.TRIGGER_ON_HIGH):
+			return TLocation(restValue.sensor, restValue.max + restValue.allowance,
+					SAModel.TRIGGER_ON_LOW)
+		else:
+			return TLocation(restValue.sensor, restValue.min - restValue.allowance,
+					SAModel.TRIGGER_ON_HIGH)
+			
 		
-		return True
 
 # Message Updating	
 def updateMessage(title, msg):
@@ -295,18 +324,22 @@ def endSolutionProcessing():
 def mouseSelection():
 	gSyncEvent.clear()
 	if gCancelAction: 
-		return
+		return None
 	gSolutionWindow.event_generate('<<MouseSelect>>')
 	gSyncEvent.wait()
+	if gCancelAction: 
+		return None
 	return gSolutionWindow.mouseType
 
 # Interval selection
 def intervalSelection():
 	gSyncEvent.clear()
 	if gCancelAction:
-		return
+		return None
 	gSolutionWindow.event_generate('<<IntervalSelect>>')
 	gSyncEvent.wait()
+	if gCancelAction: 
+		return None
 	return gSolutionWindow.interval
 		
 #
@@ -345,8 +378,17 @@ def oneBtnMouse(group):
 	global gCancelAction	
 	gCancelAction = False
 	
+	success = False
 	cal = Calibration(group)
-	success = cal.run()
+	cal.startCalibration()
+	cal.getInitialValues()
+	activeLocation = cal.getLocation("Please press the button")
+	if not activeLocation == None:
+		restLocation = cal.getRestPositionRelativeTo(activeLocation)
+		if not restLocation == None:
+			success = True
+	cal.endCalibration()
+
 	if gCancelAction:
 		return
 	if not success:
@@ -355,36 +397,25 @@ def oneBtnMouse(group):
 		endSolutionProcessing()
 		return
 		
-	mouse = mouseSelection()
+	action = mouseSelection()
 	if gCancelAction:
 		return
 		
-	if cal.activeInv:
-		onCondition = SAModel.TRIGGER_ON_LOW
-		offCondition = SAModel.TRIGGER_ON_HIGH
-	else:
-		onCondition = SAModel.TRIGGER_ON_HIGH
-		offCondition = SAModel.TRIGGER_ON_LOW
-
-	if mouse == 'BT':
-		action = SAModel.getActionByID(9, 0) # BT id is 9
-	else:
-		action = SAModel.getActionByID(5, 0) # HID id is 5
-	buzzer = SAModel.getActionByID(7,0) # Buzzer
+	buzzer = SAModel.getActionByName("Buzzer")
 	
 	delay = intervalSelection()
 	if gCancelAction:
 		return
 	
-	SAModel.allTriggers.deleteTriggerSet(cal.targetSensor)
+	SAModel.allTriggers.deleteTriggerSet(activeLocation.sensor)
 	for t in oneBtnMouseList:
-		tr = SAModel.allTriggers.newTrigger(cal.targetSensor)
+		tr = SAModel.allTriggers.newTrigger(activeLocation.sensor)
 		if t.condition == 'H':
-			tr.triggerValue = cal.activeAt
-			tr.condition = onCondition
+			tr.triggerValue = activeLocation.value
+			tr.condition = activeLocation.condition
 		else:
-			tr.triggerValue = cal.inactiveAt
-			tr.condition = offCondition
+			tr.triggerValue = restLocation.value
+			tr.condition = restLocation.condition
 		
 		tr.delay = delay * t.delay
 		
@@ -403,12 +434,26 @@ def oneBtnMouse(group):
 	endSolutionProcessing()
 	return
 
+leftMouseBtnList = []
+#                         Condition, Delay, State,  Action, New-State, Action-Parameter
+leftMouseBtnList.append( Trig('H',      0,     1,     'A',     1,         SACustom.MOUSE_PRESS) )
+leftMouseBtnList.append( Trig('L',      0,     1,     'A',     1,         SACustom.MOUSE_RELEASE) )
+
 def leftMouseBtn(group):
 	global gCancelAction	
 	gCancelAction = False
 	
+	success = False
 	cal = Calibration(group)
-	success = cal.run()
+	cal.startCalibration()
+	cal.getInitialValues()
+	activeLocation = cal.getLocation("Please press the button")
+	if not activeLocation == None:
+		restLocation = cal.getRestPositionRelativeTo(activeLocation)
+		if not restLocation == None:
+			success = True
+	cal.endCalibration()
+
 	if gCancelAction:
 		return
 	if not success:
@@ -417,30 +462,31 @@ def leftMouseBtn(group):
 		endSolutionProcessing()
 		return
 		
-	mouse = mouseSelection()
+	action = mouseSelection()
 	if gCancelAction:
 		return
+	
+	delay = 0
 		
-	SAModel.allTriggers.deleteTriggerSet(cal.targetSensor)
-	t1 = SAModel.allTriggers.newTrigger(cal.targetSensor)
-	t2 = SAModel.allTriggers.newTrigger(cal.targetSensor)
-	if mouse == 'BT':
-		t1.action = t2.action = SAModel.getActionByID(9, 0) # BT id is 9
-	else:
-		t1.action = t2.action = SAModel.getActionByID(5, 0) # HID id is 5
-	
-	t1.triggerValue = cal.activeAt
-	t2.triggerValue = cal.inactiveAt
-	
-	t1.actionParam = SACustom.MOUSE_PRESS
-	t2.actionParam = SACustom.MOUSE_RELEASE
-	
-	if cal.activeInv:
-		t1.condition = SAModel.TRIGGER_ON_LOW
-		t2.condition = SAModel.TRIGGER_ON_HIGH
-	else:
-		t2.condition = SAModel.TRIGGER_ON_LOW
-		t1.condition = SAModel.TRIGGER_ON_HIGH
+	SAModel.allTriggers.deleteTriggerSet(activeLocation.sensor)
+	for t in leftMouseBtnList:
+		tr = SAModel.allTriggers.newTrigger(activeLocation.sensor)
+		if t.condition == 'H':
+			tr.triggerValue = activeLocation.value
+			tr.condition = activeLocation.condition
+		else:
+			tr.triggerValue = restLocation.value
+			tr.condition = restLocation.condition
+		
+		tr.delay = delay * t.delay
+		
+		tr.reqdState = t.cState
+		
+		tr.action = action
+			
+		tr.actionParam = t.aParam
+		
+		tr.actionState = t.aState
 
 	SASensorUI.reloadTriggers()
 		
@@ -450,3 +496,63 @@ def leftMouseBtn(group):
 def joystickMouse(group):
 	global gCancelAction	
 	gCancelAction = False
+	
+	success = False
+	cal = Calibration(group)
+	cal.startCalibration()
+	cal.getInitialValues()
+	upLocation = cal.getLocation("Move joystick to UP position")
+	if not upLocation == None:
+		downLocation = cal.getLocation("Move joystick to DOWN position")
+		if not downLocation == None:
+			leftLocation = cal.getLocation("Move joystick to LEFT position")
+			if not leftLocation == None:
+				rightLocation = cal.getLocation("Move joystick to RIGHT position")
+				if not rightLocation == None:
+					success = True
+	cal.endCalibration()
+
+	if gCancelAction:
+		return
+	if not success:
+		updateMessage("Solution Failure", "Sorry, Joystick motion not detected")
+		time.sleep(2)
+		endSolutionProcessing()
+		return
+
+	action = mouseSelection()
+	if gCancelAction:
+		return
+
+	SAModel.allTriggers.deleteTriggerSet(upLocation.sensor)
+	SAModel.allTriggers.deleteTriggerSet(leftLocation.sensor)
+	
+	t = SAModel.allTriggers.newTrigger(upLocation.sensor)
+	t.triggerValue = upLocation.value
+	t.condition = upLocation.condition
+	t.action = action
+	t.actionParam = SACustom.MOUSE_UP
+	
+	t = SAModel.allTriggers.newTrigger(downLocation.sensor)
+	t.triggerValue = downLocation.value
+	t.condition = downLocation.condition
+	t.action = action
+	t.actionParam = SACustom.MOUSE_DOWN
+	
+	t = SAModel.allTriggers.newTrigger(leftLocation.sensor)
+	t.triggerValue = leftLocation.value
+	t.condition = leftLocation.condition
+	t.action = action
+	t.actionParam = SACustom.MOUSE_LEFT
+
+	t = SAModel.allTriggers.newTrigger(rightLocation.sensor)
+	t.triggerValue = rightLocation.value
+	t.condition = rightLocation.condition
+	t.action = action
+	t.actionParam = SACustom.MOUSE_RIGHT
+
+	SASensorUI.reloadTriggers()
+		
+	endSolutionProcessing()
+	return
+		

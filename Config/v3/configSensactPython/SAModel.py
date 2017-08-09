@@ -43,7 +43,6 @@ sensactVersionID = 0
 
 sensorGroups = []	# All sensor groups - set up during startup
 sensors = []	# All sensors - set up during startup
-actions = []	# All actions - set up during startup
 
 def setupLists():
 	createSensorList()
@@ -125,6 +124,8 @@ def getSensorById(id):
 #		
 # --- ACTIONS --- #
 #
+actions = []	# All actions - set up during startup
+gActionDict = {}
 	
 class Action:
 	def __init__(self, i, n, optionFunc, default, pcheck):
@@ -156,6 +157,11 @@ def createActionList():
 	actions.append( Action(7, "Buzzer",        SAC_Buzzer, (400 << 16) + 250, None) )
 	actions.append( Action(8, "IR",            SAC_IROption, TV_ON_OFF, None) )
 	
+	# Create action dictionary.  Allows look-up by name
+	global gActionDict
+	for a in actions:
+		gActionDict[a.name] = a
+	
 	
 # getActionById uses param to determine whether the
 # action is 'Keyboard' or 'Special'.  Different guis are required.
@@ -170,6 +176,9 @@ def getActionByID(id, param):
 				return act
 	return None
 
+def getActionByName(name):
+	return gActionDict[name]
+	
 #	
 # --- Triggers --- #
 #
