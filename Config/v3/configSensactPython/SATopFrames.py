@@ -23,13 +23,17 @@ def statusFrame(parent):
 	return f
 
 # Buttons
-def runCommand():
+def runCommand(event = None):
 	SASensorUI.showValues(False)
 	SASerial.write(SAModel.RUN_SENSACT) 
 	
-def reportCommand():
+def reportCommand(event = None):
 	SASensorUI.showValues(True) 
 	SASerial.write(SAModel.REPORT_MODE)
+	
+def idleMode(event = None):
+	SASensorUI.showValues(False) 
+	SASerial.write(SAModel.GET_VERSION)
 	
 def exportCommand():
 	filename = filedialog.asksaveasfilename()
@@ -71,7 +75,7 @@ def buttonFrame(parent):
 	getBtn = ttk.Button(f, text="Get Tiggers")
 	setBtn = ttk.Button(f, text="Set Triggers")
 	runBtn = ttk.Button(f, text="Run")
-	reportBtn = ttk.Button(f, text="Report")
+	reportBtn = ttk.Button(f, text="Display")
 	idleBtn = ttk.Button(f, text="Idle")
 	exBtn = ttk.Button(f, text="Export")
 	imBtn = ttk.Button(f, text="Import")
@@ -81,7 +85,7 @@ def buttonFrame(parent):
 	setBtn['command'] = SAModel.sendTriggersToSensact
 	runBtn['command'] = runCommand
 	reportBtn['command'] = reportCommand
-	# idleBtn['command']
+	idleBtn['command'] = idleMode
 	exBtn['command'] = exportCommand
 	imBtn['command'] = importCommand
 
@@ -101,7 +105,7 @@ def buttonFrame(parent):
 	getBtn.bind('<Enter>', lambda x: statusMessage.set("Get configuration from sensact"))
 	setBtn.bind('<Enter>', lambda x: statusMessage.set("Re-configure the sensact"))
 	runBtn.bind('<Enter>', lambda x: statusMessage.set("Put the sensact into Run mode"))
-	reportBtn.bind('<Enter>', lambda x: statusMessage.set("Put the sensact into Report mode"))
+	reportBtn.bind('<Enter>', lambda x: statusMessage.set("Display sensor values"))
 	idleBtn.bind('<Enter>', lambda x: statusMessage.set("RPut the sensact into Idle mode"))
 	exBtn.bind('<Enter>', lambda x: statusMessage.set("Save configuration to a file"))
 	imBtn.bind('<Enter>', lambda x: statusMessage.set("Read configuration from a file"))
