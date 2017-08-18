@@ -43,6 +43,10 @@
 #define DEFAULT_REPEAT_INTERVAL 250 // Repeat interval for most things.
 #define MOUSE_REPEAT_INTERVAL   100 // Time between repeats of mouse move actions.
 
+// === Special Action ID === //
+// This action is actually performed in the trigger code.
+#define CHANGE_SENSOR_STATE 10  // Must not conflict with any action state defined in Actions.cpp
+
 // -------------------------- V3 Hardware -----------------------------------------------
 #ifdef VERSION_3_HW
 // Code for version 3 of the hardware.

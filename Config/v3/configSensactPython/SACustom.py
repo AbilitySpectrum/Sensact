@@ -295,6 +295,39 @@ def SAC_Buzzer(parent, t):
 	dur = Duration(frame, t)
 	dur.pack(side=LEFT)
 	return frame
-
-
+	
+class SensorCombo(SACombo):
+	def __init__(self, parent, t):
+		SACombo.__init__(self, parent, SAModel.sensors, self.callback, 'Sensor:')
+		
+		self.trigger = t
+		sensorID = (t.actionParam >> 8) & 0xff
+		self.setValue(SAModel.getSensorById(sensorID).name)
+		
+	def callback(self, sensor):
+		state = self.trigger.actionParam & 0xff
+		self.trigger.actionParam = (sensor.id << 8) + state
+		
+class NewState(SASpinbox):
+	def __init__(self, parent, t):
+		keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
+		SASpinbox.__init__(self, parent, keys, self.callback, "State:")
+		
+		self.trigger = t	
+		state = self.trigger.actionParam & 0xff
+		self.value.set( str(state) )
+			
+	def callback(self, value):
+		state = int(value)
+		sensorID = (self.trigger.actionParam >> 8) & 0xff
+		self.trigger.actionParam = (sensorID << 8) + state
+		
+def SAC_SetState(parent, t):
+	frame = ttk.Frame(parent)
+	sensorCombo = SensorCombo(parent, t)
+	sensorCombo.pack(side = LEFT) 
+	stateSpinner = NewState(parent, t)
+	stateSpinner.pack(side = LEFT)
+	return frame
+	
 		
