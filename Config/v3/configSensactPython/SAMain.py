@@ -107,6 +107,9 @@ def mainScreen(root):
 	root.rowconfigure(0, weight=1)
 	root.rowconfigure(1, weight=0)	
 	
+	root.bind('<Control-Key-r>', SATopFrames.runCommand)	
+	root.bind('<Control-Key-d>', SATopFrames.reportCommand)	
+	root.bind('<Control-Key-i>', SATopFrames.idleMode)	
 	root.geometry("1000x800+50+50")
 
 def defineStyles():
