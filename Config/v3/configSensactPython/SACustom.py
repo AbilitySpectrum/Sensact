@@ -136,38 +136,41 @@ NUDGE_UP = 10
 NUDGE_DOWN = 11
 NUDGE_LEFT = 12
 NUDGE_RIGHT = 13
+NUDGE_STOP = 14
 
-mice1 = []
-mice2 = []
+miceSetupComplete = False
+mice = []
 
-mice1.append( ValueLabelPair(MOUSE_UP, "Mouse Up", True))
-mice1.append( ValueLabelPair(MOUSE_DOWN, "Mouse Down", True))
-mice1.append( ValueLabelPair(MOUSE_LEFT, "Mouse Left", True))
-mice1.append( ValueLabelPair(MOUSE_RIGHT, "Mouse Right", True))
-mice1.append( ValueLabelPair(MOUSE_CLICK, "Mouse Click"))
-mice1.append( ValueLabelPair(NUDGE_UP, "Nudge Up"))
-mice1.append( ValueLabelPair(NUDGE_DOWN, "Nudge Down"))
-mice1.append( ValueLabelPair(NUDGE_LEFT, "Nudge Left"))
-mice1.append( ValueLabelPair(NUDGE_RIGHT, "Nudge Right"))
+def miceSetup():
+	global miceSetupComplete
+	
+	mice.append( ValueLabelPair(MOUSE_UP, "Mouse Up", True))
+	mice.append( ValueLabelPair(MOUSE_DOWN, "Mouse Down", True))
+	mice.append( ValueLabelPair(MOUSE_LEFT, "Mouse Left", True))
+	mice.append( ValueLabelPair(MOUSE_RIGHT, "Mouse Right", True))
+	mice.append( ValueLabelPair(MOUSE_CLICK, "Mouse Click"))
+	if SAModel.sensactVersionID >= 301:
+		mice.append( ValueLabelPair(MOUSE_RIGHT_CLICK, "Mouse Right Click"))
+		mice.append( ValueLabelPair(MOUSE_PRESS, "Mouse Press"))
+		mice.append( ValueLabelPair(MOUSE_RELEASE, "Mouse Release"))
+		
+	mice.append( ValueLabelPair(NUDGE_UP, "Nudge Up"))
+	mice.append( ValueLabelPair(NUDGE_DOWN, "Nudge Down"))
+	mice.append( ValueLabelPair(NUDGE_LEFT, "Nudge Left"))
+	mice.append( ValueLabelPair(NUDGE_RIGHT, "Nudge Right"))
+	
+	if SAModel.sensactVersionID >= 302:
+		mice.append( ValueLabelPair(NUDGE_STOP, "Nudge Stop"))
+		
+	miceSetupComplete = True
+	return
 
-mice2.append( ValueLabelPair(MOUSE_UP, "Mouse Up", True))
-mice2.append( ValueLabelPair(MOUSE_DOWN, "Mouse Down", True))
-mice2.append( ValueLabelPair(MOUSE_LEFT, "Mouse Left", True))
-mice2.append( ValueLabelPair(MOUSE_RIGHT, "Mouse Right", True))
-mice2.append( ValueLabelPair(MOUSE_CLICK, "Mouse Click"))
-mice2.append( ValueLabelPair(MOUSE_RIGHT_CLICK, "Mouse Right Click"))
-mice2.append( ValueLabelPair(MOUSE_PRESS, "Mouse Press"))
-mice2.append( ValueLabelPair(MOUSE_RELEASE, "Mouse Release"))
-mice2.append( ValueLabelPair(NUDGE_UP, "Nudge Up"))
-mice2.append( ValueLabelPair(NUDGE_DOWN, "Nudge Down"))
-mice2.append( ValueLabelPair(NUDGE_LEFT, "Nudge Left"))
-mice2.append( ValueLabelPair(NUDGE_RIGHT, "Nudge Right"))
 
 class MouseOption(SACombo):
 	def __init__(self, parent, t, keyset):
 		SACombo.__init__(self, parent, keyset, self.callback, "Mouse Action:")
 		self.trigger = t
-			
+		
 		for key in keyset:
 			if t.actionParam == key.getValue():
 				self.value.set(key.getKey())
@@ -178,13 +181,11 @@ class MouseOption(SACombo):
 		self.trigger.repeat = keyvalPair.doRepeat()
 
 		
-def SAC_MouseOption(parent, t):
-	if SAModel.sensactVersionID >= 301:
-		keys = mice2
-	else:
-		keys = mice1
-		
-	return MouseOption(parent, t, keys)
+def SAC_MouseOption(parent, t):		
+	if not miceSetupComplete:
+		miceSetup()
+			
+	return MouseOption(parent, t, mice)
 
 # Define IR TV Control		
 TV_ON_OFF = 1
