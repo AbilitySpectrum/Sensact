@@ -129,6 +129,7 @@ void Buzzer::doAction(long param) {
 #define NUDGE_DOWN    11
 #define NUDGE_LEFT    12
 #define NUDGE_RIGHT   13
+#define NUDGE_STOP    14
 
 // MouseControl repeat logic is somewhat complex.
 // Horizontal and vertical motion can be simultaneous, 
@@ -228,6 +229,10 @@ void MouseControl::doAction(long param) {
         horizontalMouseState = MOUSE_MOVING_RIGHT;
         assessAction(SA_MOUSE_RIGHT, 0);
       }
+      break;
+    case NUDGE_STOP:
+      horizontalMouseState = MOUSE_STILL;
+      verticalMouseState = MOUSE_STILL;
       break;
   }
 }

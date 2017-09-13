@@ -74,7 +74,7 @@ class Sensor:
 		self.currentValue = 0
 		self.isContinuous = c  	# If true the sensor delivers continuous values
 								# if false the sensor delivers descrete values
-	def getKey():
+	def getKey(self):
 		return self.name
 
 def createSensorList():
@@ -156,6 +156,8 @@ def createActionList():
 #	actions.append( Action(6, "Joystick",      SAC_None,  0, None) )
 	actions.append( Action(7, "Buzzer",        SAC_Buzzer, (400 << 16) + 250, None) )
 	actions.append( Action(8, "IR",            SAC_IROption, TV_ON_OFF, None) )
+	if sensactVersionID >= 302:
+		actions.append( Action(10, "Set State", SAC_SetState, 0x101, None) )
 	
 	# Create action dictionary.  Allows look-up by name
 	global gActionDict

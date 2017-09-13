@@ -110,15 +110,27 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
           pTrigger->onTime = now; // Record time of initial trigger match
           
           if (pTrigger->delayMs == 0) { // No delay? Do action immediately.
+            if (pTrigger->actionID == CHANGE_SENSOR_STATE) {
+              int state = pTrigger->actionParameters & 0xff;
+              int sensorID = (pTrigger->actionParameters >> 8) & 0xff;
+              aTmpStates[sensorID] = state;
+            } else {
+              actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
+            }
             aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
-            actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             pTrigger->actionTaken = true;
           }
           
         } else if (pTrigger->actionTaken == false) { // Waiting for delay
           if (timeDiff(now, pTrigger->onTime) > pTrigger->delayMs) {
-            aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues); 
-            actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
+            if (pTrigger->actionID == CHANGE_SENSOR_STATE) {
+              int state = pTrigger->actionParameters & 0xff;
+              int sensorID = (pTrigger->actionParameters >> 8) & 0xff;
+              aTmpStates[sensorID] = state;
+            } else {
+              actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
+            }
+            aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
             pTrigger->actionTaken = true;
          }
           

@@ -20,7 +20,7 @@
 #include <IRLib.h>
 #include <Wire.h>
 
-enum rMode{RUN, REPORT};
+enum rMode{RUN, REPORT, IDLEX};  // IDLE seems to be a keyword - thus IDLEX.
 rMode runMode;
 
 extern Sensors sensors;
@@ -84,8 +84,10 @@ void loop() {
       triggers.sendTriggers(&serialOutput);
       break;
       
-    case GET_VERSION:
-      sendVersionInfo();  // TBD
+    case GET_VERSION: // Get Version also sets IDLEX mode.
+      sendVersionInfo();  
+      runMode = IDLEX;
+      setLED();
       break;
       
     case RUN_SENSACT:
@@ -113,14 +115,14 @@ void loop() {
       lastActionTime = millis();
     }
     
-  } else {
+  } else if (runMode == RUN) {
     if ((lastActionTime + READING_INTERVAL) < millis()) {
       pSensorData = sensors.getData();
       const ActionData *pActionData = triggers.getActions(pSensorData);
       actors.doActions(pActionData);
       lastActionTime = millis();
-    }
-  }
+    } 
+  } // ELSE IDLEX mode - do nothing.
 }
 
 int checkForCommand() {
@@ -153,8 +155,10 @@ void setLED() {
   // Thus the "7 - " in the following code.
   if (runMode == RUN) {
      doLED(7 - LED_GREEN);
-  } else {  // REPORT mode
+  } else if (runMode == REPORT) { 
      doLED(7 - LED_RED);
+  } else { // IDLEX
+     doLED(7 - LED_BLUE);
   }
 } 
   

@@ -12,7 +12,7 @@
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
-#define VERSION         "3.1"
+#define VERSION         "3.2"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
@@ -42,6 +42,10 @@
 #define PULSE_WIDTH         500  // Output pulse width - for relays
 #define DEFAULT_REPEAT_INTERVAL 250 // Repeat interval for most things.
 #define MOUSE_REPEAT_INTERVAL   100 // Time between repeats of mouse move actions.
+
+// === Special Action ID === //
+// This action is actually performed in the trigger code.
+#define CHANGE_SENSOR_STATE 10  // Must not conflict with any action state defined in Actions.cpp
 
 // -------------------------- V3 Hardware -----------------------------------------------
 #ifdef VERSION_3_HW
