@@ -1,6 +1,8 @@
 /*
  * Test Code for Sensact board V3
  * 
+ * Update: For V4.1 Hardware.
+ * 
  * Commands can be sent via the serial link to drive Sensact functions.
  * 
  * 'i' + 0 to 15.  Sets power to the input jacks according to bit values.
@@ -20,24 +22,22 @@
 #define INPUT_5   A4 
 #define INPUT_6   A5 
 
-#define RELAY_1 11
-#define RELAY_2 12
+#define OUTPUT_A 11  
+#define OUTPUT_B 12  
 #define IR_PIN 9
 
-#define BUZZER  10
-#define LATCH_PIN 4
-#define COUNTER_PIN 6
-#define COUNTER_RESET_PIN 7
+#define LED_RED   5
+#define LED_GREEN 6
+#define LED_BLUE  7
 
-#define DELAY_TIME  5 // Time in MS to wait for chips to reset, latch etc.  
-                      // Probably can be much shorter.  Chips response times are given on ns on spec sheet.
+#define BUZZER  10
 
 GyroSensor gyro;
 
 void setup() {
-  pinMode(COUNTER_RESET_PIN, OUTPUT);
-  pinMode(COUNTER_PIN, OUTPUT);
-  pinMode(LATCH_PIN, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_BLUE, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
 
   pinMode(INPUT_1, INPUT);
   pinMode(INPUT_2, INPUT);
@@ -47,8 +47,8 @@ void setup() {
   pinMode(INPUT_6, INPUT);
 
   pinMode(IR_PIN, OUTPUT);
-  pinMode(RELAY_1, OUTPUT);
-  pinMode(RELAY_2, OUTPUT);  
+  pinMode(OUTPUT_A, OUTPUT);
+  pinMode(OUTPUT_B, OUTPUT);  
 
   Serial.begin(9600);
   while(!Serial);
@@ -67,41 +67,42 @@ void loop() {
     lastReadTime = millis();
   }
   if (Serial.available()) {
+    cmd =  getNextToken();
+    if (cmd == -1) { // Nothing but white space.
+      return;
+    } 
     readVal = 0;
-    cmd =  Serial.read();
-    switch(cmd) {
-      // Ignore white space
-      case ' ':
-      case '\n':
-      case '\r':
-      case '\t':
-        break;
-
-      case 'i':
-        val = getInt();
-        if (val >= 0 && val <= 15) {
-          Serial.print("Input " ); Serial.println(val);
-          setLatches(val);
-        } else {
-          Serial.println("Bad input value.");
-        }
-        break;
-        
+    switch(cmd) {                
       case 'o':
-        val = getInt();
-        if (val >= 0 && val <= 3) {
-          doOutput(val);
-          Serial.print("Output " ); Serial.println(val);
+        val = getNextToken();
+        if (val == 'a') {
+          doOutput(OUTPUT_A);
+          Serial.println("Output A on" ); 
+        } else if (val == 'b') {
+          doOutput(OUTPUT_B);
+          Serial.println("Output B on" ); 
+        } else if (val == '0') {
+          doOutput(0);
+          Serial.println("Outputs off" ); 
         } else {
-          Serial.println("Bad output value.");
+          Serial.println("Bad output option.");
         }
         break;
 
       case 'l':
-        val = getInt();
-        if (val >= 0 && val <= 7) {
-          doLED(val);
-          Serial.print("LED " ); Serial.println(val);
+        val = getNextToken();
+        if (val == 'r') {
+          setLED(LED_RED);
+          Serial.println("LED Red" ); 
+        } else if (val == 'g') {
+          setLED(LED_GREEN);
+          Serial.println("LED Green" ); 
+        } else if (val == 'b') {
+          setLED(LED_BLUE);
+          Serial.println("LED Blue" ); 
+        } else if (val == '0') {
+          setLED(0);
+          Serial.println("LED off");
         } else {
           Serial.println("Bad LED value.");
         }
@@ -113,7 +114,8 @@ void loop() {
         break;
         
       case 'r':
-        val = getInt();
+        val = getNextToken();
+        val = val - '0';
         if (val == 0) {
           Serial.println("Read All.");
           doRead(0);
@@ -128,10 +130,6 @@ void loop() {
         break;
 
       case 'g':
-        setLatches(0);  // Turn off power to gyro
-        delay(100);     // Wait for it to shut down completely.
-        setLatches(8);  // Power on gyro
-        delay(10);
         gyro.init();
         delay(10);     
         gyro.readValues();
@@ -156,20 +154,17 @@ void loop() {
         Serial.println("Huh?");
         break;
     }
+    
   }
 
 }
 
-int getInt() {
-  int val = 0;
-  
-  while(Serial.available()) {
-    int ch = Serial.read();
-    if (ch >= '0' && ch <= '9') {
-      val = val * 10 + (ch - '0');
-    } else {
-      return val;
-    }
+int getNextToken() {
+  int val;
+  val = Serial.read();
+  // Ignore white space
+  while(val == ' ' || val == '\r' || val == '\n' || val == '\t') {
+    val = Serial.read();
   }
   return val;
 }
@@ -178,46 +173,19 @@ void doBeep() {
   tone( BUZZER, 400, 500);
 }
 
-void setLatches(int latchBits) {
-  doLED(latchBits);
-
-  // Latch the counter output to the Latch_Qn outputs.
-  digitalWrite(LATCH_PIN, HIGH);
-  delay(DELAY_TIME);
-  digitalWrite(LATCH_PIN, LOW); 
-
-  // Turn off LEDs
-  doLED(0);
-}
-
-void doLED(int val) {
-  digitalWrite(COUNTER_PIN, LOW); // Ensure the right start point
-
-  // Reset the counter
-  digitalWrite(COUNTER_RESET_PIN, HIGH);
-  delay(DELAY_TIME);      
-  digitalWrite(COUNTER_RESET_PIN, LOW);
-
-  // Set the counter - each low-to-high transition adds 1 to the counter
-   for(int i=0; i<val; i++) {
-    digitalWrite(COUNTER_PIN, HIGH);
-    delay(DELAY_TIME);
-    digitalWrite(COUNTER_PIN, LOW);
-    delay(DELAY_TIME);
+void setLED(int color) {
+  digitalWrite(LED_RED, LOW);
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_BLUE, LOW);
+  if (color != 0) {
+    digitalWrite(color, HIGH);
   }
 }
 
 void doOutput(int val) {
-  if (val & 0x01) {
-    digitalWrite(RELAY_1, HIGH);
-  } else {
-    digitalWrite(RELAY_1, LOW);
-  }
-  if (val & 0x02) {
-    digitalWrite(RELAY_2, HIGH);
-  } else {
-    digitalWrite(RELAY_2, LOW);
-  }
+  digitalWrite(OUTPUT_A, LOW);
+  digitalWrite(OUTPUT_B, LOW);
+  digitalWrite(val, HIGH);
 }
 
 void doRead(int val) {
@@ -253,15 +221,16 @@ void doRead(int val) {
 }
 
 void doHelp() {
-  Serial.println(" 'i' + 0 to 15.  Sets power to the input jacks according to bit values.");
-  Serial.println(" 'o' + 0 to 3.   Turns on the output ports according to bit values.");
-  Serial.println(" 'l' + 0 to 7.   Sets the value of LED outputs.");
+  Serial.println(" 'o' + 'a' or 'b. Turns on an output port.");
+  Serial.println(" 'o0' (o + zero) Turns all outputs off.");
+  Serial.println(" 'l' + 'r', 'g' or 'b'.   Sets the color of the LED.");
+  Serial.println(" 'l0'            Turns the LED off.");
   Serial.println(" 'b'             Sounds the buzzer.");
   Serial.println(" 'r'             Reads the value of all input pins.");
   Serial.println(" 'r' 1 to 6      Reads the value of a particular input port ");
   Serial.println("                 repeating until another command is entered.");
   Serial.println("                 (1 = I1A, 2 = I1B, 3 = I2A ... 6 = I3B)");
-  Serial.println(" 'g'             Reads I2C Gyroscope. (Leaves non-I2C inputs powered off)");
+  Serial.println(" 'g'             Reads I2C Gyroscope.");
   Serial.println(" 't'             Runs the TV IR.  On/Off cycling every 1/4 second for two seconds.");
   Serial.println("                 Watch with a cell phone camera or with a multi-tester.");
 }
