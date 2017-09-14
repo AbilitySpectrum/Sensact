@@ -70,7 +70,7 @@ class AnalogSensor: public Sensor {
       pinNumber = p;
     }
     void init() {
-      pinMode(pinNumber, INPUT_PULLUP);
+      pinMode(pinNumber, INPUT);
     }
     void getValues(SensorData *pData) {
       int val = analogRead(pinNumber);

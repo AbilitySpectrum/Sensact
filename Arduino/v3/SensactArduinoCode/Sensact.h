@@ -3,10 +3,6 @@
 // --------------------------------------
 #ifndef SENSACT_H
 #define SENSACT_H
-
-#define VERSION_3_HW  1
-
-
 #include <Arduino.h>
 // Various Constants used throughout the code //
 
@@ -47,21 +43,10 @@
 // This action is actually performed in the trigger code.
 #define CHANGE_SENSOR_STATE 10  // Must not conflict with any action state defined in Actions.cpp
 
-// -------------------------- V3 Hardware -----------------------------------------------
-#ifdef VERSION_3_HW
-// Code for version 3 of the hardware.
-
-// Counter and Latch control
-#define LATCH_PIN 4
-#define COUNTER_PIN 6
-#define COUNTER_RESET_PIN 7
-#define LATCH_DELAY_TIME 5   // Time in MS to wait for chips to reset, latch etc.  
-                      // Probably can be much shorter.  Chips response times are given on ns on spec sheet.
-
 // === LED Values === //
-#define LED_RED    2
-#define LED_GREEN  1
-#define LED_BLUE   4
+#define LED_RED    5
+#define LED_GREEN  6
+#define LED_BLUE   7
 
 // === Sensor Pins === //
 #define SENSACT_IN1A A0
@@ -83,23 +68,4 @@
 #define MAX_SENSORS 8
 #define MAX_ACTORS  9
 
-// -------------------------- V2 Hardware -----------------------------------------------
-#elif VERSION_2_HW
-// Obsolete code for version 2 of the hardware.
-// === LED Pins === //
-#define LED_RED    A3
-#define LED_GREEN  5
-#define LED_BLUE   4
-
-// === Sensor Pins === //
-#define SENSACT_IN2   A2
-#define SENSACT_IN3   A1
-
-// === Action Pins === //
-#define SENSACT_IR_OUT  13
-#define SENSACT_BUZZER  10
-#define SENSACT_RELAY_1  9
-#define SENSACT_RELAY_2 11
-
-#endif // VERSION_2_HW
 #endif
