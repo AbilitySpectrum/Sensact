@@ -325,9 +325,9 @@ class NewState(SASpinbox):
 		
 def SAC_SetState(parent, t):
 	frame = ttk.Frame(parent)
-	sensorCombo = SensorCombo(parent, t)
+	sensorCombo = SensorCombo(frame, t)
 	sensorCombo.pack(side = LEFT) 
-	stateSpinner = NewState(parent, t)
+	stateSpinner = NewState(frame, t)
 	stateSpinner.pack(side = LEFT)
 	return frame
 	
