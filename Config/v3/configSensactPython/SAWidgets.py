@@ -134,6 +134,9 @@ class SACombo(ttk.Frame):
 		# create the box
 		self.combo = ttk.Combobox(self, textvariable=self.value)
 		self.combo['values'] = keys
+		ilength = len(items)
+		if ilength <= 16:
+			self.combo['height'] = ilength
 		self.state(['readonly'])
 		self.combo.bind('<<ComboboxSelected>>', self.selectionChanged)
 		
