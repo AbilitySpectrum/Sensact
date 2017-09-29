@@ -35,7 +35,7 @@ class KeyOption(SAEntry):
 				
 		self.value.set( strval )
 		
-	def callback(self, newval):
+	def callback(self, newval, focusChange):
 		length = len(newval)
 		if length > 4:
 			return False
@@ -223,71 +223,35 @@ def SAC_IROption(parent, t):
 #	return IROption(parent, t, IRActions)
 
 # Define Buzzer parameters
-class Frequency(SAEntry):
+class Frequency(SANumericEntry):
 	def __init__(self, parent, t):
-		SAEntry.__init__(self, parent, self.callback, "Frequency:", 4)
+		SANumericEntry.__init__(self, parent, "Frequency", 4, 50, 2000, self.final)
 		
 		self.trigger = t
-		
 		self.frequency = (t.actionParam >> 16) & 0xffff			
-		self.value.set( str(self.frequency) )
+		self.setInitialValue(self.frequency)
 		
-	def callback(self, newval):
-		try:
-			val = int(newval)
-			if not (50 <= val <= 2000):
-				messagebox.showerror(title="Entry error", 
-					message="Frequency must be a value between 50 and 2000.")						
-				if val < 50:
-					val = 50
-				elif val > 2000:
-					val = 2000
-				
-			self.frequency = val
-			duration = self.trigger.actionParam & 0xffff
+	def final(self, val):
+		self.frequency = val
+		duration = self.trigger.actionParam & 0xffff
+		
+		self.trigger.actionParam = (self.frequency << 16) + duration
+		
 			
-			self.trigger.actionParam = (self.frequency << 16) + duration
-			self.value.set( str(self.frequency) )
-			return True
-				
-		except Exception:
-			messagebox.showerror(title="Entry error", 
-				message="Frequency must be a numeric value between 50 and 2000.")						
-			self.value.set( str(self.frequency) )
-			return False
-			
-class Duration(SAEntry):
+class Duration(SANumericEntry):
 	def __init__(self, parent, t):
-		SAEntry.__init__(self, parent, self.callback, "Duration:", 4)
+		SANumericEntry.__init__(self, parent, "Duration", 4, 100, 1000, self.final)
 		
 		self.trigger = t
 		
 		self.duration = t.actionParam & 0xffff			
-		self.value.set( str(self.duration) )
+		self.setInitialValue(self.duration)
 		
-	def callback(self, newval):
-		try:
-			val = int(newval)
-			if not (0 <= val <= 1000):
-				messagebox.showerror(title="Entry error", 
-					message="Duration must be a value between 0 and 1000.")						
-				if val < 0:
-					val = 0
-				elif val > 1000:
-					val = 1000
-				
-			self.duration = val
-			frequency = (self.trigger.actionParam >> 16) & 0xffff
+	def final(self, val):
+		self.duration = val
+		frequency = (self.trigger.actionParam >> 16) & 0xffff
 			
-			self.trigger.actionParam = (frequency << 16) + self.duration
-			self.value.set( str(self.duration) )
-			return True
-				
-		except Exception:
-			messagebox.showerror(title="Entry error", 
-				message="Duration must be a numeric value between 0 and 1000.")						
-			self.value.set( str(self.duration) )
-			return False
+		self.trigger.actionParam = (frequency << 16) + self.duration
 			
 def SAC_Buzzer(parent, t):
 	frame = ttk.Frame(parent)
