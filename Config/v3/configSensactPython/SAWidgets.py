@@ -266,8 +266,10 @@ class SANumericEntry(SAEntry):
 			val = int(newval)
 			if val > self.maxval:
 				messagebox.showerror(title="Entry error", 
-					message= "{0} must be in range from {1} to {2}."
-					.format(self.label, self.minval, self.maxval))
+					message= "{0} may not be greater than {1}."
+					.format(self.label, self.maxval))
+				self.value.set(self.maxval)
+				self.finalValue(self.maxval)
 				return False
 			else:
 				return True
@@ -287,10 +289,11 @@ class SANumericEntry(SAEntry):
 			
 			# Otherwise, the entry is not valid!
 			SATopFrames.loadSavedTab() # return to the tab holding the entry.			
-			self.value.set(self.lastGoodValue)  # Restore value
 			messagebox.showerror(title="Entry error", 
-				message= "{0} must be in range from {1} to {2}."
-				.format(self.label, self.minval, self.maxval))
+				message= "{0} may not be less than {1}."
+				.format(self.label, self.minval))
+			self.value.set(self.minval)  # Show minimum value
+			self.finalValue(self.minval)
 			try:
 				self.entry.focus()				 # Restore focus
 			except:
