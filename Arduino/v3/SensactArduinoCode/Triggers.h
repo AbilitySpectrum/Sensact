@@ -22,6 +22,11 @@
 #define CONDITION(x)  (x & 0xf)
 #define ISREPEAT(x)     (x & 0x10)
 
+// Flags holds the bits ACTION_TAKEN and DISCONNECTED
+#define ACTION_TAKEN  1
+#define DISCONNECTED  2  // Set if we suspect the sensor is disconnected.
+                         // Prevents run-away repeats on disconnected joy-sticks.
+
 // Trigger - holds values for one trigger
 class Trigger {
   public:
@@ -35,11 +40,11 @@ class Trigger {
     unsigned int  delayMs;
     
     // Dynamic elements
-    boolean actionTaken;
+    char flags;
     unsigned int onTime;
   
     Trigger() {
-      actionTaken = false;
+      flags = 0;
       onTime = 0;
     }
     int readTrigger(InputStream *);
