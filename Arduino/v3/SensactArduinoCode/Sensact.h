@@ -4,6 +4,10 @@
 #ifndef SENSACT_H
 #define SENSACT_H
 #include <Arduino.h>
+
+// timeDiff function.  Defined in Actions.cpp
+unsigned int timeDiff(unsigned int now, unsigned int prev);
+
 // Various Constants used throughout the code //
 
 // === Protocol Values === //

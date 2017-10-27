@@ -8,7 +8,6 @@
 #include <SoftwareSerial.h>
 #include "BTMouseCtl.h"
 
-unsigned int timeDiff(unsigned int now, unsigned int prev);
 
 // Action - Identifies a single action.
 #define ACTION_ID_MASK   0x7F
