@@ -21,6 +21,10 @@ void Triggers::reset() {
   for(int i=0; i<=maxSensorID; i++) {
     paSensorStates[i] = 1;
   }  
+  for(int j=0; j<nTriggers; j++) {
+    Trigger *pTrigger = &aTriggers[j];
+    pTrigger->flags = DISCONNECTED; //Assume disconnected until we get a signal
+  }
 }
 
 // The first time the Triggers object gets sensor data 
@@ -77,11 +81,11 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
 
       // Check for disconnected sensor
       if (pTrigger->flags & DISCONNECTED) {
-        if (value > 10) {
+        if (value < 10) {
           // Still disconnected.  No match
           matchCondition = false;
         } else {
-          // Non-zero value.  Sensor must have been re-connected.
+          // Larger value.  Sensor must have been re-connected.
           pTrigger->flags &= ~DISCONNECTED;
         }
       }
@@ -146,7 +150,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
          }
           
         } else if (ISREPEAT(pTrigger->conditions)) {
-          if ( (timeDiff(now, pTrigger->onTime) > 15000) && (value < 10) ) {
+          if ( (value < 10) && (timeDiff(now, pTrigger->onTime) > 15000))  {
             // 15 seconds repeating on a near-0 signal probably means the sensor is disconnected.
             // Note: A disconnected cable connected to a sensor can result in a small signal - thus <10.
             // Stop doing the repeats.

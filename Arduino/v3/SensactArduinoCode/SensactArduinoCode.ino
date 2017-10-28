@@ -84,6 +84,9 @@ void loop() {
       
     case RUN_SENSACT:
       runMode = RUN;
+      triggers.reset();
+      actors.reset();
+      sensors.reset();
       setLED();
       break;
       

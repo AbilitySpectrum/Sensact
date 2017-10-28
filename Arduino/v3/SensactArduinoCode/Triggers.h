@@ -44,7 +44,7 @@ class Trigger {
     unsigned int onTime;
   
     Trigger() {
-      flags = 0;
+      flags = DISCONNECTED;
       onTime = 0;
     }
     int readTrigger(InputStream *);
