@@ -81,7 +81,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
 
       // Check for disconnected sensor
       if (pTrigger->flags & DISCONNECTED) {
-        if (value < 10) {
+        if (value < 10 && value > -10) {
           // Still disconnected.  No match
           matchCondition = false;
         } else {
@@ -150,10 +150,11 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
          }
           
         } else if (ISREPEAT(pTrigger->conditions)) {
-          if ( (value < 10) && (timeDiff(now, pTrigger->onTime) > 15000))  {
+          if ( (value < 10 && value > -10) && (timeDiff(now, pTrigger->onTime) > 15000))  {
             // 15 seconds repeating on a near-0 signal probably means the sensor is disconnected.
-            // Note: A disconnected cable connected to a sensor can result in a small signal - thus <10.
-            // Stop doing the repeats.
+            // So stop doing the repeats.
+            // Note: A cable connected to a sensor jack with nothing on the other end
+            // can result in a small signal - thus 'val < 10' rather than just 'val == 0'.
             pTrigger->flags |= DISCONNECTED; 
           } else {
             // Requests for repeated actions are sent to action processing.
