@@ -18,20 +18,21 @@ def open_port(port_name):
 	
 def close_port():
 	global _read_loop_active
+	global _serial
+	if not "_serial" in globals():
+		return
 	_read_loop_active = False
 	_serial.close()
+	del _serial
 		
 def write(data):
 	_serial.write(data)
 	_serial.flush()
-		
-#	print("Wrote ", data)
-	
+			
 def _read_loop(dispatch_function):
 	_buffer = bytearray()
 	while(_read_loop_active):
 		b = _serial.read(1)
-#		print ("read" + b.decode())
 		_buffer.extend(b)
 		if (b == b'Z'):
 			dispatch_function(_buffer)

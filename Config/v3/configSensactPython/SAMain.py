@@ -11,6 +11,7 @@ import SAStream
 import SATopFrames
 import SAModel
 import SASensorUI
+import PortSelectDlg
 import threading
 
 versionEvent = threading.Event()
@@ -59,36 +60,62 @@ def dispatcher(data):
 	else:
 		messagebox.showerror(title="Unknown Data", message="Unknown data received")
 
-	
-def serialConnect():
-	global connectionStr
+SavedGoodPort = None
 
-	portFound = False
+def portSelection(root, tryAuto):
+	global SavedGoodPort
 	
-	while not portFound:
-		availablePorts = SASerial.get_list()
+	if (SavedGoodPort != None):
+		return SavedGoodPort
+	
+	availablePorts = SASerial.get_list()
 
+	if tryAuto:
 		for onePort in availablePorts:
 			if (onePort.description.count("Leonardo") > 0):
-				target = onePort
-				portFound = True
-				break
-		else:
-			val = messagebox.askyesno(title="Connection failed",
-				message="No Leonardo device found.\nRetry?")
+				return onePort
+
+	psd = PortSelectDlg.PortSelectDlg(root, availablePorts)
+	root.wait_window(psd.dlg)
+	if (psd.cancelled):
+		return None
+	target = psd.selected
+	del psd
+	return target
+	
+def serialConnect(root):
+	connectionSuccess = False
+	while not connectionSuccess:
+		SASerial.close_port()
+		port = portSelection(root, True)
+		if port is None:
+			return False
+
+		connected = False
+		try:
+			SASerial.open_port(port.device)	
+			SASerial.init_reading(dispatcher)	
+			connected = True
+		
+		except Exception:
+			val = messagebox.askyesno(title="Connection failed", 
+				message="Connection failed.\nWould you like to try again?")
 			if val == False:
 				return False
-	
-	try:
-		SASerial.open_port(target.device)
-		connectionStr = "Connected to " + onePort.description
-	
-		SASerial.init_reading(dispatcher)	
-		return True
 		
-	except Exception:
-		messagebox.showerror(title="Connection failed", message="Connection failed")
-		return False
+		if connected:
+			SASerial.write(SAModel.GET_VERSION) 
+			# Wait for recipt of version number
+			if versionEvent.wait(timeout=2) == False:
+				val = messagebox.askyesno(title="Communication Error", 
+				 message="This does not appear to be a Sensact device.\nWould you like to try again?")
+				if val == False:
+					return False
+			else:
+				connectionSuccess = True
+	
+	SavedGoodPort = port
+	return True
 	
 	
 def mainScreen(root):
@@ -131,16 +158,9 @@ def main():
 	defineStyles()	
 	mainScreen(root)	
 	
-	if serialConnect() == False:
+	if serialConnect(root) == False:
 		return 
-		
-	SASerial.write(SAModel.GET_VERSION) 
-	# Wait for recipt of version number
-	if versionEvent.wait(timeout=5) == False:
-		messagebox.showerror(title="Communication Error", 
-		message="Failed to get version number from Sensact")
-		return
-	
+			
 	SATopFrames.SAVersionStr.set("Version " + versionStr)
 	SATopFrames.statusMessage.set(connectionStr)
 	SAModel.setupLists()	# Version number (above) is needed for this to be correct
