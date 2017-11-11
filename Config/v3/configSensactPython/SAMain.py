@@ -16,7 +16,6 @@ import threading
 
 versionEvent = threading.Event()
 versionStr = ""
-connectionStr = ""
 
 #
 # dispatcher gets data from the thread that is reading serial
@@ -60,38 +59,22 @@ def dispatcher(data):
 	else:
 		messagebox.showerror(title="Unknown Data", message="Unknown data received")
 
-SavedGoodPort = None
+#
+# Connection establishment and recovery logic and UI
+#
+# Global
+SavedGoodPortDesc = None
 
-def portSelection(root, tryAuto):
-	global SavedGoodPort
-	
-	if (SavedGoodPort != None):
-		return SavedGoodPort
-	
-	availablePorts = SASerial.get_list()
-
-	if tryAuto:
-		for onePort in availablePorts:
-			if (onePort.description.count("Leonardo") > 0):
-				return onePort
-
-	psd = PortSelectDlg.PortSelectDlg(root, availablePorts)
-	root.wait_window(psd.dlg)
-	if (psd.cancelled):
-		return None
-	target = psd.selected
-	del psd
-	return target
-	
-def serialConnect(root):
+def serialConnect(root):	
 	connectionSuccess = False
+	tryAuto = True  # First time auto-select port based on name.
 	while not connectionSuccess:
 		SASerial.close_port()
-		port = portSelection(root, True)
+		port = portSelection(root, tryAuto)
 		if port is None:
 			return False
 
-		connected = False
+		connected = False  # Assumed for now
 		try:
 			SASerial.open_port(port.device)	
 			SASerial.init_reading(dispatcher)	
@@ -113,11 +96,56 @@ def serialConnect(root):
 					return False
 			else:
 				connectionSuccess = True
+		tryAuto = False  # On a retry display the list of available ports.
 	
-	SavedGoodPort = port
+	global SavedGoodPortDesc
+	SavedGoodPortDesc = port.description
+	print("Saving {}".format(SavedGoodPortDesc))
 	return True
 	
+def portSelection(root, tryAuto):
+	matchPort = None
 	
+	print("Saved: {}".format(SavedGoodPortDesc))
+	if (SavedGoodPortDesc != None):
+		matchPort =  SavedGoodPortDesc
+	else:
+		matchPort = "Leonardo"
+	
+	print("Match port: {}".format(matchPort))
+	availablePorts = SASerial.get_list()
+
+	if tryAuto:
+		for onePort in availablePorts:
+			if (onePort.description.count(matchPort) > 0):
+				return onePort
+
+	psd = PortSelectDlg.PortSelectDlg(root, availablePorts)
+	root.wait_window(psd.dlg)
+	if (psd.cancelled):
+		return None
+	target = psd.selected
+	del psd
+	return target
+	
+def attemptReconnection():
+	val = messagebox.askyesno(title="Communication Error", 
+	 message="The connection to Sensact has been lost.\nWould you like to try to re-establish it?")
+	if (val):
+		messagebox.showinfo(title="Reconnection",
+		  message="Please ensure the Sensact is connected")
+		if serialConnect(globalRoot):
+			SATopFrames.statusMessage.set("Connected to {}".format(SavedGoodPortDesc))
+			return
+		else:
+			exit()
+	else:
+		exit() 
+
+	
+#
+# Main Line
+#	
 def mainScreen(root):
 	# Main frames
 	tabsFrame =   SATopFrames.tabFrame(root)
@@ -153,16 +181,19 @@ def defineStyles():
 #	s.map('toggle.TButton', foreground=[('active', 'red')])
 	
 def main():
+	global globalRoot
 	root = Tk()
+	globalRoot = root
 	root.title("Sensact Configuration Tool")
 	defineStyles()	
 	mainScreen(root)	
 	
 	if serialConnect(root) == False:
 		return 
-			
+	
+	print("Saved this: {}".format(SavedGoodPortDesc))		
 	SATopFrames.SAVersionStr.set("Version " + versionStr)
-	SATopFrames.statusMessage.set(connectionStr)
+	SATopFrames.statusMessage.set("Connected to {}".format(SavedGoodPortDesc))
 	SAModel.setupLists()	# Version number (above) is needed for this to be correct
 	SATopFrames.loadTabs() 	# sensor and action lists must be accurate (previous line)
 	mainloop()

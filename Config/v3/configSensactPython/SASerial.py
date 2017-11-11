@@ -14,7 +14,7 @@ def get_list():
 	
 def open_port(port_name):
 	global _serial
-	_serial = serial.Serial(port=port_name)
+	_serial = serial.Serial(port=port_name, write_timeout=1.0)
 	
 def close_port():
 	global _read_loop_active
@@ -26,8 +26,12 @@ def close_port():
 	del _serial
 		
 def write(data):
-	_serial.write(data)
-	_serial.flush()
+	try:
+		_serial.write(data)
+		_serial.flush()
+	except serial.SerialTimeoutException:
+		from __main__ import attemptReconnection
+		attemptReconnection()
 			
 def _read_loop(dispatch_function):
 	_buffer = bytearray()
@@ -45,6 +49,9 @@ def init_reading(dispatch_function):
 	_thread = Thread(target=_read_loop,args=(dispatch_function,))
 	_thread.daemon = True
 	_thread.start()
+	
+	
+
 	
 	
 
