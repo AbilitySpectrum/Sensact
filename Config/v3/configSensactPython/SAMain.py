@@ -100,19 +100,16 @@ def serialConnect(root):
 	
 	global SavedGoodPortDesc
 	SavedGoodPortDesc = port.description
-	print("Saving {}".format(SavedGoodPortDesc))
 	return True
 	
 def portSelection(root, tryAuto):
 	matchPort = None
 	
-	print("Saved: {}".format(SavedGoodPortDesc))
 	if (SavedGoodPortDesc != None):
 		matchPort =  SavedGoodPortDesc
 	else:
 		matchPort = "Leonardo"
 	
-	print("Match port: {}".format(matchPort))
 	availablePorts = SASerial.get_list()
 
 	if tryAuto:
@@ -191,7 +188,6 @@ def main():
 	if serialConnect(root) == False:
 		return 
 	
-	print("Saved this: {}".format(SavedGoodPortDesc))		
 	SATopFrames.SAVersionStr.set("Version " + versionStr)
 	SATopFrames.statusMessage.set("Connected to {}".format(SavedGoodPortDesc))
 	SAModel.setupLists()	# Version number (above) is needed for this to be correct

@@ -94,15 +94,18 @@ class SensorUIFrame(ttk.Frame):
 		
 	def setValue(self, value):
 		triggerLock.acquire()
-		for t in self.triggerUIList:
-			t.setValue(value)
+		tmpList = self.triggerUIList
 		triggerLock.release()
+		
+		for t in tmpList:
+			t.setValue(value)
 			
 	def showValues(self, show):
 		triggerLock.acquire()
-		for t in self.triggerUIList:
-			t.showValues(show)
+		tmpList = self.triggerUIList
 		triggerLock.release()
+		for t in tmpList:
+			t.showValues(show)
 		self._show_values = show
 		
 			
