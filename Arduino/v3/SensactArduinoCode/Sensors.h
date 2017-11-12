@@ -117,6 +117,8 @@ class GyroSensor: public Sensor {
     int gyroX;
     int gyroY;
     int gyroZ;
+    boolean initNeeded;
+    int timeOfLastInitAttempt;
   
   public:
     GyroSensor(int x, int y, int z, int gx, int gy, int gz) {
@@ -126,6 +128,7 @@ class GyroSensor: public Sensor {
       gyroX = gx;
       gyroY = gy;
       gyroZ = gz;
+      initNeeded = true;
     }
     void init();
     void getValues(SensorData *pData);

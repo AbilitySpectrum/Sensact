@@ -132,8 +132,23 @@ def tabFrame(parent):
 def onconfigure(x):
 	canvas.configure(scrollregion=canvas.bbox('all'))
 	
+def saveTabId():
+	global tabid
+	global tabs
+	
+	tabid = tabs.select()
+#	print("Saved tab id:", tabid)
+	
+def loadSavedTab():
+	global tabid
+	global tabs
+	
+#	print("Restoring tab id:", tabid)
+	tabs.select(tabid)
+	
 def loadTabs():	
 	global canvas
+	global tabs
 		
 	tabs = ttk.Notebook(tabsFrame)
 	tabs.grid(column=0, row=0, sticky=(N,E,S,W))

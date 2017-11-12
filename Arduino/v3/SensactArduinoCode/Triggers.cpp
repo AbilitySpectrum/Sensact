@@ -21,6 +21,10 @@ void Triggers::reset() {
   for(int i=0; i<=maxSensorID; i++) {
     paSensorStates[i] = 1;
   }  
+  for(int j=0; j<nTriggers; j++) {
+    Trigger *pTrigger = &aTriggers[j];
+    pTrigger->flags = DISCONNECTED; //Assume disconnected until we get a signal
+  }
 }
 
 // The first time the Triggers object gets sensor data 
@@ -75,6 +79,17 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
         continue; // Wrong sensor ID - forget it.
       }
 
+      // Check for disconnected sensor
+      if (pTrigger->flags & DISCONNECTED) {
+        if (value < 10 && value > -10) {
+          // Still disconnected.  No match
+          matchCondition = false;
+        } else {
+          // Larger value.  Sensor must have been re-connected.
+          pTrigger->flags &= ~DISCONNECTED;
+        }
+      }
+
       // Check states
       if ((int) REQD_STATE(pTrigger->stateValues) == 0)  {  
         // Match ANY condition - match only if not already in target state.
@@ -118,10 +133,10 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
               actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             }
             aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
-            pTrigger->actionTaken = true;
+            pTrigger->flags |= ACTION_TAKEN;
           }
           
-        } else if (pTrigger->actionTaken == false) { // Waiting for delay
+        } else if (!(pTrigger->flags & ACTION_TAKEN)) { // Waiting for delay
           if (timeDiff(now, pTrigger->onTime) > pTrigger->delayMs) {
             if (pTrigger->actionID == CHANGE_SENSOR_STATE) {
               int state = pTrigger->actionParameters & 0xff;
@@ -131,19 +146,27 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
               actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             }
             aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
-            pTrigger->actionTaken = true;
+            pTrigger->flags |= ACTION_TAKEN;
          }
           
         } else if (ISREPEAT(pTrigger->conditions)) {
-          // Requests for repeated actions are sent to action processing.
-          // There the decision of whether actually to do the action or not 
-          // is made (in assessAction) - based on the time since the last action.
-          actions.addAction(pTrigger->actionID, pTrigger->actionParameters, true);
+          if ( (value < 10 && value > -10) && (timeDiff(now, pTrigger->onTime) > 15000))  {
+            // 15 seconds repeating on a near-0 signal probably means the sensor is disconnected.
+            // So stop doing the repeats.
+            // Note: A cable connected to a sensor jack with nothing on the other end
+            // can result in a small signal - thus 'val < 10' rather than just 'val == 0'.
+            pTrigger->flags |= DISCONNECTED; 
+          } else {
+            // Requests for repeated actions are sent to action processing.
+            // There the decision of whether actually to do the action or not 
+            // is made (in assessAction) - based on the time since the last action.
+            actions.addAction(pTrigger->actionID, pTrigger->actionParameters, true);
+          }
         }          
         
       } else { 
           pTrigger->onTime = 0;
-          pTrigger->actionTaken = false;
+          pTrigger->flags &= ~ACTION_TAKEN;
       }
     }
   }

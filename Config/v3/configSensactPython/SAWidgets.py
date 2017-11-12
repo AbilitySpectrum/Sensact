@@ -11,6 +11,7 @@ import SAModel
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+import SATopFrames
 
 SCALE_SIZE = 150
 #
@@ -60,6 +61,7 @@ class SAScale(ttk.Frame):
 		# triggerValue here is a string representation of a floating point value.
 		# Yuch!
 		self.trigger.triggerValue = int(float(triggerValue))
+		self.scale.focus()	# to force final validation if Entry was edited.
 		
 	def invChange(self):
 		if self.showValues:
@@ -132,6 +134,9 @@ class SACombo(ttk.Frame):
 		# create the box
 		self.combo = ttk.Combobox(self, textvariable=self.value)
 		self.combo['values'] = keys
+		ilength = len(items)
+		if ilength <= 16:
+			self.combo['height'] = ilength
 		self.state(['readonly'])
 		self.combo.bind('<<ComboboxSelected>>', self.selectionChanged)
 		
@@ -180,6 +185,7 @@ class SASpinbox(ttk.Frame):
 		
 	def selectionChanged(self):
 		self.callback(self.value.get())
+		self.spinner.focus() # to force final validation if Entry was edited.
 		
 
 class RequiredState(SASpinbox):
@@ -220,10 +226,10 @@ class SAEntry(ttk.Frame):
 		
 		# create the entry box
 		self.entry = ttk.Entry(self, textvariable=self.value)
-		vcmd = (self.entry.register(self.validate), '%P')
+		vcmd = (self.entry.register(self.validate), '%P', '%d')
 		self.entry['width'] = width
 		self.entry['validatecommand'] = vcmd
-		self.entry['validate'] = 'key'
+		self.entry['validate'] = 'all'
 		
 		# create the label
 		label = ttk.Label(self, text=labelStr)
@@ -232,34 +238,85 @@ class SAEntry(ttk.Frame):
 		label.pack(side=LEFT, padx=(5,3))
 		self.entry.pack(side=LEFT, padx=(0,5))
 		
-	def validate(self, newval):
-		if newval == '':
-			return True
-		return self.cb(newval)	
+	def validate(self, newval, action):
+		return self.cb(newval, action == '-1')	
 
-class Delay(SAEntry):
+# A class to handle all integer numeric entry fields.
+# Handles all error checking.  Subclass just has to provide min and max values.
+class SANumericEntry(SAEntry):
+	def __init__(self, parent, labelStr, width, min, max, finalValue):
+		SAEntry.__init__(self, parent, self.callback, labelStr + ':', width)
+		self.minval = min
+		self.maxval = max
+		self.label = labelStr
+		self.finalValue = finalValue
+		
+	def setInitialValue(self, v):
+		self.lastGoodValue = v
+		self.value.set(v)
+		
+	def callback(self, newval, focusChange):
+		# focusChange is true if this field is losing or gaining the focus.
+		if not focusChange:	# intermediate entry testing
+			SATopFrames.saveTabId()	# Remember what tab we are in.
+			if newval == '':
+				return True
+			if not newval.isdigit():
+				return False	# Reject non-digit characters.
+			val = int(newval)
+			if val > self.maxval:
+				messagebox.showerror(title="Entry error", 
+					message= "{0} may not be greater than {1}."
+					.format(self.label, self.maxval))
+				self.value.set(self.maxval)
+				self.finalValue(self.maxval)
+				return False
+			else:
+				return True
+				
+		else:	# Focus change - final validity checking
+			if self.entry == self.entry.focus_get():
+				# This is a focusIn action.  No checking is done
+				return True
+
+			if newval.isdigit():
+				val = int(newval)
+				if self.minval <= val <= self.maxval:
+					self.lastGoodValue = val
+					self.finalValue(val) # This will set the trigger field.
+					self.value.set(val)  # This will change an entry of e.g. 0500 to 500
+					return True
+			
+			# Otherwise, the entry is not valid!
+			SATopFrames.loadSavedTab() # return to the tab holding the entry.			
+			messagebox.showerror(title="Entry error", 
+				message= "{0} may not be less than {1}."
+				.format(self.label, self.minval))
+			self.value.set(self.minval)  # Show minimum value
+			self.finalValue(self.minval)
+			try:
+				self.entry.focus()				 # Restore focus
+			except:
+				# The user may select the Action drop down list and
+				# change the action (why python allows this *before*
+				# validation is beyond me!).  At any rate, if this
+				# happens the attempt to refocus will fail because 
+				# self.entry has been deleted - but we do not care.
+				pass
+
+			return False						
+					
+		
+class Delay(SANumericEntry):
 	def __init__(self, parent, t):
-		SAEntry.__init__(self, parent, self.callback, "Delay:", 5)
+		SANumericEntry.__init__(self, parent, "Delay", 5, 0, 30000, self.final)
 		
 		self.trigger = t
-		self.value.set( str(self.trigger.delay) )
+		self.setInitialValue( str(self.trigger.delay) )
 		
-	def callback(self, newval):
-		try:
-			val = int(newval)
-			if 0 <= val <= 30000:
-				self.trigger.delay = val
-				return True
-			else:
-				messagebox.showerror(title="Entry error", 
-					message="Delay must be a value between 0 and 30000.")						
-				self.value.set( str(self.trigger.delay) )
-				return False
-		except Exception:
-			messagebox.showerror(title="Entry error", 
-				message="Delay must be a numeric value between 0 and 30000.")						
-			self.value.set( str(self.trigger.delay) )
-			return False
+	def final(self, val):
+		self.trigger.delay = val
+
 
 # Value for non-continuous sensors (e.g. USB keyboard)
 class SAValue(SAEntry):			
@@ -269,12 +326,25 @@ class SAValue(SAEntry):
 		self.trigger = t
 		self.value.set( chr(self.trigger.triggerValue) )
 		
-	def callback(self, newval):
-		if len(newval) > 1:
-			return False
+	def callback(self, newval, focusChange):
+		if focusChange:
+			if self.entry == self.entry.focus_get():
+				# This is a focusIn action.  No checking is done
+				return True
+			if len(newval) != 1:
+				# Empty field is invalid.  Reset to original value.
+				self.value.set( chr(self.trigger.triggerValue) )
+				return False
+			else:
+				self.trigger.triggerValue = ord(newval[0])
+				return True
 		else:
-			self.trigger.triggerValue = ord(newval[0])
-			return True
+			if newval == '':
+				return True
+			if len(newval) > 1:
+				return False
+			else:
+				return True
 
 
 # Repeat control
