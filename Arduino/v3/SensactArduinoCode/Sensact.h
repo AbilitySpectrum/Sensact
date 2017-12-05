@@ -12,7 +12,7 @@ unsigned int timeDiff(unsigned int now, unsigned int prev);
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
-#define VERSION         "3.2"
+#define VERSION         "4.0"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
@@ -20,6 +20,7 @@ unsigned int timeDiff(unsigned int now, unsigned int prev);
 #define REQUEST_TRIGGERS  'U'
 #define GET_VERSION       'V'
 #define KEYBOARD_CMD      'W'
+#define MOUSE_SPEED       'Y'
 #define MIN_COMMAND  'Q'
 #define MAX_COMMAND  'W'
 

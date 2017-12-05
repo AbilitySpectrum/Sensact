@@ -11,6 +11,7 @@ import SASerial
 import SAModel
 import SASensorUI
 import SAStream
+import SAMouseSpeed
 
 # Status Area
 def statusFrame(parent):
@@ -158,6 +159,10 @@ def loadTabs():
 	for grp in SAModel.sensorGroups:
 		frame = ScrollingSensorUI(tabs, grp)
 		tabs.add(frame, text=grp.getName())
+		
+	if SAModel.sensactVersionID >= 400:
+		frame = SAMouseSpeed.MouseSpeed(tabs)
+		tabs.add(frame, text="Mouse Speed")
 	
 	
 class ScrollingSensorUI(ttk.Frame):

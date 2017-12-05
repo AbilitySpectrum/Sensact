@@ -57,7 +57,8 @@ def dispatcher(data):
 				message="Error reading triggers:\n" + err.message)
 		
 	else:
-		messagebox.showerror(title="Unknown Data", message="Unknown data received")
+		messagebox.showerror(title="Unknown Data", 
+			message="Unknown data received ({})".format(data[0]))
 
 #
 # Connection establishment and recovery logic and UI

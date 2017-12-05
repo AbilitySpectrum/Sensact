@@ -191,6 +191,12 @@ int Triggers::readTriggers(InputStream *is) {
   nTriggers = tCount;
   
   int Z = is->getChar();
+  if (Z == MOUSE_SPEED) {
+    if (readMouseSpeed(is) == IO_ERROR) {
+      return IO_ERROR;
+    }
+    Z = is->getChar();
+  }
   if (Z != END_OF_BLOCK) { 
     return IO_ERROR;
   }
@@ -208,6 +214,8 @@ void Triggers::sendTriggers(OutputStream *os) {
   for(int i=0; i<nTriggers; i++) {
     aTriggers[i].sendTrigger(os);
   }
+  os->putChar(MOUSE_SPEED);
+  sendMouseSpeed(os);
   os->putChar(END_OF_BLOCK);  // End of transmission block
 }
 

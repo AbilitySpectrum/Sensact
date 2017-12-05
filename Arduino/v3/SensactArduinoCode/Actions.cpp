@@ -122,14 +122,73 @@ void Buzzer::doAction(long param) {
 #define SA_MOUSE_RELEASE 7
 #define SA_MOUSE_RIGHT_CLICK 8
 
-#define SA_MOUSE_SPEED 6
-
 // Mouse nudge commands - for Gyro Accel motions
 #define NUDGE_UP      10
 #define NUDGE_DOWN    11
 #define NUDGE_LEFT    12
 #define NUDGE_RIGHT   13
 #define NUDGE_STOP    14
+
+unsigned char delay_1 = 35;
+unsigned char jump_1 = 2;
+
+unsigned char transitionTime_1 = 15;
+unsigned char delay_2 = 59;
+unsigned char jump_2 = 6;
+
+unsigned char transitionTime_2 = 25;
+unsigned char delay_3 = 23;
+unsigned char jump_3 = 6;
+
+int readMouseSpeed(InputStream *is) {
+  unsigned char d1, d2, d3;
+  unsigned char j1, j2, j3;
+  unsigned char t1, t2;
+  int tmpInt;
+
+  int len = is->getNum();
+  if (len != 16) return IO_ERROR;
+
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  d1 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  j1 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  d2 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  j2 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  d3 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  j3 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  t1 = tmpInt;
+  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
+  t2 = tmpInt;
+
+  delay_1 = d1;
+  jump_1 = j1;
+  transitionTime_1 = t1;
+  delay_2 = d2;
+  jump_2 = j2;
+  transitionTime_2 = t2;
+  delay_3 = d3;
+  jump_3 = j3;
+
+  return 0;
+}
+
+void sendMouseSpeed(OutputStream *os) {
+  os->putNum(16); //data length
+  os->putID(delay_1);
+  os->putID(jump_1);
+  os->putID(delay_2);
+  os->putID(jump_2);
+  os->putID(delay_3);
+  os->putID(jump_3);
+  os->putID(transitionTime_1);
+  os->putID(transitionTime_2);
+}
 
 // MouseControl repeat logic is somewhat complex.
 // Horizontal and vertical motion can be simultaneous, 
@@ -142,13 +201,20 @@ void MouseControl::assessAction(long param, int repeat) {
   if (repeat) {
     // Accelerating mouse logic.
     unsigned int repeatInterval;
-    if (repeatCount < 10) repeatInterval = MOUSE_REPEAT_INTERVAL;
-    else if (repeatCount < 40) repeatInterval = MOUSE_REPEAT_INTERVAL/2;
-    else repeatInterval = MOUSE_REPEAT_INTERVAL/4;
-    
+    if (repeatCount < transitionTime_1) {
+      repeatInterval = delay_1;
+      jumpSize = jump_1;
+    } else if (repeatCount < transitionTime_2) {
+      repeatInterval = delay_2;
+      jumpSize = jump_2;
+    } else {
+      repeatInterval = delay_3;
+      jumpSize = jump_3;
+    }
+
     if (option == SA_MOUSE_UP || option == SA_MOUSE_DOWN) {
       if ( timeDiff(now, lastMouseVerticalMove) < repeatInterval) {
-        return;   
+        return;   // It's not yet time to repeat.
       }
     } else if (option == SA_MOUSE_LEFT || option == SA_MOUSE_RIGHT) {
       if ( timeDiff(now, lastMouseHorizontalMove) < repeatInterval) {
@@ -158,9 +224,11 @@ void MouseControl::assessAction(long param, int repeat) {
       // Repeat for all other mouse actions is not allowed
       return;
     }
-    if (repeatCount <= 40) repeatCount++; // We only get here if we are repeating.
+    if (repeatCount <= transitionTime_2) repeatCount++; // Stop counting when we reach the max
+                                                        // to avoid roll-over.
   } else {
     // Initial action - not a repeat
+    jumpSize = jump_1;
     repeatCount = 0;
   }
   if (option == SA_MOUSE_UP || option == SA_MOUSE_DOWN) {
@@ -175,16 +243,16 @@ void MouseControl::doAction(long param) {
   int option = param & 0xffff;
   switch(option) {
     case SA_MOUSE_UP:
-      mc_move(0, -SA_MOUSE_SPEED);
+      mc_move(0, -jumpSize);
       break;
     case SA_MOUSE_DOWN:
-      mc_move(0, SA_MOUSE_SPEED);
+      mc_move(0, jumpSize);
       break;
     case SA_MOUSE_LEFT:
-      mc_move(-SA_MOUSE_SPEED, 0);
+      mc_move(-jumpSize, 0);
       break;
     case SA_MOUSE_RIGHT:
-      mc_move(SA_MOUSE_SPEED, 0);
+      mc_move(jumpSize, 0);
       break;
     case SA_MOUSE_CLICK:
       mc_button(MC_LEFT_CLICK);

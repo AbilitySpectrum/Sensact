@@ -10,6 +10,7 @@
 from SAStream import *
 from SACustom import *
 import SASerial
+import math
 
 REPORT_MODE = 				b'Q'
 RUN_SENSACT = 				b'R'
@@ -22,6 +23,9 @@ START_OF_TRIGGER_BLOCK_ORD = ord(START_OF_TRIGGER_BLOCK)
 REQUEST_TRIGGERS = 			b'U'
 GET_VERSION = 				b'V'
 GET_VERSION_ORD =			ord(GET_VERSION)
+
+MOUSE_SPEED = 				b'Y'
+MOUSE_SPEED_ORD = 			ord(MOUSE_SPEED)
 
 MIN_COMMAND = 				ord('Q')
 MAX_COMMAND = 				ord('V')
@@ -298,7 +302,12 @@ def readTriggers(tmpTriggers, stream):
 		t.fromStream(stream)
 		tmpTriggers.append(t)
 	
-	if stream.getChar() != END_OF_BLOCK_ORD:
+	ch = stream.getChar()
+	if (ch == MOUSE_SPEED_ORD):
+		mouseMovingParams.fromStream(stream)
+		ch = stream.getChar()
+		
+	if ch != END_OF_BLOCK_ORD:
 		raise IOError("Invalid end of transmission")
 		
 # Writing Triggers (to sensact or a file)
@@ -325,9 +334,110 @@ def putTriggers(ostream):
 	for t in allTriggers.triggerList:
 		t.toStream(ostream)
 	
+	if (sensactVersionID >= 400):
+		mouseMovingParams.toStream(ostream)
+		
 	ostream.putChar(END_OF_BLOCK_ORD)
 			
 		
+class MouseMovingParams:
+	def __init__(self):
+		pass
+		
+	# This function allows the user interface component
+	# to register it's location with this class.  The
+	# UI will be asked for it's raw values whenever there
+	# is a need to send them, and will be updated whenever
+	# values are read.
+	def registerUI(self, ui):
+		self.ui = ui
+		
+	def toStream(self, ostream):
+		# Get three speeds and two speed-change times.
+		(s1, s2, s3, t1, t2) = self.ui.getRawValues()
+		
+#		print("P Raw {}, {}, {}, {}, {}".format(s1, s2, s3, t1, t2))
+		
+		# d* is the # of milliseconds between mouse moves
+		# j* is the # of pixels the mouse will go in a single move
+		# tt* is the number of moves until the speed changes.
+		(d1, j1) = self.convertSpeed(s1)
+		tt1 = int(t1/d1)
+		(d2, j2) = self.convertSpeed(s2)
+		tt2 = int(t2/d2) + tt1 
+		(d3, j3) = self.convertSpeed(s3)
+		
+#		print("Put d1 {} j1 {} d2 {} j2 {} d3 {} j3 {} tt1 {} tt2 {}"
+#			.format(d1, j1, d2, j2, d3, j3, tt1, tt2))
+
+		ostream.putChar(ord('\n'))
+		ostream.putChar(MOUSE_SPEED_ORD)
+		ostream.putNum( 16, 2 ) # Data length
+		# Reduce the delay by one.
+		# The actual delay will be the first 'tick' where
+		# the elapsed time is greater than the delay.
+		# We reduce delay by one to ensure we don't overshoot the 'tick'.
+		ostream.putID(d1 - 1, 2)
+		ostream.putID(j1, 2)
+		ostream.putID(d2 - 1, 2)
+		ostream.putID(j2, 2)
+		ostream.putID(d3 - 1, 2)
+		ostream.putID(j3, 2)
+		ostream.putID(tt1, 2)
+		ostream.putID(tt2, 2)
+		
+	def fromStream(self,istream):
+		num = istream.getNum(2)
+		if num != 16:
+			raise IOError("Incorrect mouse parameter length")
+		d1 = istream.getID(2) + 1	
+		j1 = istream.getID(2)	
+		d2 = istream.getID(2) + 1	
+		j2 = istream.getID(2)	
+		d3 = istream.getID(2) + 1	
+		j3 = istream.getID(2)	
+		tt1 = istream.getID(2)	
+		tt2 = istream.getID(2)
+		
+#		print("Got d1 {} j1 {} d2 {} j2 {} d3 {} j3 {} tt1 {} tt2 {}"
+#			.format(d1, j1, d2, j2, d3, j3, tt1, (tt2)))
+		
+		# Now, convert to raw parameters.
+		t1 = tt1 * d1
+		t2 = (tt2 - tt1) * d2
+		s1 = self.convertBack(d1, j1)
+		s2 = self.convertBack(d2, j2)
+		s3 = self.convertBack(d3, j3)
+		
+#		print("G Raw {}  {}  {}  {}  {}"
+#			.format(s1, s2, s3, t1, t2))
+		
+		self.ui.setRawValues(s1, s2, s3, t1, t2)
+		
+	# Convert the logarithmic value for pixels/second from the Widget
+	# to number-of-milliseconds between mouse moves
+	# and size of mouse jump.
+	# Aim for a speed with a mouse jump of less than 10,
+	# but for the highest speeds we get a delay of 24 
+	# and a jump of 15.
+	def convertSpeed(self, lspeed):
+		speed = math.exp(lspeed)
+		for delay in range(60, 23, -12): # 60, 48, 36, 24
+			jump = int ((speed * delay) / 1000.0 + 0.5)
+			if jump < 10:
+				break
+		
+		return (delay, jump)
+		
+	# Reverse the conversion above.
+	def convertBack(self, delay, jump):
+		speed = (jump * 1000.0) / delay
+		return math.log(speed)
+		
+# Singleton mouse parameters
+mouseMovingParams = MouseMovingParams()
+
+
 ## --- Test Code --- ##
 def outfunc(data):
 	print(data.decode())

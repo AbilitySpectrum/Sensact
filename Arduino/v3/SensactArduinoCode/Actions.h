@@ -7,7 +7,10 @@
 #include "Sensact.h"
 #include <SoftwareSerial.h>
 #include "BTMouseCtl.h"
+#include "IO.h"
 
+int readMouseSpeed(InputStream *is);
+void sendMouseSpeed(OutputStream *os);
 
 // Action - Identifies a single action.
 #define ACTION_ID_MASK   0x7F
@@ -144,6 +147,7 @@ class MouseControl: public Actor {
     unsigned int lastMouseVerticalMove;
     unsigned int lastMouseHorizontalMove;
     unsigned char repeatCount;
+    unsigned char jumpSize;
 
   public:
     MouseControl() {
