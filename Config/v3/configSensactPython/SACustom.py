@@ -240,7 +240,7 @@ class Frequency(SANumericEntry):
 			
 class Duration(SANumericEntry):
 	def __init__(self, parent, t):
-		SANumericEntry.__init__(self, parent, "Duration", 4, 100, 1000, self.final)
+		SANumericEntry.__init__(self, parent, "Duration", 4, 20, 1000, self.final)
 		
 		self.trigger = t
 		

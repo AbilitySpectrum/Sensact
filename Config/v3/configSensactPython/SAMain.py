@@ -39,7 +39,7 @@ def dispatcher(data):
 		try:
 			istream = SAStream.InputStream(data)
 			SASensorUI.doReport(istream)
-		except IOError as err:
+		except SAStream.IOError as err:
 			messagebox.showerror(title="Reporting error", 
 				message="Error receiving sensor values:\n" + err.message)			
 			
@@ -52,7 +52,7 @@ def dispatcher(data):
 			SASensorUI.reloadTriggers()
 			SATopFrames.statusMessage.set("Trigger load successful")
 			
-		except IOError as err:
+		except SAStream.IOError as err:
 			messagebox.showerror(title="Load Failed", 
 				message="Error reading triggers:\n" + err.message)
 		

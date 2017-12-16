@@ -95,7 +95,7 @@ class SpeedSelection(ttk.Frame):
 # Uses the error checking and correction logic of SANumericEntry
 class MouseTimer(SAWidgets.SANumericEntry):
 	def __init__(self, parent, initial):
-		SAWidgets.SANumericEntry.__init__(self, parent, "", 4, 0, 4000, self.final)
+		SAWidgets.SANumericEntry.__init__(self, parent, "", 5, 0, 10000, self.final)
 		
 		self.setInitialValue( str(initial) )
 		self.tvalue = initial

@@ -146,8 +146,9 @@ class MouseControl: public Actor {
     // the same time - so we need two repeat timers.
     unsigned int lastMouseVerticalMove;
     unsigned int lastMouseHorizontalMove;
-    unsigned char repeatCount;
-    unsigned char jumpSize;
+    unsigned int mouseStartTime;
+    unsigned char maxSpeedReached;
+    unsigned char jumpSize;         // Size of each mouse move
 
   public:
     MouseControl() {
@@ -226,5 +227,13 @@ class IRTV: public Actor {
     }
     void init();
     void doAction(long param);
+};
+
+class SerialSend: public KeyboardControl {
+  public:
+    SerialSend(int i) {
+      id = i;
+    }
+    virtual void kc_write(char character);
 };
 #endif

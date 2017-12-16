@@ -160,6 +160,8 @@ def createActionList():
 #	actions.append( Action(6, "Joystick",      SAC_None,  0, None) )
 	actions.append( Action(7, "Buzzer",        SAC_Buzzer, (400 << 16) + 250, None) )
 	actions.append( Action(8, "IR",            SAC_IROption, TV_ON_OFF, None) )
+	if sensactVersionID >= 400:
+		actions.append( Action(6, "Serial", SAC_KeyOption, 65, None) )
 	if sensactVersionID >= 302:
 		actions.append( Action(10, "Set State", SAC_SetState, 0x101, None) )
 	
@@ -362,17 +364,15 @@ class MouseMovingParams:
 		# j* is the # of pixels the mouse will go in a single move
 		# tt* is the number of moves until the speed changes.
 		(d1, j1) = self.convertSpeed(s1)
-		tt1 = int(t1/d1)
 		(d2, j2) = self.convertSpeed(s2)
-		tt2 = int(t2/d2) + tt1 
 		(d3, j3) = self.convertSpeed(s3)
 		
-#		print("Put d1 {} j1 {} d2 {} j2 {} d3 {} j3 {} tt1 {} tt2 {}"
-#			.format(d1, j1, d2, j2, d3, j3, tt1, tt2))
+#		print("Put d1 {} j1 {} d2 {} j2 {} d3 {} j3 {} t1 {} t2 {}"
+#			.format(d1, j1, d2, j2, d3, j3, t1, t2))
 
 		ostream.putChar(ord('\n'))
 		ostream.putChar(MOUSE_SPEED_ORD)
-		ostream.putNum( 16, 2 ) # Data length
+		ostream.putNum( 20, 2 ) # Data length
 		# Reduce the delay by one.
 		# The actual delay will be the first 'tick' where
 		# the elapsed time is greater than the delay.
@@ -383,28 +383,28 @@ class MouseMovingParams:
 		ostream.putID(j2, 2)
 		ostream.putID(d3 - 1, 2)
 		ostream.putID(j3, 2)
-		ostream.putID(tt1, 2)
-		ostream.putID(tt2, 2)
+		ostream.putNum(t1, 2)
+		ostream.putNum(t2, 2)
 		
 	def fromStream(self,istream):
 		num = istream.getNum(2)
-		if num != 16:
-			raise IOError("Incorrect mouse parameter length")
+		if num != 20:
+			for i in range (0, num):
+				istream.getChar();
+			return
 		d1 = istream.getID(2) + 1	
 		j1 = istream.getID(2)	
 		d2 = istream.getID(2) + 1	
 		j2 = istream.getID(2)	
 		d3 = istream.getID(2) + 1	
 		j3 = istream.getID(2)	
-		tt1 = istream.getID(2)	
-		tt2 = istream.getID(2)
+		t1 = istream.getNum(2)	
+		t2 = istream.getNum(2)
 		
-#		print("Got d1 {} j1 {} d2 {} j2 {} d3 {} j3 {} tt1 {} tt2 {}"
-#			.format(d1, j1, d2, j2, d3, j3, tt1, (tt2)))
+#		print("Got d1 {} j1 {} d2 {} j2 {} d3 {} j3 {} t1 {} t2 {}"
+#			.format(d1, j1, d2, j2, d3, j3, t1, t2))
 		
 		# Now, convert to raw parameters.
-		t1 = tt1 * d1
-		t2 = (tt2 - tt1) * d2
 		s1 = self.convertBack(d1, j1)
 		s2 = self.convertBack(d2, j2)
 		s3 = self.convertBack(d3, j3)
@@ -438,7 +438,7 @@ class MouseMovingParams:
 mouseMovingParams = MouseMovingParams()
 
 
-## --- Test Code --- ##
+## --- Test Code - Probably obsolete --- ##
 def outfunc(data):
 	print(data.decode())
 	

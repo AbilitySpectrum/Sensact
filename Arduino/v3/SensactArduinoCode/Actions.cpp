@@ -36,6 +36,7 @@ void Actors::init() {
   addActor( new HIDMouse(5) );
   addActor( new Buzzer(7, SENSACT_BUZZER) );
   addActor( new IRTV(8) );
+  addActor( new SerialSend(6) );
 
   for(int i=0; i<nActors; i++) {
     apActors[i]->init();
@@ -132,22 +133,29 @@ void Buzzer::doAction(long param) {
 unsigned char delay_1 = 35;
 unsigned char jump_1 = 2;
 
-unsigned char transitionTime_1 = 15;
+unsigned int transitionTime_1 = 500;
 unsigned char delay_2 = 59;
 unsigned char jump_2 = 6;
 
-unsigned char transitionTime_2 = 25;
+unsigned int transitionTime_2 = 1000;
 unsigned char delay_3 = 23;
 unsigned char jump_3 = 6;
 
 int readMouseSpeed(InputStream *is) {
   unsigned char d1, d2, d3;
   unsigned char j1, j2, j3;
-  unsigned char t1, t2;
+  unsigned int t1, t2;
   int tmpInt;
+  long tmpLong;
 
   int len = is->getNum();
-  if (len != 16) return IO_ERROR;
+  if (len != 20) {
+    // Discard unknown data.
+    for(int i=0; i<len; i++) {
+      is->getChar();
+    }
+    return;
+  }
 
   if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
   d1 = tmpInt;
@@ -161,17 +169,17 @@ int readMouseSpeed(InputStream *is) {
   d3 = tmpInt;
   if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
   j3 = tmpInt;
-  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
-  t1 = tmpInt;
-  if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
-  t2 = tmpInt;
+  if ((tmpLong = is->getNum()) == IO_ERROR) return IO_ERROR;
+  t1 = tmpLong;
+  if ((tmpLong = is->getNum()) == IO_ERROR) return IO_ERROR;
+  t2 = tmpLong;
 
   delay_1 = d1;
   jump_1 = j1;
   transitionTime_1 = t1;
   delay_2 = d2;
   jump_2 = j2;
-  transitionTime_2 = t2;
+  transitionTime_2 = t1 + t2;
   delay_3 = d3;
   jump_3 = j3;
 
@@ -179,15 +187,15 @@ int readMouseSpeed(InputStream *is) {
 }
 
 void sendMouseSpeed(OutputStream *os) {
-  os->putNum(16); //data length
+  os->putNum(20); //data length
   os->putID(delay_1);
   os->putID(jump_1);
   os->putID(delay_2);
   os->putID(jump_2);
   os->putID(delay_3);
   os->putID(jump_3);
-  os->putID(transitionTime_1);
-  os->putID(transitionTime_2);
+  os->putNum(transitionTime_1);
+  os->putNum(transitionTime_2 - transitionTime_1);
 }
 
 // MouseControl repeat logic is somewhat complex.
@@ -200,16 +208,20 @@ void MouseControl::assessAction(long param, int repeat) {
   
   if (repeat) {
     // Accelerating mouse logic.
-    unsigned int repeatInterval;
-    if (repeatCount < transitionTime_1) {
+    unsigned int repeatInterval; // Time between mouse moves.
+    if (maxSpeedReached) {
+      repeatInterval = delay_3;
+      jumpSize = jump_3;      
+    } else if (timeDiff(now, mouseStartTime) < transitionTime_1) {
       repeatInterval = delay_1;
       jumpSize = jump_1;
-    } else if (repeatCount < transitionTime_2) {
+    } else if (timeDiff(now, mouseStartTime) < transitionTime_2) {
       repeatInterval = delay_2;
       jumpSize = jump_2;
     } else {
       repeatInterval = delay_3;
       jumpSize = jump_3;
+      maxSpeedReached = 1;
     }
 
     if (option == SA_MOUSE_UP || option == SA_MOUSE_DOWN) {
@@ -224,12 +236,11 @@ void MouseControl::assessAction(long param, int repeat) {
       // Repeat for all other mouse actions is not allowed
       return;
     }
-    if (repeatCount <= transitionTime_2) repeatCount++; // Stop counting when we reach the max
-                                                        // to avoid roll-over.
   } else {
     // Initial action - not a repeat
     jumpSize = jump_1;
-    repeatCount = 0;
+    mouseStartTime = now;
+    maxSpeedReached = 0;
   }
   if (option == SA_MOUSE_UP || option == SA_MOUSE_DOWN) {
     lastMouseVerticalMove = now;
@@ -470,3 +481,9 @@ void IRTV::doAction(long param) {
       break;
   }
 }
+
+void SerialSend::kc_write(char ch) {
+  Serial.print(ch);
+}
+
+
