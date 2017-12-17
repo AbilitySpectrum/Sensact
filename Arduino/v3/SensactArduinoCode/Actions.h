@@ -7,7 +7,10 @@
 #include "Sensact.h"
 #include <SoftwareSerial.h>
 #include "BTMouseCtl.h"
+#include "IO.h"
 
+int readMouseSpeed(InputStream *is);
+void sendMouseSpeed(OutputStream *os);
 
 // Action - Identifies a single action.
 #define ACTION_ID_MASK   0x7F
@@ -143,7 +146,9 @@ class MouseControl: public Actor {
     // the same time - so we need two repeat timers.
     unsigned int lastMouseVerticalMove;
     unsigned int lastMouseHorizontalMove;
-    unsigned char repeatCount;
+    unsigned int mouseStartTime;
+    unsigned char maxSpeedReached;
+    unsigned char jumpSize;         // Size of each mouse move
 
   public:
     MouseControl() {
@@ -222,5 +227,13 @@ class IRTV: public Actor {
     }
     void init();
     void doAction(long param);
+};
+
+class SerialSend: public KeyboardControl {
+  public:
+    SerialSend(int i) {
+      id = i;
+    }
+    virtual void kc_write(char character);
 };
 #endif

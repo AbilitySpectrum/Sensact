@@ -382,7 +382,7 @@ def oneBtnMouse(group):
 	cal = Calibration(group)
 	cal.startCalibration()
 	cal.getInitialValues()
-	activeLocation = cal.getLocation("Please press the button")
+	activeLocation = cal.getLocation("Please press and hold the button")
 	if not activeLocation == None:
 		restLocation = cal.getRestPositionRelativeTo(activeLocation)
 		if not restLocation == None:
@@ -447,7 +447,7 @@ def leftMouseBtn(group):
 	cal = Calibration(group)
 	cal.startCalibration()
 	cal.getInitialValues()
-	activeLocation = cal.getLocation("Please press the button")
+	activeLocation = cal.getLocation("Please press and hold the button")
 	if not activeLocation == None:
 		restLocation = cal.getRestPositionRelativeTo(activeLocation)
 		if not restLocation == None:

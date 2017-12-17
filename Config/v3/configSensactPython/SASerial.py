@@ -33,19 +33,23 @@ def write(data):
 		from __main__ import attemptReconnection
 		attemptReconnection()
 			
-def _read_loop(dispatch_function):
+def _doRead():
 	try:
-		_buffer = bytearray()
-		while(_read_loop_active):
-			b = _serial.read(1)
-			_buffer.extend(b)
-			if (b == b'Z'):
-				dispatch_function(_buffer)
-				_buffer = bytearray()
+		b = _serial.read(1)
+		return b
 	except:
 		from __main__ import attemptReconnection
 		attemptReconnection()
 
+def _read_loop(dispatch_function):
+	_buffer = bytearray()
+	while(_read_loop_active):
+		b = _doRead()
+		_buffer.extend(b)
+		if (b == b'Z'):
+			dispatch_function(_buffer)
+			_buffer = bytearray()
+		
 def init_reading(dispatch_function):
 	global _read_loop_active
 	global _thread
