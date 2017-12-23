@@ -100,6 +100,9 @@ class SensorUIFrame(ttk.Frame):
 		for t in tmpList:
 			t.setValue(value)
 			
+	def setNewValue(self): # Called by reporting, after currentValue is set.
+		self.setValue(self.sensor.currentValue)
+
 	def showValues(self, show):
 		triggerLock.acquire()
 		tmpList = self.triggerUIList
@@ -152,9 +155,11 @@ def doReport(istream):
 		value = istream.getNum(2)
 		for s in sensorUIList:
 			if s.sensor.id == id:
-				if not calibrating:
-					s.setValue(value)
 				s.sensor.currentValue = value
+				if not calibrating:
+					s.after(1, s.setNewValue)
+#					s.setValue(value)
+#					s.update_idletasks()
 
 
 # Turn on value reporting mode in all triggers

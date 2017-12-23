@@ -49,7 +49,11 @@ class SpeedSelection(ttk.Frame):
 		
 		initialLogValue = math.log(initialValue)
 		
-		self.scale = ttk.Scale(self, orient=HORIZONTAL, length=300, from_=3.5, to=6.5)
+		# On the Mac the Scale widget does not work right if from and to are not integers.
+		# We want the scale to go from 3.5 to 6.5.
+		# To handle the Mac we have it go from 3.0 to 6.0 and then do the 0.5 adjustment
+		# below.
+		self.scale = ttk.Scale(self, orient=HORIZONTAL, length=300, from_=3.0, to=6.0)
 		self.scale['value'] = initialLogValue
 		self.scale['command'] = self.valueChange;
 		self.scale.pack(side=LEFT)
@@ -72,7 +76,7 @@ class SpeedSelection(ttk.Frame):
 		#    6.0                416                 
 		#    6.5                666                 
 		
-		self.value = float(newValue)
+		self.value = float(newValue) + 0.5  # Add 0.5 for the Mac
 		if self.value < 4.0:
 			self.label['text'] = "Very slow"
 		elif self.value < 4.7:
@@ -88,6 +92,7 @@ class SpeedSelection(ttk.Frame):
 		return self.value
 	
 	def setValue(self, val):
+		val = val - 0.5  # Adjustment for the mac
 		self.scale['value'] = val
 		self.valueChange(val)
 

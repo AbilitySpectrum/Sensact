@@ -21,6 +21,7 @@ class PortSelectDlg:
 		
 		cancelBtn = ttk.Button(self.dlg, text="Cancel", command=self.cancel)
 		cancelBtn.pack(pady=5)
+		self.cancelled = True # default.
 		
 		self.dlg.focus_set()
 		self.dlg.update_idletasks()

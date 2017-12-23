@@ -45,6 +45,8 @@ def _read_loop(dispatch_function):
 	_buffer = bytearray()
 	while(_read_loop_active):
 		b = _doRead()
+		if b is None:
+			return  # Read must have failed. 
 		_buffer.extend(b)
 		if (b == b'Z'):
 			dispatch_function(_buffer)

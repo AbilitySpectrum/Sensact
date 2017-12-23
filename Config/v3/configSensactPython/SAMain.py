@@ -112,6 +112,12 @@ def portSelection(root, tryAuto):
 		matchPort = "Leonardo"
 	
 	availablePorts = SASerial.get_list()
+	while not availablePorts:
+		val = messagebox.askyesno(title="No ports", 
+			message="No ports found.\nPerhaps the Sensact is not connected.\nWould you like to try again?")
+		if val == False:
+			return None
+		availablePorts = SASerial.get_list()
 
 	if tryAuto:
 		for onePort in availablePorts:
