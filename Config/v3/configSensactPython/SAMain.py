@@ -22,6 +22,7 @@ versionStr = ""
 # data.  When a 'Z' is read (end of a data stream) the block of 
 # data read is passed to the dispatcher, which figures out
 # what to do with it.
+# This code does not run in the main loop!
 #
 def dispatcher(data):
 	global versionStr
@@ -32,7 +33,8 @@ def dispatcher(data):
 		versionStr = substr.decode()
 		parts = substr.split(b'.')
 		SAModel.sensactVersionID = int(parts[0]) * 100 + int(parts[1])
-		versionEvent.set()	# Signal that version number was received.
+		# Signal that version number was received - do it in main loop.
+		globalRoot.after(10, versionEvent.set())
 		
 	elif (data[0] == SAModel.START_OF_SENSOR_DATA_ORD):
 		# This is current sensor value information
@@ -40,8 +42,8 @@ def dispatcher(data):
 			istream = SAStream.InputStream(data)
 			SASensorUI.doReport(istream)
 		except SAStream.IOError as err:
-			messagebox.showerror(title="Reporting error", 
-				message="Error receiving sensor values:\n" + err.message)			
+			globalRoot.after(10, showError, "Reporting error",
+				"Error receiving sensor values:\n" + err.message)
 			
 		
 	elif (data[0] == SAModel.START_OF_TRIGGER_BLOCK_ORD):
@@ -50,16 +52,22 @@ def dispatcher(data):
 		try:
 			SAModel.loadTriggers(istream)
 			SASensorUI.reloadTriggers()
-			SATopFrames.statusMessage.set("Trigger load successful")
+			globalRoot.after(10, SATopFrames.statusMessage.set, 
+				"Trigger load successful")
 			
 		except SAStream.IOError as err:
-			messagebox.showerror(title="Load Failed", 
-				message="Error reading triggers:\n" + err.message)
+			globalRoot.after(10, showError, "Load Failed",
+				"Error reading triggers:\n" + err.message)
 		
 	else:
-		messagebox.showerror(title="Unknown Data", 
-			message="Unknown data received ({})".format(data[0]))
+		print("Unknown data received ({})".format(data[0]))
+#		globalRoot.after(10, showError, "Unknown Data", 
+#			"Unknown data received ({})".format(data[0]))
 
+# Show error box - in main loop.
+def showError(t, msg):
+	messagebox.showerror(title=t, message=msg)
+	
 #
 # Connection establishment and recovery logic and UI
 #
@@ -133,6 +141,10 @@ def portSelection(root, tryAuto):
 	return target
 	
 def attemptReconnection():
+	globalRoot.after(10, doAttemptInMainLoop)
+	
+def doAttemptInMainLoop():
+	SASerial.close_port()
 	val = messagebox.askyesno(title="Communication Error", 
 	 message="The connection to Sensact has been lost.\nWould you like to try to re-establish it?")
 	if (val):
@@ -188,18 +200,31 @@ def main():
 	global globalRoot
 	root = Tk()
 	globalRoot = root
+	
+	# Force window to the front on Mac at startup.
+	# but allow other windows to be put in front of it
+	root.lift()
+	root.attributes("-topmost", True)
+	root.after_idle(root.attributes, "-topmost", False)
+	
 	root.title("Sensact Configuration Tool")
+	
 	defineStyles()	
 	mainScreen(root)	
 	
-	if serialConnect(root) == False:
-		return 
+	root.after(10, afterMain)
+	mainloop()
+	
+# Run after main loop is started, so that any UI activity
+# has a running mainloop.
+def afterMain():	
+	if serialConnect(globalRoot) == False:
+		exit() 
 	
 	SATopFrames.SAVersionStr.set("Version " + versionStr)
 	SATopFrames.statusMessage.set("Connected to {}".format(SavedGoodPortDesc))
 	SAModel.setupLists()	# Version number (above) is needed for this to be correct
 	SATopFrames.loadTabs() 	# sensor and action lists must be accurate (previous line)
-	mainloop()
 		
 if __name__ == '__main__':
 	main()
