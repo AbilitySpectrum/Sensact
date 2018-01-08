@@ -22,7 +22,7 @@ void Sensors::init() {
   addSensor( new AnalogSensor(6, SENSACT_IN3B) );
   pcInput = new PCInputSensor(7);
   addSensor( pcInput );
-  addSensor( new GyroSensor(8, 9, 10, 11, 12, 13) );
+  addSensor( new GyroSensor(8, 9, 10, 11, 12, 13, 14) );
 
   int dataUnits = 0;
   for(int i=0; i<nSensors; i++) {
@@ -67,6 +67,7 @@ void GyroSensor::getValues(SensorData *pData) {
 
   boolean skipRead = false;
   int AcX, AcY, AcZ, GyX, GyY, GyZ, Tmp;
+  float anyMotion;
   
   AcX = AcY = AcZ = GyX = GyY = GyZ = 0; // Default values if read is skipped.
     
@@ -107,10 +108,22 @@ void GyroSensor::getValues(SensorData *pData) {
   pData->addValue(acclX, AcX);
   pData->addValue(acclY, AcY);
   pData->addValue(acclZ, AcZ);
-  
+
+  // Gyro values:
+  //  Small motions generate values of +/- ~1,500
+  //  Larger motions can generate +/- ~15,000
+  //  Max values are -32768 to +32767
   pData->addValue(gyroX, GyX);
   pData->addValue(gyroY, GyY);
   pData->addValue(gyroZ, GyZ);
+
+  anyMotion = (float) GyX * (float) GyX;
+  anyMotion += (float) GyY * (float) GyY;
+  anyMotion += (float) GyZ * (float) GyZ;
+  anyMotion = sqrt(anyMotion) / 2; 
+  // Max value for anyMotion observed at this point is 28,377.92
+  // which is about sqrt(32676 ^ 2 * 3) / 2
+  pData->addValue(gyroAny, (int)anyMotion);
 }
 
 

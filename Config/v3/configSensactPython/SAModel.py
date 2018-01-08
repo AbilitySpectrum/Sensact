@@ -103,10 +103,19 @@ def createSensorList():
 	grp.append( Sensor(10, "Accel-Z", -16000, 16000, True) )	
 	sensorGroups.append(grp)
 	
+	#
+	# Gyro values go from -32768 to + 32767, but the high values
+	# are for very violent motions.  
+	# Here we chop off the highest values to improve sensitivity 
+	# for the smaller motions.
+	# Simlarly the "Any Motion sensor will deliver values from
+	# 0 to 28,377 but we chop off the most violent motions.
 	grp = SensorGroup("Gyro")
-	grp.append( Sensor(11, "Gyro-X", -7000, 7000, True) )	
-	grp.append( Sensor(12, "Gyro-Y", -7000, 7000, True) )	
-	grp.append( Sensor(13, "Gyro-Z", -7000, 7000, True) )	
+	grp.append( Sensor(11, "Gyro-X", -15000, 15000, True) )	
+	grp.append( Sensor(12, "Gyro-Y", -15000, 15000, True) )	
+	grp.append( Sensor(13, "Gyro-Z", -15000, 15000, True) )	
+	if sensactVersionID >= 401:
+		grp.append( Sensor(14, "Any Motion", 0, 13000, True) )	
 	sensorGroups.append(grp)
 
 	grp = SensorGroup("USB Input")

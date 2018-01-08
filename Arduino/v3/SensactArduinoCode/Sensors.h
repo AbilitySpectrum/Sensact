@@ -117,22 +117,24 @@ class GyroSensor: public Sensor {
     int gyroX;
     int gyroY;
     int gyroZ;
+    int gyroAny;
     boolean initNeeded;
     int timeOfLastInitAttempt;
   
   public:
-    GyroSensor(int x, int y, int z, int gx, int gy, int gz) {
+    GyroSensor(int x, int y, int z, int gx, int gy, int gz, int gs) {
       acclX = x;
       acclY = y;
       acclZ = z;
       gyroX = gx;
       gyroY = gy;
       gyroZ = gz;
+      gyroAny = gs;
       initNeeded = true;
     }
     void init();
     void getValues(SensorData *pData);
-    int nDataUnits() { return 6; }
+    int nDataUnits() { return 7; }
 };
   
 // Sensors - a container for all sensors.

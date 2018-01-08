@@ -12,7 +12,7 @@ unsigned int timeDiff(unsigned int now, unsigned int prev);
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
-#define VERSION         "4.0"
+#define VERSION         "4.1"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
