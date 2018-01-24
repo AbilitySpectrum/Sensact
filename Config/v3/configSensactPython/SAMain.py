@@ -13,6 +13,7 @@ import SAModel
 import SASensorUI
 import PortSelectDlg
 import threading
+import time
 
 versionEvent = threading.Event()
 versionStr = ""
@@ -86,6 +87,8 @@ def serialConnect(root):
 		connected = False  # Assumed for now
 		try:
 			SASerial.open_port(port.device)	
+			time.sleep(1.0);	# ATMega needs time to re-boot
+								# after serial connection.
 			SASerial.init_reading(dispatcher)	
 			connected = True
 		

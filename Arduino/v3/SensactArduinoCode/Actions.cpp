@@ -2,8 +2,17 @@
 // Actions.cpp
 // -------------------------------------
 
+/*
+ * Possible symbols for #ifdefs
+ * 
+ *   __AVR_ATmega32U4__    // Leonardo
+ *   __AVR_ATmega2560__    // AT Mega
+ */
+ 
+#ifdef __AVR_ATmega32U4__  // Leonardo
 #include <Keyboard.h>
 #include <Mouse.h>
+#endif
 #include <IRLib.h>
 #include "Actions.h"
 
@@ -31,9 +40,13 @@ void Actors::init() {
   addActor( new Relay(1, SENSACT_RELAY_1) );
   addActor( new Relay(2, SENSACT_RELAY_2) );
   addActor( new BTKeyboard(3) );
+#ifdef __AVR_ATmega32U4__  // Leonardo
   addActor( new HIDKeyboard(4) );
+#endif
   addActor( new BTMouse(9) );
+#ifdef __AVR_ATmega32U4__  // Leonardo
   addActor( new HIDMouse(5) );
+#endif
   addActor( new Buzzer(7, SENSACT_BUZZER) );
   addActor( new IRTV(8) );
   addActor( new SerialSend(6) );
@@ -154,7 +167,7 @@ int readMouseSpeed(InputStream *is) {
     for(int i=0; i<len; i++) {
       is->getChar();
     }
-    return;
+    return 0;
   }
 
   if ((tmpInt = is->getID()) == IO_ERROR) return IO_ERROR;
@@ -342,6 +355,7 @@ void KeyboardControl::doAction(long param) {
   }  
 }
 
+#ifdef __AVR_ATmega32U4__  // Leonardo
 // === HID === //
 // --- HID Mouse --- //
 void HIDMouse::mc_move(int x, int y) {
@@ -369,6 +383,7 @@ void HIDMouse::mc_button(int val) {
 void HIDKeyboard::kc_write(char character) {
   Keyboard.write(character);
 }
+#endif
 
 // === Bluetooth === //
 #define BT_TX_PIN 0

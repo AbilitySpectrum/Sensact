@@ -76,8 +76,9 @@ void GyroSensor::getValues(SensorData *pData) {
     int now = millis() & 0xffff;
     if (timeDiff(now, timeOfLastInitAttempt) < 2000) {
       skipRead = true;  // Skip read - initNeeded but not yet time for retry.
+    } else {
+      init();
     }
-    init();
     if (initNeeded) { 
       skipRead = true;  // Skip read.  Init failed.
     }

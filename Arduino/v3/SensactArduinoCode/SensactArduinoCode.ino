@@ -38,11 +38,12 @@ void setup() {
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
   
+  
+  Serial.begin(9600);
+
   sensors.init();
   actors.init();
   triggers.init();
-  
-  Serial.begin(9600);
 
   runMode = RUN;
   setLED();

@@ -173,6 +173,7 @@ class KeyboardControl: public Actor {
     virtual void kc_write(char character) = 0;
 };
 
+#ifdef __AVR_ATmega32U4__  // Leonardo
 class HIDMouse: public MouseControl {
   private:
     
@@ -191,7 +192,7 @@ class HIDKeyboard: public KeyboardControl {
     }
     void kc_write(char character);
 };
-
+#endif
 
 class BTMouse: public MouseControl {
   private: 
