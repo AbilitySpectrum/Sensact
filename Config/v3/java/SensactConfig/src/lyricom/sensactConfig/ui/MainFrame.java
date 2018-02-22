@@ -152,8 +152,8 @@ public class MainFrame extends JFrame {
             }
         });
         
-        JButton testBtn = newBtn("Test");
-        testBtn.addActionListener(e -> displayTriggers());
+//        JButton testBtn = newBtn("Test");
+//        testBtn.addActionListener(e -> displayTriggers());
 
         JButton[] buttons =  {
             getBtn,
@@ -162,7 +162,7 @@ public class MainFrame extends JFrame {
             idleBtn,
             importBtn,
             exportBtn,
-            testBtn,
+//            testBtn,
             exitBtn
         };
         

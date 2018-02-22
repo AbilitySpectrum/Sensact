@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.Trigger;
 import lyricom.sensactConfig.model.Triggers;
 import lyricom.sensactConfig.widgets.*;
@@ -23,6 +24,9 @@ import lyricom.sensactConfig.widgets.*;
  * @author Andrew
  */
 public class TriggerPanel extends JPanel {
+    private static int ACTION_WIDTH = 0;
+    private static int ACTION_HEIGHT = 0;
+    
     private JPopupMenu popup;
     
     private final Trigger theTrigger;
@@ -63,8 +67,20 @@ public class TriggerPanel extends JPanel {
         
         add(new Arrow(35));
         
+        if (ACTION_WIDTH == 0) {
+            // Calibrate the size of actionUI.
+            Trigger tmp = new Trigger(t.getSensor());
+            tmp.setAction(Model.getActionByName("IR"));
+            tmp.setActionParam( 2 );
+            WT_Action tmpUI = new WT_Action("", tmp);
+            Dimension dim = tmpUI.getPreferredSize();
+//            System.out.println("Calibration - H: " + Integer.toString(dim.height) + " W: " + Integer.toString(dim.width));
+            ACTION_WIDTH = dim.width + 5;
+            ACTION_HEIGHT = dim.height;
+        }
+        
         actionUI = new WT_Action("", t);
-        actionUI.setPreferredSize(new Dimension(400, 30));
+        actionUI.setPreferredSize(new Dimension(ACTION_WIDTH, ACTION_HEIGHT)); // Enough for PI
         add( actionUI );
         actionState = new WT_ActionState("", t);
         add( actionState );

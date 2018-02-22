@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
+import lyricom.sensactConfig.model.Model;
+import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.Trigger;
 import lyricom.sensactConfig.widgets.*;
 
@@ -16,7 +18,9 @@ import lyricom.sensactConfig.widgets.*;
  * @author Andrew
  */
 public class TriggerEditDlg extends JDialog {
-
+    private static int ACTION_HEIGHT = 0;
+    private static int ACTION_WIDTH = 0;
+    
     private final Trigger tmpTrig;
     private final Trigger theTrigger;
     private final TriggerEditDlg thisDlg;
@@ -170,10 +174,27 @@ public class TriggerEditDlg extends JDialog {
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         p.add( Utils.getLabel("THEN do action ", lblSize) );
-        p.add(new WT_Action("", tmpTrig));
         
-        Dimension d = p.getPreferredSize();
-        d.width = 520;
+        if (ACTION_WIDTH == 0) {
+            // Calibration
+            SaAction savedAction = tmpTrig.getAction();
+            tmpTrig.setAction(Model.getActionByName("IR"));
+            int savedParam = tmpTrig.getActionParam();
+            tmpTrig.setActionParam(2);
+            WT_Action actionUI = new WT_Action("", tmpTrig);
+            p.add(actionUI);
+            Dimension dim = p.getPreferredSize();
+            ACTION_HEIGHT = dim.height;
+            ACTION_WIDTH = dim.width + 10;
+            System.out.println("Calibration - H: " + Integer.toString(dim.height) + " W: " + Integer.toString(dim.width));
+            tmpTrig.setAction(savedAction);
+            tmpTrig.setActionParam(savedParam);  
+            actionUI.update();
+        } else {       
+            p.add(new WT_Action("", tmpTrig));
+        }
+        
+        Dimension d = new Dimension(ACTION_WIDTH, ACTION_HEIGHT);
         p.setPreferredSize(d);
         p.setMaximumSize(d);
         

@@ -67,6 +67,7 @@ public class Sensor {
         }
     }
     
+    @Override
     public String toString() {
         return name;
     }
@@ -82,5 +83,21 @@ public class Sensor {
     
     public int getLevel2() {
         return level2;
+    }
+    
+    public int getLevel(Trigger.Level level) {
+        if (level == Trigger.Level.LEVEL1) {
+            return getLevel1();
+        } else {
+            return getLevel2();
+        }
+    }
+    
+    public void setLevel(Trigger.Level level, int value) {
+        if (level == Trigger.Level.LEVEL1) {
+            level1 = value;
+        } else {
+            level2 = value;
+        }
     }
 }

@@ -8,6 +8,7 @@ import lyricom.sensactConfig.ui.MainFrame;
 import javax.swing.SwingUtilities;
 import lyricom.sensactConfig.comms.Connection;
 import lyricom.sensactConfig.model.Model;
+import lyricom.sensactConfig.solutions.SolutionRegister;
 
 /**
  *
@@ -24,6 +25,7 @@ public class Main {
         conn.establishConnection();
         
         Model.initModel(conn.getVersionID());
+        SolutionRegister.init();
         
         SwingUtilities.invokeLater(() -> {
             new MainFrame(conn.getVersionString());

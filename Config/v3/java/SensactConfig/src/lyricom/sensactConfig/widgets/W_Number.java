@@ -47,11 +47,11 @@ public class W_Number extends W_Base {
                 BorderFactory.createEmptyBorder(1, 2, 0, 2)));    
     }
     
-    protected void setValue(int value) {
+    public void setValue(int value) {
         field.setText(Integer.toString(value));
     }
     
-    protected int getValue() {
+    public int getValue() {
         String txt = field.getText();
         return new Integer(txt);
     }    

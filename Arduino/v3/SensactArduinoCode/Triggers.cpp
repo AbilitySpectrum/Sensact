@@ -56,13 +56,6 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
   // Empty the actions container, preparing for new actions.
   actions.reset();    
   
-  // Create a temporary place to hold state changes.
-  // This keeps state changes from having a changed effect 
-  // in the middle of processing the sensor data.
-  int aTmpStates[maxSensorID+1];
-  for(int i=0; i<=maxSensorID; i++) {
-    aTmpStates[i] = paSensorStates[i];
-  }  
   // Check each sensor against each trigger, looking for matches 
   // and associated actions.
   int nSensors = pData->length();
@@ -128,11 +121,11 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
             if (pTrigger->actionID == CHANGE_SENSOR_STATE) {
               int state = pTrigger->actionParameters & 0xff;
               int sensorID = (pTrigger->actionParameters >> 8) & 0xff;
-              aTmpStates[sensorID] = state;
+              paSensorStates[sensorID] = state;
             } else {
               actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             }
-            aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
+            paSensorStates[ID] = ACTION_STATE(pTrigger->stateValues);  
             pTrigger->flags |= ACTION_TAKEN;
           }
           
@@ -141,11 +134,11 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
             if (pTrigger->actionID == CHANGE_SENSOR_STATE) {
               int state = pTrigger->actionParameters & 0xff;
               int sensorID = (pTrigger->actionParameters >> 8) & 0xff;
-              aTmpStates[sensorID] = state;
+              paSensorStates[sensorID] = state;
             } else {
               actions.addAction(pTrigger->actionID, pTrigger->actionParameters, false);
             }
-            aTmpStates[ID] = ACTION_STATE(pTrigger->stateValues);  
+            paSensorStates[ID] = ACTION_STATE(pTrigger->stateValues);  
             pTrigger->flags |= ACTION_TAKEN;
          }
           
@@ -171,10 +164,6 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
     }
   }
   
-  // Copy the temporary sensor values to the permanent ones.
-  for(int i=0; i<=maxSensorID; i++) {
-    paSensorStates[i] = aTmpStates[i];
-  }
   return &actions;
 }
 
