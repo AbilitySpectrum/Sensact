@@ -59,15 +59,27 @@ public class SensorPanel extends JPanel {
         return theSensor;
     }
     
+    private int maxWidth = 0;
     private JComponent triggerHeader() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel name = new JLabel(theSensor.getName());
+        JLabel name;
+        if (maxWidth == 0) {
+           name = new JLabel("Any Motion");
+           maxWidth = name.getPreferredSize().width;
+        }
+        name = new JLabel(theSensor.getName());
         Dimension d = name.getPreferredSize();
-        d.width = 60;
+        d.width = maxWidth;
         name.setPreferredSize(d);
         name.setMaximumSize(d);
         p.add(name);
+        
+        if (theSensor.isContinuous()) {
+            JButton setThresholdsBtn = new JButton("Set Thresholds");
+            p.add(setThresholdsBtn);
+            setThresholdsBtn.addActionListener(e -> setThresholds());
+        }
         
         JButton newTrigger = new JButton("New Trigger");
         p.add(newTrigger);
@@ -76,18 +88,14 @@ public class SensorPanel extends JPanel {
             revalidate();
         });
         
+        p.add(Box.createHorizontalStrut(15));
+        
         JButton deleteAll = new JButton("Delete All");
         p.add(deleteAll);
         deleteAll.addActionListener(e -> {
             deleteAll();
             revalidate();
         });
-        
-        if (theSensor.isContinuous()) {
-            JButton setThresholdsBtn = new JButton("Set Thresholds");
-            p.add(setThresholdsBtn);
-            setThresholdsBtn.addActionListener(e -> setThresholds());
-        }
         
         return p;
     }

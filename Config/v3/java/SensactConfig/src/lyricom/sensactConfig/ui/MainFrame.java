@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
         pack();
  
         // Center on screen
-        Dimension dim = new Dimension(1000,600);
+        Dimension dim = new Dimension(1100,600);
         setSize(dim);
         Point center = ScreenInfo.getCenter();
         setLocation(center.x-dim.width/2, center.y-dim.height/2);
@@ -88,6 +88,16 @@ public class MainFrame extends JFrame {
         p.add(l);
         return p;
     }
+    
+    private JButton getBtn;
+    private JButton saveBtn;
+    private JButton runBtn;
+    private JButton idleBtn;
+    private JButton importBtn;
+    private JButton exportBtn;
+    private JButton exitBtn;
+//    private JButton testBtn;
+    
     private JComponent buttonPanel(JComponent vLabel) {
         JPanel p = new JPanel();
         Border boarder = new LineBorder(Color.BLACK, 2);
@@ -118,23 +128,38 @@ public class MainFrame extends JFrame {
         }
 
         // Display buttons
-        for(JButton b: buttons) {
-            vb.add(b);
-            vb.add(Box.createVerticalStrut(BTN_SPACING));
-        }
+        vb.add(getBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(saveBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(new JSeparator(JSeparator.HORIZONTAL));
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(runBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(idleBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(new JSeparator(JSeparator.HORIZONTAL));
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(importBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(exportBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(new JSeparator(JSeparator.HORIZONTAL));
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(exitBtn);        
                      
         p.add(vb);
         return p;
     }
     
     private JButton[] createButtons() {
-        JButton getBtn = newBtn("Get");
-        JButton saveBtn = newBtn(RES.getString("BTN_SAVE"));
-        JButton runBtn = newBtn(RES.getString("BTN_RUN"));
-        JButton idleBtn = newBtn(RES.getString("BTN_IDLE"));
-        JButton importBtn = newBtn(RES.getString("BTN_IMPORT"));
-        JButton exportBtn = newBtn(RES.getString("BTN_EXPORT"));
-        JButton exitBtn = newBtn(RES.getString("BTN_EXIT"));
+        getBtn = newBtn(RES.getString("BTN_GET"));
+        saveBtn = newBtn(RES.getString("BTN_SAVE"));
+        runBtn = newBtn(RES.getString("BTN_RUN"));
+        idleBtn = newBtn(RES.getString("BTN_IDLE"));
+        importBtn = newBtn(RES.getString("BTN_IMPORT"));
+        exportBtn = newBtn(RES.getString("BTN_EXPORT"));
+        exitBtn = newBtn(RES.getString("BTN_EXIT"));
         
         getBtn.addActionListener(e -> Serial.getInstance().writeByte(Model.CMD_GET_TRIGGERS));
         saveBtn.addActionListener(e -> doSave());

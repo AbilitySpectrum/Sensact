@@ -17,10 +17,10 @@ public class SolutionRegister {
         if (initDone) return;
         SolutionRegister reg = getInstance();
         String[] groups1 = {"Input 1", "Input 2", "Input 3"};
-        reg.register( "JoystickMouseSolution", "Joystick Mouse", groups1);
-        reg.register( "OneBtnMouse", "One Button Mouse", groups1);
-        reg.register( "ToggleMouse", "Toggle Mouse", groups1);
-        reg.register( "MouseClickButton", "Mouse Click Button", groups1);
+        reg.register( JoystickMouseSolution.class, "Joystick Mouse", groups1);
+        reg.register( OneBtnMouse.class, "One Button Mouse", groups1);
+        reg.register( ToggleMouse.class, "Toggle Mouse", groups1);
+        reg.register( MouseClickButton.class, "Mouse Click Button", groups1);
         initDone = true;
     }
 
@@ -38,12 +38,12 @@ public class SolutionRegister {
     }
     
     private class RegisterEntry {
-        String className;
+        Class clazz;
         String solutionName;
         String[] applicableGroups;
         
-        RegisterEntry(String c, String s, String[] a) {
-            className = c;
+        RegisterEntry(Class c, String s, String[] a) {
+            clazz = c;
             solutionName = s;
             applicableGroups = a;
         }
@@ -51,8 +51,8 @@ public class SolutionRegister {
     
     private Map<String, RegisterEntry> entryMap = new TreeMap<>();
     
-    void register(String className, String solutionName, String[] app) {
-        RegisterEntry reg = new RegisterEntry(className, solutionName, app);
+    void register(Class clazz, String solutionName, String[] app) {
+        RegisterEntry reg = new RegisterEntry(clazz, solutionName, app);
         entryMap.put(solutionName, reg);
     }
     
@@ -74,8 +74,7 @@ public class SolutionRegister {
         RegisterEntry r = entryMap.get(solutionName);
         if (r != null) {
             try {
-                String className = "lyricom.sensactConfig.solutions." + r.className;
-                Class theClass = Class.forName(className);
+                Class theClass = r.clazz;
                 Constructor constructor 
                         = theClass.getConstructor(SolutionsUI.class, SensorGroup.class);
                 SolutionBase solution = (SolutionBase) constructor.newInstance(sui, sg);
