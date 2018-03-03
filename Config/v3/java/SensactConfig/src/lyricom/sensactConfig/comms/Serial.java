@@ -94,7 +94,7 @@ public class Serial implements Runnable {
                     break;
                     
                 case -1:  // Error
-                    System.out.print("Read error. Closing - ");System.out.println(closing);
+//                    System.out.print("Read error. Closing - ");System.out.println(closing);
                     if (!closing) {
                         callback.connectionLost();
                     }
@@ -121,7 +121,7 @@ public class Serial implements Runnable {
     public int writeData(byte[] buffer) {
         int writeBytes = thePort.writeBytes(buffer, buffer.length);
         if (writeBytes == -1) {
-            System.out.println("Write error");
+//            System.out.println("Write error");
             if (!closing) {
                 callback.connectionLost();
             }
@@ -142,7 +142,7 @@ public class Serial implements Runnable {
                 callback.dispatchData(bytes);
             }
         } 
-        System.out.println("Read thread exit");
+//        System.out.println("Read thread exit");
         readThread = null;
     }
 }

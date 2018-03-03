@@ -146,6 +146,10 @@ public class Model {
         }
         actionList.add(new SaAction(10, "Set State", 0x101, ActionUI.SET_STATE, null));
         
+        if (versionID >= 402) {
+            actionList.add(new SaAction(11, "Light Box", 0, ActionUI.LIGHT_BOX, null));
+        }
+        
         // Create a map of actions for lookup-by-name
         for (SaAction a: actionList) {
             actionMap.put(a.getName(), a);

@@ -237,4 +237,13 @@ class SerialSend: public KeyboardControl {
     }
     virtual void kc_write(char character);
 };
+
+class LightBox: public Actor {
+  public:
+    LightBox(int i) {
+      id = i;
+    }
+    void init() {}
+    void doAction(long param);
+};
 #endif

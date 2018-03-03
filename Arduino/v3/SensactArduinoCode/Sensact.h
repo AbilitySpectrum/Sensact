@@ -12,7 +12,7 @@ unsigned int timeDiff(unsigned int now, unsigned int prev);
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
-#define VERSION         "4.1"
+#define VERSION         "4.2"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
@@ -69,8 +69,8 @@ unsigned int timeDiff(unsigned int now, unsigned int prev);
 
 // ==== Some Limits === //
 #define MAX_TRIGGERS 20           // Maximum number of triggers allowed.
-#define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check.
+#define MAX_ACTIONS 5            // Maximum number of actions allowed per trigger check.
 #define MAX_SENSORS 8
-#define MAX_ACTORS  9
+#define MAX_ACTORS  10
 
 #endif

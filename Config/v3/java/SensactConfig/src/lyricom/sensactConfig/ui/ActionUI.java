@@ -21,6 +21,7 @@ public class ActionUI {
     public static final ActionUI BUZZER         = new BuzzerUI();
     public static final ActionUI IR_OPTION      = new IRActionUI();
     public static final ActionUI SET_STATE      = new SetStateUI();
+    public static final ActionUI LIGHT_BOX      = new LightBoxUI();
         
     // ----------------------------------------
     // Class and sub-class definition.
@@ -166,6 +167,13 @@ public class ActionUI {
              comp.addPart(new WT_StateSpinner("State:", t));
              return comp;
          }
+    }
+    
+    public static class LightBoxUI extends ActionUI {
+        @Override
+        public W_Base createUI(Trigger t) {
+            return new WT_LightBox("Value:", t);
+        }
     }
 }
     

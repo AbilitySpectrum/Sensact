@@ -1,7 +1,5 @@
 package lyricom.sensactConfig.widgets;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import lyricom.sensactConfig.model.Trigger;
 
 /**

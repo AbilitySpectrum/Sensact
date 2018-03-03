@@ -13,6 +13,7 @@
 #include <Keyboard.h>
 #include <Mouse.h>
 #endif
+#include "Wire.h"
 #include <IRLib.h>
 #include "Actions.h"
 
@@ -50,6 +51,7 @@ void Actors::init() {
   addActor( new Buzzer(7, SENSACT_BUZZER) );
   addActor( new IRTV(8) );
   addActor( new SerialSend(6) );
+  addActor( new LightBox(11) );
 
   for(int i=0; i<nActors; i++) {
     apActors[i]->init();
@@ -499,6 +501,21 @@ void IRTV::doAction(long param) {
 
 void SerialSend::kc_write(char ch) {
   Serial.print(ch);
+}
+
+#define MCP23008_ADDRESS 0x20
+void LightBox::doAction(long param) {
+  byte val = param &0xff;
+  Wire.begin();
+  Wire.beginTransmission(MCP23008_ADDRESS);
+  Wire.write((byte)0);
+  Wire.write((byte)0x00);  // Set all pins to output mode
+  Wire.endTransmission(); 
+
+  Wire.beginTransmission(MCP23008_ADDRESS);
+  Wire.write((byte)9);  // GPIO Address
+  Wire.write(val);
+  Wire.endTransmission();  
 }
 
 
