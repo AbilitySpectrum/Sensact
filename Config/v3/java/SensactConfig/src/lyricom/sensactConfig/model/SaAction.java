@@ -9,12 +9,12 @@ import lyricom.sensactConfig.ui.ActionUI;
  */
 public class SaAction {
     private final int id;
-    private final String name;
+    private final ActionName name;
     private final int defaultVal;
     private final ActionUI optionUI;
     private final ParameterCheck pCheck;
 
-    public SaAction(int id, String name, int defaultVal, ActionUI optionUI, ParameterCheck pCheck) {
+    public SaAction(int id, ActionName name, int defaultVal, ActionUI optionUI, ParameterCheck pCheck) {
         this.id = id;
         this.name = name;
         this.defaultVal = defaultVal;
@@ -38,7 +38,7 @@ public class SaAction {
         return id;
     }
 
-    public String getName() {
+    public ActionName getName() {
         return name;
     }
 
@@ -47,6 +47,6 @@ public class SaAction {
     }
     
     public String toString() {
-        return name;
+        return name.toString();
     }
 }

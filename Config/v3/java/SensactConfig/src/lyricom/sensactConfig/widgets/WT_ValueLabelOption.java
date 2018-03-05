@@ -1,8 +1,5 @@
 package lyricom.sensactConfig.widgets;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.Trigger;
 
 /**

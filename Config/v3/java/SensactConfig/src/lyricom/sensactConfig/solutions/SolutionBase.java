@@ -3,6 +3,7 @@ package lyricom.sensactConfig.solutions;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import lyricom.sensactConfig.model.ActionName;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -96,9 +97,9 @@ public abstract class SolutionBase implements Runnable {
         String option = theUI.getOption("What kind of mouse?", MOUSE_OPTS);
         if (option == null || cancelling) return null;
         if (option.equals(HID_MOUSE)) {
-            return Model.getActionByName("HID Mouse");
+            return Model.getActionByName(ActionName.HID_MOUSE);
         } else {
-            return Model.getActionByName("BT Mouse");
+            return Model.getActionByName(ActionName.BT_MOUSE);
         }
     }
 

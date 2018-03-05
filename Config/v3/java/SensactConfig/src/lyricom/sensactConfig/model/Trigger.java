@@ -1,8 +1,5 @@
 package lyricom.sensactConfig.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author Andrew

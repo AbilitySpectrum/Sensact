@@ -1,14 +1,12 @@
 package lyricom.sensactConfig.solutions;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
 import java.util.concurrent.Semaphore;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import lyricom.sensactConfig.model.SensorGroup;
 import lyricom.sensactConfig.ui.MainFrame;
 import lyricom.sensactConfig.ui.ScreenInfo;
@@ -76,6 +74,10 @@ public class SolutionsUI extends JDialog {
         for(String s: opts) {
             final String fs = s;
             JButton b = new JButton(fs);
+            String toolTip = SolutionRegister.getInstance().getToolTip(fs);
+            if (toolTip != null) {
+                b.setToolTipText(toolTip);
+            }
             b.setAlignmentX(Component.CENTER_ALIGNMENT);
             b.addActionListener(e -> {
                 if (theSolution == null) {

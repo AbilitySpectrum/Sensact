@@ -37,7 +37,7 @@ public class TriggerTest {
     public void testToStream() {
         Sensor s = Model.getSensorByID(2); // Input_1B
         Trigger t = new Trigger(s);
-        SaAction a = Model.getActionByName("Buzzer");
+        SaAction a = Model.getActionByName(ActionName.BUZZER);
         t.setAction(a);
         t.setActionParam(a.getDefaultVal());
         t.setReqdState(1);
@@ -65,7 +65,7 @@ public class TriggerTest {
             t.fromStream(is);
             
             assertEquals("Input 1B", t.getSensor().getName());
-            assertEquals("Buzzer", t.getAction().getName());
+            assertEquals("Buzzer", t.getAction().getName().toString());
             assertEquals(1, t.getReqdState());
             assertEquals(2, t.getActionState());
             assertEquals(0x1234567, t.getActionParam());

@@ -58,7 +58,7 @@ public class Model {
     public static List<Sensor> sensorList;
     public static List<SensorGroup> sensorGroups;
     public static List<SaAction> actionList;
-    public static Map<String,SaAction> actionMap;
+    public static Map<ActionName,SaAction> actionMap;
     
     public static void initModel(int versionID) {
         initSensorList(versionID);
@@ -126,28 +126,28 @@ public class Model {
         actionList = new ArrayList<>();
         actionMap = new HashMap<>();
         
-        actionList.add(new SaAction(0, "None",    0, ActionUI.NONE, null));
-        actionList.add(new SaAction(1, "Relay A", 0, ActionUI.NONE, null));
-        actionList.add(new SaAction(2, "Relay B", 0, ActionUI.NONE, null));
+        actionList.add(new SaAction(0, ActionName.NONE,    0, ActionUI.NONE, null));
+        actionList.add(new SaAction(1, ActionName.RELAY_A, 0, ActionUI.NONE, null));
+        actionList.add(new SaAction(2, ActionName.RELAY_B, 0, ActionUI.NONE, null));
         
-        actionList.add(new SaAction(3, "BT Keyboard", 65, ActionUI.KEY_OPTION, (p) -> p >= 32));
-        actionList.add(new SaAction(3, "BT Special",  10, ActionUI.BT_SPECIAL, (p) -> p < 32));
+        actionList.add(new SaAction(3, ActionName.BT_KEYBOARD, 65, ActionUI.KEY_OPTION, (p) -> p >= 32));
+        actionList.add(new SaAction(3, ActionName.BT_SPECIAL,  10, ActionUI.BT_SPECIAL, (p) -> p < 32));
         
-        actionList.add(new SaAction(9, "BT Mouse", MOUSE_UP, ActionUI.MOUSE_OPTION, null));
-        actionList.add(new SaAction(4, "HID Keyboard",  65,  ActionUI.KEY_OPTION, 
+        actionList.add(new SaAction(9, ActionName.BT_MOUSE, MOUSE_UP, ActionUI.MOUSE_OPTION, null));
+        actionList.add(new SaAction(4, ActionName.HID_KEYBOARD,  65,  ActionUI.KEY_OPTION, 
                 (p) -> !((0x100 > p) && (p > 0x7f))));
-        actionList.add(new SaAction(4, "HID Special", 0xB0,  ActionUI.HID_SPECIAL, 
+        actionList.add(new SaAction(4, ActionName.HID_SPECIAL, 0xB0,  ActionUI.HID_SPECIAL, 
                 (p) ->  ((0x100 > p) && (p > 0x7f))));
-        actionList.add(new SaAction(5, "HID Mouse", MOUSE_UP,       ActionUI.MOUSE_OPTION, null));
-        actionList.add(new SaAction(7, "Buzzer", (400 << 16) + 250, ActionUI.BUZZER,       null));
-        actionList.add(new SaAction(8, "IR", TV_ON_OFF,             ActionUI.IR_OPTION,    null));
+        actionList.add(new SaAction(5, ActionName.HID_MOUSE, MOUSE_UP,       ActionUI.MOUSE_OPTION, null));
+        actionList.add(new SaAction(7, ActionName.BUZZER, (400 << 16) + 250, ActionUI.BUZZER,       null));
+        actionList.add(new SaAction(8, ActionName.IR, TV_ON_OFF,             ActionUI.IR_OPTION,    null));
         if (versionID >= 400) {
-            actionList.add(new SaAction(6, "Serial", 65, ActionUI.KEY_OPTION, null));
+            actionList.add(new SaAction(6, ActionName.SERIAL, 65, ActionUI.KEY_OPTION, null));
         }
-        actionList.add(new SaAction(10, "Set State", 0x101, ActionUI.SET_STATE, null));
+        actionList.add(new SaAction(10, ActionName.SET_STATE, 0x101, ActionUI.SET_STATE, null));
         
         if (versionID >= 402) {
-            actionList.add(new SaAction(11, "Light Box", 0, ActionUI.LIGHT_BOX, null));
+            actionList.add(new SaAction(11, ActionName.LIGHT_BOX, 0, ActionUI.LIGHT_BOX, null));
         }
         
         // Create a map of actions for lookup-by-name
@@ -188,7 +188,7 @@ public class Model {
         return null;
     }
     
-    public static SaAction getActionByName(String name) {
+    public static SaAction getActionByName(ActionName name) {
         return actionMap.get(name);
     }
     

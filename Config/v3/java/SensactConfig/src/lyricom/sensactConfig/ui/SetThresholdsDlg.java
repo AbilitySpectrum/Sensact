@@ -10,7 +10,6 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import lyricom.sensactConfig.comms.Serial;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.Sensor;
@@ -131,13 +130,13 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
         b.add(p);
 
         p = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        p.add(newLabel("Level one threshold"));
+        p.add(newLabel("Level 1 threshold"));
         gtSlider = newSlider(level1);
         p.add(gtSlider);
         b.add(p);
         
         p = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        p.add(newLabel("Level two threshold"));
+        p.add(newLabel("Level 2 threshold"));
         ltSlider = newSlider(level2);
         p.add(ltSlider);
         b.add(p);

@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
+import lyricom.sensactConfig.model.ActionName;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.Trigger;
@@ -99,8 +100,8 @@ public class TriggerEditDlg extends JDialog {
     
     private static final String GREATER_THAN = "greater than";
     private static final String LESS_THAN = "less than";
-    private static final String LEVEL_ONE = "level one";
-    private static final String LEVEL_TWO = "level two";
+    private static final String LEVEL_ONE = "level 1";
+    private static final String LEVEL_TWO = "level 2";
     
     private JPanel sigLevelLine() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -108,6 +109,13 @@ public class TriggerEditDlg extends JDialog {
         
         p.add( Utils.getLabel("   and signal is ", lblSize) );
         
+        W_Composite wc = new W_Composite();
+        wc.add(new WT_Condition("", tmpTrig));
+        wc.add(new WT_Level("", tmpTrig));
+        
+        p.add(wc);
+        
+        /*
         final JComboBox cb = new JComboBox();
         cb.addItem(GREATER_THAN);
         cb.addItem(LESS_THAN);
@@ -145,7 +153,7 @@ public class TriggerEditDlg extends JDialog {
             }
         });                
         p.add(cb2);
-        
+        */
         return p;
     }
     
@@ -165,7 +173,6 @@ public class TriggerEditDlg extends JDialog {
         
         p.add( Utils.getLabel("   for more than ", lblSize) );
         p.add(new WT_Delay("", tmpTrig));
-        p.add(new JLabel(" msec"));
         return p;
     }
         
@@ -178,7 +185,7 @@ public class TriggerEditDlg extends JDialog {
         if (ACTION_WIDTH == 0) {
             // Calibration
             SaAction savedAction = tmpTrig.getAction();
-            tmpTrig.setAction(Model.getActionByName("IR"));
+            tmpTrig.setAction(Model.getActionByName(ActionName.IR));
             int savedParam = tmpTrig.getActionParam();
             tmpTrig.setActionParam(2);
             WT_Action actionUI = new WT_Action("", tmpTrig);

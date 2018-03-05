@@ -1,8 +1,7 @@
 package lyricom.sensactConfig.widgets;
 
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
 import lyricom.sensactConfig.model.Trigger;
-import lyricom.sensactConfig.ui.MainFrame;
 
 /**
  *
@@ -13,6 +12,7 @@ public class WT_Delay extends W_Number {
     private final Trigger theTrigger;
     public WT_Delay(String label, Trigger t) {
         super(label, "Hold time", 5, 0, 60000);
+        add(new JLabel("msec"));
         theTrigger = t;
         update();
     }

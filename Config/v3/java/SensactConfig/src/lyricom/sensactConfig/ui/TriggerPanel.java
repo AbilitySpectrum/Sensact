@@ -14,6 +14,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import lyricom.sensactConfig.model.ActionName;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.Trigger;
 import lyricom.sensactConfig.model.Triggers;
@@ -45,6 +46,8 @@ public class TriggerPanel extends JPanel {
         isContinuous = t.getSensor().isContinuous();
         thisPanel = this;
         
+        setToolTipText("Right-click for options.");
+        
         parent = p;
         setLayout(new FlowLayout(FlowLayout.LEFT));
         setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -52,37 +55,41 @@ public class TriggerPanel extends JPanel {
         setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
         createMenus();
         
-        reqdState = new WT_ReqdState("", t);
+        reqdState = new WT_ReqdState("IF", t);
         add( reqdState );
-        add( new ThickBar(10));
+//        add( new ThickBar(10));
         if (isContinuous) {
+//            W_Composite wc = new W_Composite();
+//            wc.addPart( new WT_Condition_Short("sig", t));
+//            wc.addPart( new WT_Level_Short("", t));
+//            signalLevel = wc;
             signalLevel = new WT_SignalLevel(t);
         } else {
             signalLevel = new WT_SensorValue("", t);
         }
         add( signalLevel );
-        add( new ThickBar(10));
+//        add( new ThickBar(10));
         delay = new WT_Delay("for", t);
         add(delay);
         
-        add(new Arrow(35));
+//        add(new Arrow(35));
         
         if (ACTION_WIDTH == 0) {
             // Calibrate the size of actionUI.
             Trigger tmp = new Trigger(t.getSensor());
-            tmp.setAction(Model.getActionByName("IR"));
+            tmp.setAction(Model.getActionByName(ActionName.IR));
             tmp.setActionParam( 2 );
-            WT_Action tmpUI = new WT_Action("", tmp);
+            WT_Action tmpUI = new WT_Action("DO", tmp);
             Dimension dim = tmpUI.getPreferredSize();
 //            System.out.println("Calibration - H: " + Integer.toString(dim.height) + " W: " + Integer.toString(dim.width));
             ACTION_WIDTH = dim.width + 5;
             ACTION_HEIGHT = dim.height;
         }
         
-        actionUI = new WT_Action("", t);
+        actionUI = new WT_Action("DO", t);
         actionUI.setPreferredSize(new Dimension(ACTION_WIDTH, ACTION_HEIGHT)); // Enough for PI
         add( actionUI );
-        actionState = new WT_ActionState("", t);
+        actionState = new WT_ActionState("go to", t);
         add( actionState );
         
         MouseListener pListener = new PopupListener();
