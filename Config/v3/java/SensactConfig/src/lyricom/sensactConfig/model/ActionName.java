@@ -6,28 +6,30 @@ package lyricom.sensactConfig.model;
  * @author Andrew
  */
 public enum ActionName {
-    NONE("Nothing"),
-    RELAY_A("Relay A"),
-    RELAY_B("Relay B"),
-    BT_KEYBOARD("BT Keyboard"),
-    BT_SPECIAL("BT Special"),
-    BT_MOUSE("BT Mouse"),
-    HID_KEYBOARD("HID Keyboard"),
-    HID_SPECIAL("HID Special"),
-    HID_MOUSE("HID Mouse"),
-    BUZZER("Buzzer"),
-    IR("IR"),
-    SERIAL("Serial"),
-    SET_STATE("Set State"),
-    LIGHT_BOX("Light Box");
+    NONE,
+    RELAY_A,
+    RELAY_B,
+    BT_KEYBOARD,
+    BT_SPECIAL,
+    BT_MOUSE,
+    HID_KEYBOARD,
+    HID_SPECIAL,
+    HID_MOUSE,
+    BUZZER,
+    IR,
+    SERIAL,
+    SET_STATE,
+    LIGHT_BOX;
+
     
-    private final String id;
-    ActionName(String id) {
-        this.id = id;
+    private final String localizedName;
+    ActionName() {
+        localizedName = MRes.getStr(this.name());
     }
     
     @Override
     public String toString() {
-        return id;
+        return localizedName;
     }
+ 
 }

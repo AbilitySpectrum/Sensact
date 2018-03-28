@@ -70,25 +70,25 @@ public class Model {
         sensorList = new ArrayList<>();
         sensorGroups = new ArrayList<>();
         
-        SensorGroup grp = new SensorGroup("Input 1");
-        grp.add( new Sensor(1, "Input 1A", 0, 1023, true) );
-        grp.add( new Sensor(2, "Input 1B", 0, 1023, true) );
+        SensorGroup grp = new SensorGroup(MRes.getStr("INPUT1"));
+        grp.add( new Sensor(1, MRes.getStr("INPUT1A"), 0, 1023, true) );
+        grp.add( new Sensor(2, MRes.getStr("INPUT1B"), 0, 1023, true) );
         sensorGroups.add(grp);
 
-        grp = new SensorGroup("Input 2");
-        grp.add( new Sensor(3, "Input 2A", 0, 1023, true) );
-        grp.add( new Sensor(4, "Input 2B", 0, 1023, true) );
+        grp = new SensorGroup(MRes.getStr("INPUT2"));
+        grp.add( new Sensor(3, MRes.getStr("INPUT2A"), 0, 1023, true) );
+        grp.add( new Sensor(4, MRes.getStr("INPUT2B"), 0, 1023, true) );
         sensorGroups.add(grp);
         
-        grp = new SensorGroup("Input 3");
-        grp.add( new Sensor(5, "Input 3A", 0, 1023, true) );
-        grp.add( new Sensor(6, "Input 3B", 0, 1023, true) );
+        grp = new SensorGroup(MRes.getStr("INPUT3"));
+        grp.add( new Sensor(5, MRes.getStr("INPUT3A"), 0, 1023, true) );
+        grp.add( new Sensor(6, MRes.getStr("INPUT3B"), 0, 1023, true) );
         sensorGroups.add(grp);
         
-        grp = new SensorGroup("Accel");
-        grp.add( new Sensor(8,  "Accel-X", -16000, 16000, true) );
-        grp.add( new Sensor(9,  "Accel-Y", -16000, 16000, true) );
-        grp.add( new Sensor(10, "Accel-Z", -16000, 16000, true) );
+        grp = new SensorGroup(MRes.getStr("ACCEL"));
+        grp.add( new Sensor(8,  MRes.getStr("ACCELX"), -16000, 16000, true) );
+        grp.add( new Sensor(9,  MRes.getStr("ACCELY"), -16000, 16000, true) );
+        grp.add( new Sensor(10, MRes.getStr("ACCELZ"), -16000, 16000, true) );
         sensorGroups.add(grp);
 
 	/*
@@ -99,17 +99,17 @@ public class Model {
 	* Simlarly the "Any Motion sensor will deliver values from
 	* 0 to 28,377 but we chop off the most violent motions.
         */
-        grp = new SensorGroup("Gyro");
-        grp.add( new Sensor(11, "Gyro-X", -15000, 15000, true) );
-        grp.add( new Sensor(12, "Gyro-Y", -15000, 15000, true) );
-        grp.add( new Sensor(13, "Gyro-Z", -15000, 15000, true) );
+        grp = new SensorGroup(MRes.getStr("GYRO"));
+        grp.add( new Sensor(11, MRes.getStr("GYROX"), -15000, 15000, true) );
+        grp.add( new Sensor(12, MRes.getStr("GYROY"), -15000, 15000, true) );
+        grp.add( new Sensor(13, MRes.getStr("GYROZ"), -15000, 15000, true) );
         if (versionID >= 401) {
-            grp.add( new Sensor(14, "Any Motion", 0, 13000, true) );            
+            grp.add( new Sensor(14, MRes.getStr("GYRO_ANY"), 0, 13000, true) );            
         }
         sensorGroups.add(grp);
 
-        grp = new SensorGroup("USB Port");
-        grp.add( new Sensor(7, "USB Input", 0, 255, false) );
+        grp = new SensorGroup(MRes.getStr("USB_PORT"));
+        grp.add( new Sensor(7, MRes.getStr("USB_INPUT"), 0, 255, false) );
         sensorGroups.add(grp);
         
         // Create a single list of all sensors
