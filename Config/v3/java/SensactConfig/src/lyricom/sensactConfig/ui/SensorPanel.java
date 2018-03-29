@@ -40,10 +40,12 @@ public class SensorPanel extends JPanel {
    
     private final JPanel triggersPanel;
     private final List<TriggerPanel> triggerPanelList = new ArrayList<>();
+    private final SensorGroupPanel parentPanel;
 
-    SensorPanel(Sensor s) {
+    SensorPanel(Sensor s, SensorGroupPanel sgp) {
         super();
         theSensor = s;
+        parentPanel = sgp;
         setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
                
         triggersPanel = getTriggersPanel();
@@ -57,6 +59,10 @@ public class SensorPanel extends JPanel {
     
     public Sensor getSensor() {
         return theSensor;
+    }
+    
+    public int getTriggerCount() {
+        return triggerPanelList.size();
     }
     
     private int maxWidth = 0;
@@ -117,12 +123,18 @@ public class SensorPanel extends JPanel {
             triggerPanelList.add(tp);
             triggersPanel.add(tp);   
         }
+        if (getTriggerCount() == 1) {
+            parentPanel.checkPanelStatus();
+        }
     }
     
     // Called by TriggerPanel when delete has been requested.
     void removeTriggerUI(TriggerPanel tp) {
         triggersPanel.remove(tp);
         triggerPanelList.remove(tp);
+        if (getTriggerCount() == 0) {
+            parentPanel.checkPanelStatus();
+        }
         revalidate();
     }
     
@@ -131,6 +143,9 @@ public class SensorPanel extends JPanel {
         TriggerPanel tp = new TriggerPanel(t, this);
         triggerPanelList.add(tp);
         triggersPanel.add(tp);  
+        if (getTriggerCount() == 1) {
+            parentPanel.checkPanelStatus();
+        }
         revalidate();
     }
     
@@ -138,15 +153,23 @@ public class SensorPanel extends JPanel {
     // This is called when triggers are received, and by now
     // the underlying triggers have already been removed.
     public void deleteAllUI() {
+        boolean check = getTriggerCount() != 0;
         triggersPanel.removeAll();
         triggerPanelList.clear();
+        if (check) {
+            parentPanel.checkPanelStatus();
+        }
         revalidate();
     }
     
     private void deleteAll() {
+        boolean check = getTriggerCount() != 0;
         triggersPanel.removeAll();
         Triggers.getInstance().deleteTriggerSet(theSensor);
         triggerPanelList.clear();       
+        if (check) {
+            parentPanel.checkPanelStatus();
+        }
     }
     
     private void setThresholds() {

@@ -23,6 +23,7 @@ import javax.swing.border.LineBorder;
 import lyricom.sensactConfig.comms.Serial;
 import lyricom.sensactConfig.model.IOError;
 import lyricom.sensactConfig.model.InStream;
+import lyricom.sensactConfig.model.MRes;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.OutStream;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -91,6 +92,7 @@ public class MainFrame extends JFrame {
     
     private JButton getBtn;
     private JButton saveBtn;
+    private JButton clearAllBtn;
     private JButton runBtn;
     private JButton idleBtn;
     private JButton importBtn;
@@ -132,6 +134,8 @@ public class MainFrame extends JFrame {
         vb.add(Box.createVerticalStrut(BTN_SPACING));
         vb.add(saveBtn);
         vb.add(Box.createVerticalStrut(BTN_SPACING));
+        vb.add(clearAllBtn);
+        vb.add(Box.createVerticalStrut(BTN_SPACING));
         vb.add(new JSeparator(JSeparator.HORIZONTAL));
         vb.add(Box.createVerticalStrut(BTN_SPACING));
         vb.add(runBtn);
@@ -155,14 +159,25 @@ public class MainFrame extends JFrame {
     private JButton[] createButtons() {
         getBtn = newBtn(RES.getString("BTN_GET"));
         saveBtn = newBtn(RES.getString("BTN_SAVE"));
+        clearAllBtn = newBtn(RES.getString("BTN_CLEAR_ALL"));
         runBtn = newBtn(RES.getString("BTN_RUN"));
         idleBtn = newBtn(RES.getString("BTN_IDLE"));
         importBtn = newBtn(RES.getString("BTN_IMPORT"));
         exportBtn = newBtn(RES.getString("BTN_EXPORT"));
         exitBtn = newBtn(RES.getString("BTN_EXIT"));
         
+        getBtn.setToolTipText(RES.getString("BTN_GET_TTT"));
+        saveBtn.setToolTipText(RES.getString("BTN_SAVE_TTT"));
+        clearAllBtn.setToolTipText(RES.getString("BTN_CLEAR_ALL_TTT"));
+        runBtn.setToolTipText(RES.getString("BTN_RUN_TTT"));
+        idleBtn.setToolTipText(RES.getString("BTN_IDLE_TTT"));
+        importBtn.setToolTipText(RES.getString("BTN_IMPORT_TTT"));
+        exportBtn.setToolTipText(RES.getString("BTN_EXPORT_TTT"));
+        exitBtn.setToolTipText(RES.getString("BTN_EXIT_TTT"));
+        
         getBtn.addActionListener(e -> Serial.getInstance().writeByte(Model.CMD_GET_TRIGGERS));
         saveBtn.addActionListener(e -> doSave());
+        clearAllBtn.addActionListener(e -> doClearAll());
         runBtn.addActionListener (e -> {
             if (inSyncCheck()) {
                 Serial.getInstance().writeByte(Model.CMD_RUN);
@@ -183,6 +198,7 @@ public class MainFrame extends JFrame {
         JButton[] buttons =  {
             getBtn,
             saveBtn,
+            clearAllBtn,
             runBtn,
             idleBtn,
             importBtn,
@@ -204,6 +220,20 @@ public class MainFrame extends JFrame {
     private void doSave() {
         OutStream os = Triggers.getInstance().getTriggerData();
         Serial.getInstance().writeList(os.getBuffer());
+        Triggers.DATA_IN_SYNC = true;
+    }
+    
+    private void doClearAll() {
+        int result = JOptionPane.showConfirmDialog(MainFrame.this,
+            "This will erase all triggers in all tabs.\nDo you want to continue?",
+            "Clear All",
+            JOptionPane.YES_NO_OPTION); 
+        if (result == JOptionPane.NO_OPTION) {
+            return;
+        }
+        
+        Triggers.getInstance().deleteAll();
+        SensorPanel.reloadTriggers();    
         Triggers.DATA_IN_SYNC = true;
     }
     
@@ -288,17 +318,21 @@ public class MainFrame extends JFrame {
     private JComponent tabbedPanes() {
         JTabbedPane pane = new JTabbedPane();
         
+        ImageIcon icon = Utils.getIcon(Utils.ICON_EMPTY);
+        int tabNumber = 0;
         for(SensorGroup g: Model.getSensorGroups()) {
-            SensorGroupPanel p = new SensorGroupPanel(g);
+            PaneStatusCntrl psc = new PaneStatusCntrl(pane, tabNumber);
+            SensorGroupPanel p = new SensorGroupPanel(g, psc);
             sensorGroups.add(p);
-            pane.add(g.getName(), p);
+            pane.addTab(g.getName(), icon, p);
+            tabNumber++;
         }
         
         JPanel p = new MouseSpeedPanel();
-        pane.add("Mouse Speed", p);
+        pane.add(MRes.getStr("MOUSE_SPEED"), p);
         return pane;
     }
-    
+        
     // If true is returned continue with the operation.
     // If false is returned cancel the operation.
     private boolean inSyncCheck() {

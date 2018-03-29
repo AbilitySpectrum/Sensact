@@ -10,7 +10,7 @@ import java.util.ResourceBundle;
 public class MRes {
     private static final ResourceBundle RES = ResourceBundle.getBundle("model");    
 
-    static String getStr(String key) {
+    static public String getStr(String key) {
         return RES.getString(key);
     }
 }

@@ -19,15 +19,18 @@ import lyricom.sensactConfig.solutions.SolutionsUI;
  */
 public class SensorGroupPanel extends JPanel {
 
-    private final List<SensorPanel> triggerSetPanels = new ArrayList<>();
+    private final List<SensorPanel> sensorPanels = new ArrayList<>();
     private final SensorGroup thisGroup;
+    private final PaneStatusCntrl statusControl;
+    private boolean hasTriggers;
     
-    public SensorGroupPanel(SensorGroup group) {
+    public SensorGroupPanel(SensorGroup group, PaneStatusCntrl psc) {
         super();
         
         setLayout(new BorderLayout());
         
         thisGroup = group;
+        statusControl = psc;
         
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 //        setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -41,8 +44,8 @@ public class SensorGroupPanel extends JPanel {
         }
         
         for(Sensor s: group.getMembers()) {
-            SensorPanel tscp = new SensorPanel(s);
-            triggerSetPanels.add(tscp);
+            SensorPanel tscp = new SensorPanel(s, this);
+            sensorPanels.add(tscp);
             tscp.setAlignmentX(Component.LEFT_ALIGNMENT);
             b.add(tscp);
         }
@@ -51,6 +54,25 @@ public class SensorGroupPanel extends JPanel {
         
         JScrollPane scroll = new JScrollPane(p);
         add(scroll, BorderLayout.CENTER);
+    }
+    
+    void checkPanelStatus() {
+        boolean hasT = false;   // assumed to start
+        for(SensorPanel sp: sensorPanels) {
+            if (sp.getTriggerCount() > 0) {
+                hasT = true;
+            } 
+        }
+        
+        if (hasTriggers != hasT) {
+            // Status has changed
+            hasTriggers = hasT;
+            if (hasTriggers) {
+                statusControl.panelContainsTriggers();
+            } else {
+                statusControl.panelIsEmpty();
+            }
+        }
     }
     
     private JComponent solutionsBtn() {
