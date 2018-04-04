@@ -15,6 +15,7 @@ public class ActionUI {
     
     public static final ActionUI NONE           = new ActionUI();
     public static final ActionUI KEY_OPTION     = new KeyOptionUI();
+    public static final ActionUI RELAY_OPTION   = new RelayOptionUI();
     public static final ActionUI MOUSE_OPTION   = new MouseOptionUI();
     public static final ActionUI HID_SPECIAL    = new HIDSpecialUI();
     public static final ActionUI BT_SPECIAL     = new BTSpecialUI();
@@ -40,6 +41,22 @@ public class ActionUI {
             return new WT_KeyOption("Character:", t);
         }
     } 
+    
+    // ----------------------------------
+    // RelayOptionUI - UI for the relay - starting with V4.3
+    static final ValueLabelPair RelayActions[] = {
+        new ValueLabelPair(Model.RELAY_PULSE, "Pulse"),
+        new ValueLabelPair(Model.RELAY_ON, "On"),
+        new ValueLabelPair(Model.RELAY_OFF, "Off"),
+    };
+    
+    public static class RelayOptionUI extends ActionUI {    
+        @Override
+         public W_Base createUI(Trigger t) {
+             W_Base option = new WT_ValueLabelOption("Action:", t, RelayActions);
+             return option;
+        }         
+    }     
 
     // ----------------------------------
     // MouseOptionUI - UI for components that take mouse motions.

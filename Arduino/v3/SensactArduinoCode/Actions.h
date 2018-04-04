@@ -89,6 +89,10 @@ class Actors {
 };
 
 // === Actor sub-classes === //
+#define RELAY_PULSE 0
+#define RELAY_ON    1
+#define RELAY_OFF   2
+
 class Relay: public Actor {
   private:
     int pin;

@@ -103,8 +103,18 @@ void Relay::init() {
 }
 
 void Relay::doAction(long param) {
-  actionStartTime = millis();
-  digitalWrite(pin, HIGH);
+  switch(param) {
+    case RELAY_PULSE:
+      actionStartTime = millis();
+      digitalWrite(pin, HIGH);
+      break;
+    case RELAY_ON:
+      digitalWrite(pin, HIGH);
+      break;
+    case RELAY_OFF:
+      digitalWrite(pin, LOW);
+      break;
+  }
 }
 
 void Relay::checkAction() {

@@ -52,6 +52,11 @@ public class Model {
     static public final int VOLUME_DOWN = 3;
     static public final int CHANNEL_UP = 4;
     static public final int CHANNEL_DOWN = 5;
+    
+    // Relay values (starting with V4.3)
+    static public final int RELAY_PULSE = 0;
+    static public final int RELAY_ON = 1;
+    static public final int RELAY_OFF = 2;
 
     // Lists of Sensors and Actions.
     // Created once by initModel.
@@ -127,8 +132,13 @@ public class Model {
         actionMap = new HashMap<>();
         
         actionList.add(new SaAction(0, ActionName.NONE,    0, ActionUI.NONE, null));
-        actionList.add(new SaAction(1, ActionName.RELAY_A, 0, ActionUI.NONE, null));
-        actionList.add(new SaAction(2, ActionName.RELAY_B, 0, ActionUI.NONE, null));
+        if (versionID >= 403) {
+            actionList.add(new SaAction(1, ActionName.RELAY_A, 0, ActionUI.RELAY_OPTION, null));            
+            actionList.add(new SaAction(2, ActionName.RELAY_B, 0, ActionUI.RELAY_OPTION, null));
+        } else {
+            actionList.add(new SaAction(1, ActionName.RELAY_A, 0, ActionUI.NONE, null));
+            actionList.add(new SaAction(2, ActionName.RELAY_B, 0, ActionUI.NONE, null));
+        }
         
         actionList.add(new SaAction(3, ActionName.BT_KEYBOARD, 65, ActionUI.KEY_OPTION, (p) -> p >= 32));
         actionList.add(new SaAction(3, ActionName.BT_SPECIAL,  10, ActionUI.BT_SPECIAL, (p) -> p < 32));
