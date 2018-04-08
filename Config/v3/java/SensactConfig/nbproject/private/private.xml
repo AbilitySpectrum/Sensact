@@ -5,11 +5,14 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/ui/SensorPanel.java</file>
-            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/solutions/SolutionRegister.java</file>
-            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/Main.java</file>
-            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/solutions/RegisterInfo.java</file>
+            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/comms/Connection.java</file>
+            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/ui/SensorGroupPanel.java</file>
+            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/ui/PaneStatusCntrl.java</file>
             <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/ui/MainFrame.java</file>
             <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/strings.properties</file>
+            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/model.properties</file>
+            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/model/MRes.java</file>
+            <file>file:/C:/Users/Andrew/Documents/GitHub/Sensact/Config/v3/java/SensactConfig/src/lyricom/sensactConfig/ui/Utils.java</file>
         </group>
     </open-files>
 </project-private>
