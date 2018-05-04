@@ -8,6 +8,7 @@ package lyricom.sensactConfig.comms;
 
 import com.fazecast.jSerialComm.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.ui.Utils;
@@ -119,14 +120,31 @@ public class Serial implements Runnable {
     }
     
     public int writeData(byte[] buffer) {
-        int writeBytes = thePort.writeBytes(buffer, buffer.length);
+        int writeBytes;
+        int totalBytes = 0;
+        while (buffer.length > 300) {
+            // On the mac we can only send <400 bytes at a time.
+            byte[] part = Arrays.copyOfRange(buffer, 0, 300);
+            buffer = Arrays.copyOfRange(buffer, 300, buffer.length);
+            writeBytes = thePort.writeBytes(part,300);
+            if (writeBytes == -1) {
+                if (!closing) {
+                    callback.connectionLost();
+                }
+                return -1;
+            }
+            totalBytes += writeBytes;
+        }
+        writeBytes = thePort.writeBytes(buffer, buffer.length);
         if (writeBytes == -1) {
 //            System.out.println("Write error");
             if (!closing) {
                 callback.connectionLost();
             }
+            return -1;
         }
-        return writeBytes;
+        totalBytes += writeBytes;
+        return totalBytes;
     }
     
     public void startDispatchThread() {
