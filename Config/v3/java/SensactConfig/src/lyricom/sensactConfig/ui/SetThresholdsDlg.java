@@ -31,6 +31,8 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
     private JSlider gtSlider;
     private JSlider ltSlider;
     
+    private SigLevelBuffer sigBuf;
+    
     public SetThresholdsDlg(Sensor s) {
         super(MainFrame.TheFrame, true);
         theSensor = s;
@@ -38,6 +40,8 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
         cancelled = false;
         level1 = s.getLevel1();
         level2 = s.getLevel2();
+        
+        sigBuf = new SigLevelBuffer(20);
         
         setLayout(new BorderLayout());
         
@@ -199,7 +203,10 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
     }
 
     @Override
-    public void newSensorValue(int value) {       
+    public void newSensorValue(int value) { 
+        
+        sigBuf.addValue(value);
+
         level1 = gtSlider.getValue();
         level2 = ltSlider.getValue();
         
@@ -218,7 +225,7 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
         } else {
             currentSlider.setColor(Color.BLUE);
         }
-        currentSlider.setValue(value);
+        currentSlider.setValue(value, sigBuf.getMaxVal(), sigBuf.getMinVal());
     }
     
    
@@ -227,6 +234,8 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
         int max;
         int min;
         int val;
+        int bufmin;
+        int bufmax;
         Color color;
         
         mySlider(int min, int max, int val) {
@@ -249,13 +258,30 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
             Graphics2D g2d = (Graphics2D) g;
             g2d.setColor(Color.GRAY);
             g2d.drawRect(5,0,PWIDTH-12,10);
-            int position = ((val - min) * PWIDTH-14) / (max - min);
+            int position = ((val - min) * (PWIDTH-14)) / (max - min);
             g2d.setColor(color);
             g2d.fillRect(6, 2, position, 7);
+ /* Min/Max buffer level display - hold off for now.          
+            g2d.setColor(Color.BLACK);
+            int maxPosition = ((bufmax - min) * (PWIDTH-14)) / (max-min) + 6;
+            g2d.fillRect(maxPosition, 1, 2, 9);
+            int minPosition = ((bufmin - min) * (PWIDTH-14)) / (max-min) + 6;
+            g2d.fillRect(minPosition, 1, 2, 9);
+*/
         }
         
-        public void setValue(int val) {
+        public void setValue(int val, int bufmin, int bufmax) {
             this.val = val;
+            this.bufmin = bufmin;
+            this.bufmax = bufmax;
+            // Accelerometer can deliver values outside the meter's range.
+            // They get chopped.
+            if (this.val > max) this.val = max;
+            if (this.bufmin > max) this.bufmin = max;
+            if (this.bufmax > max) this.bufmax = max;
+            if (this.val < min) this.val = min;
+            if (this.bufmin < min) this.bufmin = min;
+            if (this.bufmax < min) this.bufmax = min;
             repaint();
         }
         
