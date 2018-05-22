@@ -75,19 +75,19 @@ public class Model {
         sensorList = new ArrayList<>();
         sensorGroups = new ArrayList<>();
         
-        SensorGroup grp = new SensorGroup(MRes.getStr("INPUT1"));
-        grp.add( new Sensor(1, MRes.getStr("INPUT1A"), 0, 1023, true) );
-        grp.add( new Sensor(2, MRes.getStr("INPUT1B"), 0, 1023, true) );
+        SensorGroup grp = new SensorGroup(MRes.getStr("SENSOR1"));
+        grp.add( new Sensor(5, MRes.getStr("SENSOR1A"), 0, 1023, true) );
+        grp.add( new Sensor(6, MRes.getStr("SENSOR1B"), 0, 1023, true) );
         sensorGroups.add(grp);
 
-        grp = new SensorGroup(MRes.getStr("INPUT2"));
-        grp.add( new Sensor(3, MRes.getStr("INPUT2A"), 0, 1023, true) );
-        grp.add( new Sensor(4, MRes.getStr("INPUT2B"), 0, 1023, true) );
+        grp = new SensorGroup(MRes.getStr("SENSOR2"));
+        grp.add( new Sensor(3, MRes.getStr("SENSOR2A"), 0, 1023, true) );
+        grp.add( new Sensor(4, MRes.getStr("SENSOR2B"), 0, 1023, true) );
         sensorGroups.add(grp);
         
-        grp = new SensorGroup(MRes.getStr("INPUT3"));
-        grp.add( new Sensor(5, MRes.getStr("INPUT3A"), 0, 1023, true) );
-        grp.add( new Sensor(6, MRes.getStr("INPUT3B"), 0, 1023, true) );
+        grp = new SensorGroup(MRes.getStr("SENSOR3"));
+        grp.add( new Sensor(1, MRes.getStr("SENSOR3A"), 0, 1023, true) );
+        grp.add( new Sensor(2, MRes.getStr("SENSOR3B"), 0, 1023, true) );
         sensorGroups.add(grp);
         
         grp = new SensorGroup(MRes.getStr("ACCEL"));

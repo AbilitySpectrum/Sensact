@@ -19,7 +19,7 @@ public class SolutionRegister {
     public static void init() {
         if (initDone) return;
         SolutionRegister reg = getInstance();
-        String[] groups1 = {"Input 1", "Input 2", "Input 3"};
+        String[] groups1 = {"Sensor 1", "Sensor 2", "Sensor 3"};
         reg.register( JoystickMouseSolution.class, "Joystick Mouse", groups1);
         reg.register( OneBtnMouse.class, "One Button Mouse", groups1);
         reg.register( ToggleMouse.class, "Toggle Mouse", groups1);
