@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -139,8 +140,10 @@ public class MainFrame extends JFrame {
         vb.add(new JSeparator(JSeparator.HORIZONTAL));
         vb.add(Box.createVerticalStrut(BTN_SPACING));
         vb.add(runBtn);
+        runBtn.setMnemonic(KeyEvent.VK_R);
         vb.add(Box.createVerticalStrut(BTN_SPACING));
         vb.add(idleBtn);
+        idleBtn.setMnemonic(KeyEvent.VK_I);
         vb.add(Box.createVerticalStrut(BTN_SPACING));
         vb.add(new JSeparator(JSeparator.HORIZONTAL));
         vb.add(Box.createVerticalStrut(BTN_SPACING));
@@ -354,5 +357,5 @@ public class MainFrame extends JFrame {
         }
         return true;
     }
-    
-}
+
+    }
