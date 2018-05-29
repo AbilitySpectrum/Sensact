@@ -32,4 +32,8 @@ public class W_Spinner extends W_Base {
         add(spinner);        
         spinner.addChangeListener(e -> widgetChanged());        
     }
+    
+    public String getValue() {
+        return (String) spinModel.getValue();
+    }
 }

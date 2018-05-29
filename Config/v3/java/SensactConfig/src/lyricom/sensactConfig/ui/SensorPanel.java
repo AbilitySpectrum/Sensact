@@ -99,6 +99,13 @@ public class SensorPanel extends JPanel {
         JButton deleteAll = new JButton("Delete All");
         p.add(deleteAll);
         deleteAll.addActionListener(e -> {
+            int result = JOptionPane.showConfirmDialog(MainFrame.TheFrame,
+                "This will erase all triggers for "+theSensor.getName()+".\nDo you want to continue?",
+                "Delete Triggers",
+                JOptionPane.YES_NO_OPTION); 
+            if (result == JOptionPane.NO_OPTION) {
+                return;
+            }
             deleteAll();
             revalidate();
         });

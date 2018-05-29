@@ -127,6 +127,11 @@ public class Serial implements Runnable {
             byte[] part = Arrays.copyOfRange(buffer, 0, 300);
             buffer = Arrays.copyOfRange(buffer, 300, buffer.length);
             writeBytes = thePort.writeBytes(part,300);
+            try {
+                Thread.sleep(100);  // Give the Mac a chance - poor thing!
+            } catch (InterruptedException ex) {
+                // ignore
+            }
             if (writeBytes == -1) {
                 if (!closing) {
                     callback.connectionLost();
