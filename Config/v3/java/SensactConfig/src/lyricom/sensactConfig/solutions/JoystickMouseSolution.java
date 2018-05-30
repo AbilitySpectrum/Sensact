@@ -33,13 +33,13 @@ public class JoystickMouseSolution extends SolutionBase {
         upLocation = downLocation = leftLocation = rightLocation = null;
         
         boolean success = false;
-        upLocation = c.getLocation("Move joystick to the UP position.");
+        upLocation = c.getLocation("Hold joystick in the UP position.");
         if (upLocation != null) {
-            downLocation = c.getLocation("Move joystick to the DOWN position.");
+            downLocation = c.getLocation("Hold joystick in the DOWN position.");
             if (downLocation != null) {
-                leftLocation = c.getLocation("Move joystick to the LEFT position.");
+                leftLocation = c.getLocation("Hold joystick in the LEFT position.");
                 if (leftLocation != null) {
-                    rightLocation = c.getLocation("Move joystick to the RIGHT position.");
+                    rightLocation = c.getLocation("Hold joystick in the RIGHT position.");
                     if (rightLocation != null) {
                         success = true;
                     }

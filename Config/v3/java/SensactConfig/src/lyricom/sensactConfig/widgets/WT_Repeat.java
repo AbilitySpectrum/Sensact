@@ -28,11 +28,11 @@ public class WT_Repeat extends W_Base implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         theTrigger.setRepeat(repeatBox.isSelected());
-        if (theTrigger.isRepeat()) {
+/*        if (theTrigger.isRepeat()) {
             System.out.println("Repeat is TRUE");
         } else {
             System.out.println("Repeat is FALSE");
-        }
+        } */
     }
     
     @Override

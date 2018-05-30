@@ -5,6 +5,11 @@ import java.awt.Font;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.Model;
+import lyricom.sensactConfig.model.Trigger;
+import lyricom.sensactConfig.widgets.WT_Action;
 
 /**
  *
@@ -74,5 +79,5 @@ public class Utils {
             System.err.println("Couldn't find file: " + path);
             return null;
         }
-    }    
+    } 
 }

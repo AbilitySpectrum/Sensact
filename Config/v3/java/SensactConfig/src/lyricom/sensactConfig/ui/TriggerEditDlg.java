@@ -19,8 +19,7 @@ import lyricom.sensactConfig.widgets.*;
  * @author Andrew
  */
 public class TriggerEditDlg extends JDialog {
-    private static int ACTION_HEIGHT = 0;
-    private static int ACTION_WIDTH = 0;
+    private static Dimension ACTION_SIZE = null;
     
     private final Trigger tmpTrig;
     private final Trigger theTrigger;
@@ -97,12 +96,7 @@ public class TriggerEditDlg extends JDialog {
         p.add(new WT_ReqdState("", tmpTrig));
         return p;
     }
-    
-    private static final String GREATER_THAN = "greater than";
-    private static final String LESS_THAN = "less than";
-    private static final String LEVEL_ONE = "level 1";
-    private static final String LEVEL_TWO = "level 2";
-    
+        
     private JPanel sigLevelLine() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -115,45 +109,6 @@ public class TriggerEditDlg extends JDialog {
         
         p.add(wc);
         
-        /*
-        final JComboBox cb = new JComboBox();
-        cb.addItem(GREATER_THAN);
-        cb.addItem(LESS_THAN);
-        if (tmpTrig.getCondition() == Trigger.TRIGGER_ON_HIGH) {
-            cb.setSelectedItem(GREATER_THAN);
-        } else {
-            cb.setSelectedItem(LESS_THAN);
-        }
-        
-        cb.addActionListener(e -> {
-            if (cb.getSelectedItem() == GREATER_THAN) {
-                tmpTrig.setCondition(Trigger.TRIGGER_ON_HIGH);
-            } else {
-                tmpTrig.setCondition(Trigger.TRIGGER_ON_LOW);
-            }
-        });                
-        p.add(cb);
-        
-        final JComboBox cb2 = new JComboBox();
-        cb2.addItem(LEVEL_ONE);
-        cb2.addItem(LEVEL_TWO);
-        if (tmpTrig.getLevel() == Trigger.Level.LEVEL1) {
-            cb2.setSelectedItem(LEVEL_ONE);
-        } else {
-            cb2.setSelectedItem(LEVEL_TWO);
-        }
-        
-        cb2.addActionListener(e -> {
-            if (cb2.getSelectedItem() == LEVEL_ONE) {
-                tmpTrig.setLevel(Trigger.Level.LEVEL1);
-                tmpTrig.setTriggerValue( theTrigger.getSensor().getLevel1() );
-            } else {
-                tmpTrig.setLevel(Trigger.Level.LEVEL2);
-                tmpTrig.setTriggerValue( theTrigger.getSensor().getLevel2() );
-            }
-        });                
-        p.add(cb2);
-        */
         return p;
     }
     
@@ -182,7 +137,7 @@ public class TriggerEditDlg extends JDialog {
         
         p.add( Utils.getLabel("THEN do action ", lblSize) );
         
-        if (ACTION_WIDTH == 0) {
+        if (ACTION_SIZE == null) {
             // Calibration
             SaAction savedAction = tmpTrig.getAction();
             tmpTrig.setAction(Model.getActionByName(ActionName.IR));
@@ -190,10 +145,9 @@ public class TriggerEditDlg extends JDialog {
             tmpTrig.setActionParam(2);
             WT_Action actionUI = new WT_Action("", tmpTrig);
             p.add(actionUI);
-            Dimension dim = p.getPreferredSize();
-            ACTION_HEIGHT = dim.height;
-            ACTION_WIDTH = dim.width + 10;
-            System.out.println("Calibration - H: " + Integer.toString(dim.height) + " W: " + Integer.toString(dim.width));
+            ACTION_SIZE = p.getPreferredSize();
+            ACTION_SIZE.width += 10;
+//            System.out.println("Calibration - H: " + Integer.toString(ACTION_SIZE.height) + " W: " + Integer.toString(ACTION_SIZE.width));
             tmpTrig.setAction(savedAction);
             tmpTrig.setActionParam(savedParam);  
             actionUI.update();
@@ -201,9 +155,8 @@ public class TriggerEditDlg extends JDialog {
             p.add(new WT_Action("", tmpTrig));
         }
         
-        Dimension d = new Dimension(ACTION_WIDTH, ACTION_HEIGHT);
-        p.setPreferredSize(d);
-        p.setMaximumSize(d);
+        p.setPreferredSize(ACTION_SIZE);
+        p.setMaximumSize(ACTION_SIZE);
         
         return p;
     }
