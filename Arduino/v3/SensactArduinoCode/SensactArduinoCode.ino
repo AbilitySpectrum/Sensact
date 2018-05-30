@@ -62,10 +62,12 @@ void loop() {
       val = triggers.readTriggers(&serialInput);
       if (val == IO_ERROR) {
         flashLED(LED_RED);
-        tone(SENSACT_BUZZER, 800, 250);
+        tone(SENSACT_BUZZER, 190, 500);
       } else {
         flashLED(LED_GREEN);
-        tone(SENSACT_BUZZER, 200, 500);
+        tone(SENSACT_BUZZER, 800, 200);
+        delay(500);
+        tone(SENSACT_BUZZER, 800, 200);
         triggers.reset();
         actors.reset();
         sensors.reset();
