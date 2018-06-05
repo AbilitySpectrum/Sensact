@@ -47,12 +47,18 @@ public class PressReleaseWaitSelect extends SolutionBase {
         int baseState = 2; 
         for(ActionRow ar: actions) {
             makeTrigger(baseState, btnLocLo, delay, ar.prompt.getAction(), ar.prompt.getActionParam(), baseState + 2);
-            makeTrigger(baseState+2, btnLocHi, 0, ar.action.getAction(), ar.action.getActionParam(), baseState+3);
-            if (ar.latch.isSelected()) {
-                makeTrigger(baseState+3, btnLocHi, 0, ar.action.getAction(), ar.action.getActionParam(), baseState+3);
-                makeTrigger(baseState+3, btnLocLo, endDelay, endAction.getAction(), endAction.getActionParam(), 1);
+            if (baseState == 10 && ar.latch.isSelected()) {
+                // Special case.  Saves one trigger on last latching action
+                makeTrigger(baseState+2, btnLocHi, 0, ar.action.getAction(), ar.action.getActionParam(), baseState+2);
+                makeTrigger(baseState+2, btnLocLo, endDelay, endAction.getAction(), endAction.getActionParam(), 1);
             } else {
-                makeTrigger(baseState+3, btnLocLo, 0, endAction.getAction(), endAction.getActionParam(), 1);
+                makeTrigger(baseState+2, btnLocHi, 0, ar.action.getAction(), ar.action.getActionParam(), baseState+3);
+                if (ar.latch.isSelected()) {
+                        makeTrigger(baseState+3, btnLocHi, 0, ar.action.getAction(), ar.action.getActionParam(), baseState+3);
+                        makeTrigger(baseState+3, btnLocLo, endDelay, endAction.getAction(), endAction.getActionParam(), 1);
+                } else {
+                    makeTrigger(baseState+3, btnLocLo, 0, endAction.getAction(), endAction.getActionParam(), 1);
+                }
             }
             baseState += 2;
         }
