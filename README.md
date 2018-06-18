@@ -18,7 +18,7 @@ We provide a generic device that allows the user to experiment with different se
 
 The Sensact Hub brings together 3 analog inputs (one of them can be configured as an I2C input) and 2 relay outputs as well as HID, IR and Bluetooth outputs.
 
-We use 2.5mm audio sockets to make it easy to swap different input sensors. The tip is VCC, sleeve is GND and Ring is Signal. The first socket can be used by an I2C device where the two rings are SDA and SCL.
+We use 3.5mm audio sockets to make it easy to swap different input sensors. The tip is VCC, sleeve is GND and Ring is Signal. The first socket can be used by an I2C device where the two rings are SDA and SCL.
 
 #### Use cases
 
