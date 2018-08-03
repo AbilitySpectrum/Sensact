@@ -1,9 +1,9 @@
-The Arduino code requires a version IRLib to compile and run.
+The Arduino code requires a version IRLib2 to compile and run.
 
-We are using a version of IRLib by Chris Young - Version 1.5.1 March 2015.
+We are using a version of IRLib2 by Chris Young - Version 2.0.16 May 3, 2018
 
-To use this 
-. place the IRLib-master.zip file in your arduino 'libraries' directory.
-. unzip the file
-. rename the 'IRLib-master' directory to simply 'IRLib'
+To use this library: 
+. Place the IRLib2-master.zip file in a separate directory
+. Unzip the file
+. Follow the installation instructions in the 'readme.md' file
 

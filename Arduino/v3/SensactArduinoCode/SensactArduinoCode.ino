@@ -17,7 +17,7 @@
 #include "IO.h"
 #include <EEPROM.h>
 #include <SoftwareSerial.h>
-#include <IRLib.h>
+//#include <IRLib2.h>
 #include <Wire.h>
 
 enum rMode{RUN, REPORT, IDLEX};  // IDLE seems to be a keyword - thus IDLEX.
