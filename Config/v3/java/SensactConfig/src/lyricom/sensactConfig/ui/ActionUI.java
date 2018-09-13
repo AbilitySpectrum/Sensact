@@ -18,6 +18,8 @@ public class ActionUI {
     public static final ActionUI RELAY_OPTION   = new RelayOptionUI();
     public static final ActionUI MOUSE_OPTION   = new MouseOptionUI();
     public static final ActionUI HID_SPECIAL    = new HIDSpecialUI();
+    public static final ActionUI HID_KEYPRESS   = new HIDKeyPress();
+    public static final ActionUI HID_KEYRELEASE = new HIDKeyRelease();
     public static final ActionUI BT_SPECIAL     = new BTSpecialUI();
     public static final ActionUI BUZZER         = new BuzzerUI();
     public static final ActionUI IR_OPTION      = new IRActionUI();
@@ -114,6 +116,75 @@ public class ActionUI {
              return option;
         }
     } 
+    
+    // Press-Release key codes
+    static final ValueLabelPair PR_Keys[] = {
+        new ValueLabelPair( 0x61, "A KEY"),
+        new ValueLabelPair( 0x62, "B KEY"),
+        new ValueLabelPair( 0x63, "C KEY"),
+        new ValueLabelPair( 0x64, "D KEY"),
+        new ValueLabelPair( 0x65, "E KEY"),
+        new ValueLabelPair( 0x66, "F KEY"),
+        new ValueLabelPair( 0x67, "G KEY"),
+        new ValueLabelPair( 0x68, "H KEY"),
+        new ValueLabelPair( 0x69, "I KEY"),
+        new ValueLabelPair( 0x6A, "J KEY"),
+        new ValueLabelPair( 0x6B, "K KEY"),
+        new ValueLabelPair( 0x6C, "L KEY"),
+        new ValueLabelPair( 0x6D, "M KEY"),
+        new ValueLabelPair( 0x6E, "N KEY"),
+        new ValueLabelPair( 0x6F, "O KEY"),
+        new ValueLabelPair( 0x70, "P KEY"),
+        new ValueLabelPair( 0x71, "Q KEY"),
+        new ValueLabelPair( 0x72, "R KEY"),
+        new ValueLabelPair( 0x73, "S KEY"),
+        new ValueLabelPair( 0x74, "T KEY"),
+        new ValueLabelPair( 0x75, "U KEY"),
+        new ValueLabelPair( 0x76, "V KEY"),
+        new ValueLabelPair( 0x77, "W KEY"),
+        new ValueLabelPair( 0x78, "X KEY"),
+        new ValueLabelPair( 0x79, "Y KEY"),
+        new ValueLabelPair( 0x7A, "Z KEY"),
+        new ValueLabelPair( 0x30, "0 KEY"),
+        new ValueLabelPair( 0x31, "1 KEY"),
+        new ValueLabelPair( 0x32, "2 KEY"),
+        new ValueLabelPair( 0x33, "3 KEY"),
+        new ValueLabelPair( 0x34, "4 KEY"),
+        new ValueLabelPair( 0x35, "5 KEY"),
+        new ValueLabelPair( 0x36, "6 KEY"),
+        new ValueLabelPair( 0x37, "7 KEY"),
+        new ValueLabelPair( 0x38, "8 KEY"),
+        new ValueLabelPair( 0x39, "9 KEY"),
+        new ValueLabelPair( 0x20, "SPACE BAR"),
+        new ValueLabelPair( 0xDA, "UP ARROW" ),
+        new ValueLabelPair( 0xD9, "DOWN ARROW" ),
+        new ValueLabelPair( 0xD8, "LEFT ARROW" ),
+        new ValueLabelPair( 0xD7, "RIGHT ARROW" ),
+        new ValueLabelPair( 0xB2, "BACKSPACE" ),
+        new ValueLabelPair( 0xB3, "TAB" ),
+        new ValueLabelPair( 0xB0, "RETURN" ),
+        new ValueLabelPair( 0xB1, "ESC" ),
+        new ValueLabelPair( 0xD1, "INSERT" ),
+        new ValueLabelPair( 0xD4, "DELETE" ),
+        new ValueLabelPair( 0xD3, "PAGE UP" ),
+        new ValueLabelPair( 0xD6, "PAGE DOWN" ),
+        new ValueLabelPair( 0xD2, "HOME" ),
+        new ValueLabelPair( 0xD5, "END" )
+    };
+       
+    public static class HIDKeyPress extends ActionUI {
+        @Override
+        public W_Base createUI(Trigger t) {
+            return new WT_ValueLabelOption("Key:", Model.KEY_PRESS, t, PR_Keys);            
+        }
+    }
+
+    public static class HIDKeyRelease extends ActionUI {
+        @Override
+        public W_Base createUI(Trigger t) {
+            return new WT_ValueLabelOption("Key:", Model.KEY_RELEASE, t, PR_Keys);            
+        }
+    }
 
     // ----------------------------------
     // BTSpecialUI - UI for components that taking BT special keys

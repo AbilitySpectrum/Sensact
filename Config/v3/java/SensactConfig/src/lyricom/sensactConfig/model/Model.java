@@ -57,6 +57,10 @@ public class Model {
     static public final int RELAY_PULSE = 0;
     static public final int RELAY_ON = 1;
     static public final int RELAY_OFF = 2;
+    
+    // Press and Release values - added to key values (starting with v 4.4)
+    static public final int KEY_PRESS = 0xff000000;
+    static public final int KEY_RELEASE = 0xfe000000;
 
     // Lists of Sensors and Actions.
     // Created once by initModel.
@@ -141,13 +145,19 @@ public class Model {
         }
         
         actionList.add(new SaAction(3, ActionName.BT_KEYBOARD, 65, ActionUI.KEY_OPTION, (p) -> p >= 32));
-        actionList.add(new SaAction(3, ActionName.BT_SPECIAL,  10, ActionUI.BT_SPECIAL, (p) -> p < 32));
+        actionList.add(new SaAction(3, ActionName.BT_SPECIAL,  10, ActionUI.BT_SPECIAL, (p) -> p <  32));
         
         actionList.add(new SaAction(9, ActionName.BT_MOUSE, MOUSE_UP, ActionUI.MOUSE_OPTION, null));
         actionList.add(new SaAction(4, ActionName.HID_KEYBOARD,  65,  ActionUI.KEY_OPTION, 
-                (p) -> !((0x100 > p) && (p > 0x7f))));
+                (p) -> (((p & 0x80000000) == 0) && !((0x100 > p) && (p > 0x7f))) ) );
         actionList.add(new SaAction(4, ActionName.HID_SPECIAL, 0xB0,  ActionUI.HID_SPECIAL, 
-                (p) ->  ((0x100 > p) && (p > 0x7f))));
+                (p) ->  ((0xfe > p) && (p > 0x7f))));
+        if (versionID >= 404) {
+            actionList.add(new SaAction(4, ActionName.HID_KEYPRESS, 0xFF000061,  ActionUI.HID_KEYPRESS, 
+                (p) ->  ((p & 0xff000000) == KEY_PRESS)));
+            actionList.add(new SaAction(4, ActionName.HID_KEYRELEASE, 0xFE000061,  ActionUI.HID_KEYRELEASE, 
+                (p) ->  ((p & 0xff000000) == KEY_RELEASE)));
+        }
         actionList.add(new SaAction(5, ActionName.HID_MOUSE, MOUSE_UP,       ActionUI.MOUSE_OPTION, null));
         actionList.add(new SaAction(7, ActionName.BUZZER, (400 << 16) + 250, ActionUI.BUZZER,       null));
         actionList.add(new SaAction(8, ActionName.IR, TV_ON_OFF,             ActionUI.IR_OPTION,    null));

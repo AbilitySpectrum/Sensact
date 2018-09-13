@@ -14,6 +14,7 @@ public class WT_ValueLabelOption extends W_Combo {
     private final ValueLabelPair[] actions;
     private final Trigger theTrigger;
     private final boolean updateRepeat;
+    private final int overlay;
     
     public WT_ValueLabelOption(String label, Trigger t, 
             ValueLabelPair[] actions, boolean updateRepeat) {
@@ -21,6 +22,17 @@ public class WT_ValueLabelOption extends W_Combo {
         this.updateRepeat = updateRepeat;
         theTrigger = t;
         this.actions = actions;
+        overlay = 0;
+        update();
+    }
+    
+    public WT_ValueLabelOption(String label, int overlay, Trigger t, 
+            ValueLabelPair[] actions) {
+        super(label, actions);
+        this.updateRepeat = false;
+        theTrigger = t;
+        this.actions = actions;
+        this.overlay = overlay;
         update();
     }
 
@@ -31,7 +43,7 @@ public class WT_ValueLabelOption extends W_Combo {
     @Override
     public void widgetChanged() {
         ValueLabelPair p = (ValueLabelPair) theBox.getSelectedItem();
-        theTrigger.setActionParam(p.getValue());
+        theTrigger.setActionParam(p.getValue() | overlay);
         if ( updateRepeat ) {     // Needed for IR
             theTrigger.setRepeat(p.getRepeat());
         }
@@ -39,8 +51,9 @@ public class WT_ValueLabelOption extends W_Combo {
     
     @Override
     public void update() {
+        int param = theTrigger.getActionParam() & 0xff;
         for(ValueLabelPair p: actions) {
-            if (p.getValue() == theTrigger.getActionParam()) {
+            if (p.getValue() == param) {
                 theBox.setSelectedItem(p);
             }
         }        
