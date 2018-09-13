@@ -14,7 +14,21 @@
 #include <Mouse.h>
 #endif
 #include "Wire.h"
-#include <IRLib.h>
+
+#include <IRLibSendBase.h>
+#include <IRLib_P01_NEC.h>   // Lowest numbers must be first
+//#include <IRLib_P02_Sony.h>
+//#include <IRLib_P03_RC5.h>
+//#include <IRLib_P04_RC6.h>
+//#include <IRLib_P05_Panasonic_Old.h>
+//#include <IRLib_P06_JVC.h>
+#include <IRLib_P07_NECx.h>
+//#include <IRLib_P08_Samsung36.h>
+//#include <IRLib_P09_GICable.h>
+//#include <IRLib_P10_DirecTV.h>
+#include <IRLibCombo.h>     // Combine them into "IRsend"
+#include <IRLibProtocols.h>
+
 #include "Actions.h"
 
 Actors actors;
@@ -466,7 +480,9 @@ void BTKeyboard::kc_write(char character) {
 // Hard-wired IR values - for now.
 #ifdef MY_TV
 // Codes for Andrew's home TV - an LG
-IRTYPES IRProtocol         = NEC;
+byte protocol    = NEC;
+byte bits        = 32;
+byte khz         = 38;
 unsigned long code_OnOff        = 0x20DF10EF;
 unsigned long code_VolumeUp     = 0x20DF40BF;
 unsigned long code_VolumeDown   = 0x20DFC03F;
@@ -474,7 +490,9 @@ unsigned long code_ChannelUp    = 0;
 unsigned long code_ChannelDown  = 0;
 #else
 // Codes for Bruyere TVs
-IRTYPES IRProtocol         = NECX;
+byte protocol    = NECX;
+byte bits        = 32;
+byte khz         = 38;
 unsigned long code_OnOff        = 0xE0E040BF;
 unsigned long code_VolumeUp     = 0xE0E0E01F;
 unsigned long code_VolumeDown   = 0xE0E0D02F;
@@ -492,19 +510,19 @@ void IRTV::doAction(long param) {
   
   switch(option) {
     case TV_ON_OFF:
-      irSender.send(IRProtocol, code_OnOff, 0);
+      irSender.send(protocol, code_OnOff, bits, khz);
       break;
     case VOLUME_UP:
-      irSender.send(IRProtocol, code_VolumeUp, 0);
+      irSender.send(protocol, code_VolumeUp, bits, khz);
       break;
     case VOLUME_DOWN:
-      irSender.send(IRProtocol, code_VolumeDown, 0);
+      irSender.send(protocol, code_VolumeDown, bits, khz);
       break;
     case CHANNEL_UP:
-      irSender.send(IRProtocol, code_ChannelUp, 0);
+      irSender.send(protocol, code_ChannelUp, bits, khz);
       break;
     case CHANNEL_DOWN:
-      irSender.send(IRProtocol, code_ChannelDown, 0);
+      irSender.send(protocol, code_ChannelDown, bits, khz);
       break;
   }
 }
