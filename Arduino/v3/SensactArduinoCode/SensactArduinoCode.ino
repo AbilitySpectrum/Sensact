@@ -20,6 +20,13 @@
 #include <IRLib.h>
 #include <Wire.h>
 
+#ifdef MEMCHECK
+#define MEMCHECK_SIZE 400
+brkPoints BreakPoints;
+char memcheck_done = 0;
+char memcheck_started = 0;
+#endif
+
 enum rMode{RUN, REPORT, IDLEX};  // IDLE seems to be a keyword - thus IDLEX.
 rMode runMode;
 
@@ -33,7 +40,6 @@ SerialOutputStream serialOutput;
 long lastActionTime = 0;
 
 void setup() {
-
   pinMode(LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
@@ -41,12 +47,19 @@ void setup() {
   
   Serial.begin(9600);
 
+#ifdef MEMCHECK
+  BreakPoints.atStart = (int) __brkval;
+#endif
   sensors.init();
   actors.init();
   triggers.init();
+#ifdef MEMCHECK
+  BreakPoints.triggersInit = (int) __brkval;
+#endif
 
   runMode = RUN;
   setLED();
+
 }
 
 void loop() {
@@ -55,6 +68,22 @@ void loop() {
   
 //  Serial.print(F("ram: ")); Serial.println(freeRam());
 //  delay(1000);
+
+#ifdef MEMCHECK
+  if (runMode == IDLEX) {
+    if (!memcheck_started) {
+      startMemCheck();
+      memcheck_started = 1;
+    }
+    if (!memcheck_done) {
+      doMemCheck();
+      memcheck_done = 1;
+    }
+//    Serial.print(F("ram: ")); Serial.println(freeRam());
+  } else {
+    memcheck_done = 0;
+  }
+#endif
 
   switch(cmd) {
     case START_OF_TRIGGER_BLOCK:
@@ -187,4 +216,38 @@ int freeRam ()  {
    int v; 
    return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
+
+#ifdef MEMCHECK
+char *memBuf;
+void startMemCheck() {
+  memBuf = new char[MEMCHECK_SIZE];
+  for(int i=0; i<370; i++) {
+    memBuf[i] = 1;
+  }
+}
+
+void doMemCheck() {
+  extern int __heap_start; 
+  int i;
+  for(i=0; i<MEMCHECK_SIZE; i++) {
+    if (memBuf[i] != 1) {
+      break;
+    }
+  }
+  Serial.println();
+  Serial.println((int) &__heap_start);
+  Serial.println(BreakPoints.atStart);
+  Serial.println(BreakPoints.sensorsAlloc);
+  Serial.println(BreakPoints.sensorsInit);
+  Serial.println(BreakPoints.actorsAlloc);
+  Serial.println(BreakPoints.actorsInit);
+  Serial.println(BreakPoints.triggersInit);
+  Serial.println((int) __brkval);
+
+  Serial.println((int) &i);
+
+  Serial.println((int)memBuf);
+  Serial.print("MemCheck: "); Serial.println(i);
+}
+#endif
   

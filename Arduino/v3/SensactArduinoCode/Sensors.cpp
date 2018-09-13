@@ -23,7 +23,9 @@ void Sensors::init() {
   pcInput = new PCInputSensor(7);
   addSensor( pcInput );
   addSensor( new GyroSensor(8, 9, 10, 11, 12, 13, 14) );
-
+#ifdef MEMCHECK
+  BreakPoints.sensorsAlloc = (int) __brkval;
+#endif  
   int dataUnits = 0;
   for(int i=0; i<nSensors; i++) {
     paSensor[i]->init();
@@ -31,6 +33,9 @@ void Sensors::init() {
   }
   
   data.init(dataUnits);
+#ifdef MEMCHECK
+  BreakPoints.sensorsInit = (int) __brkval;
+#endif
 }
 
 void Sensors::reset() {

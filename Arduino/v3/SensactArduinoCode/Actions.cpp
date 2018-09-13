@@ -52,10 +52,15 @@ void Actors::init() {
   addActor( new IRTV(8) );
   addActor( new SerialSend(6) );
   addActor( new LightBox(11) );
-
+#ifdef MEMCHECK
+  BreakPoints.actorsAlloc = (int) __brkval;
+#endif
   for(int i=0; i<nActors; i++) {
     apActors[i]->init();
   }
+#ifdef MEMCHECK
+  BreakPoints.actorsInit = (int) __brkval;
+#endif
 }
 
 void Actors::reset() {
@@ -359,12 +364,32 @@ void MouseControl::checkAction() {
 // === Keyboard Control === //
 void KeyboardControl::doAction(long param) {
   int i;
-  for(i=0; i<4; i++){
-    int character = (param >> 8 * (3-i)) & 0xff;
-    if (character != 0) {
-      kc_write(character);
+  int option = (param >> 24) & 0xff;
+
+  if (option == 0xff) {
+    for(i=1; i<4; i++) {
+      int character = (param >> 8 * (3-i)) & 0xff;
+      if (character != 0) {
+        kc_press(character);
+      }
     }
-  }  
+    
+  } else if (option == 0xfe) {
+    for(i=1; i<4; i++) {
+      int character = (param >> 8 * (3-i)) & 0xff;
+      if (character != 0) {
+        kc_release(character);
+      }
+    }
+    
+  } else {
+    for(i=0; i<4; i++) {
+      int character = (param >> 8 * (3-i)) & 0xff;
+      if (character != 0) {
+        kc_write(character);
+      }
+    }       
+  }
 }
 
 #ifdef __AVR_ATmega32U4__  // Leonardo
@@ -394,6 +419,12 @@ void HIDMouse::mc_button(int val) {
 // --- HID Keyboard --- //
 void HIDKeyboard::kc_write(char character) {
   Keyboard.write(character);
+}
+void HIDKeyboard::kc_press(char key) {
+  Keyboard.press(key);
+}
+void HIDKeyboard::kc_release(char key) {
+  Keyboard.release(key);
 }
 #endif
 
