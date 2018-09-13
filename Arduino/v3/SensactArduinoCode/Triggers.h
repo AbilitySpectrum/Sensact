@@ -67,7 +67,7 @@ class Triggers {
       nTriggers = maxSensorID = 0;
     }
     
-    void init();
+    void init(int maxSensorID);
     void reset();
     const ActionData* getActions(const SensorData *);
     int readTriggers(InputStream *);

@@ -154,6 +154,7 @@ class Sensors {
     void init();
     void reset();
     const SensorData* getData() const;
+    int getHighestID() const;
 };
 
 #endif

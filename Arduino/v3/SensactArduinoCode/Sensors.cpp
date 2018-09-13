@@ -12,7 +12,7 @@ PCInputSensor *pcInput;
 
 void Sensors::init() {
   // This code defines the set of sensors.
-  // It must match the sensor definitions in the JavaScript control code.
+  // It must match the sensor definitions in the Java control code.
   // ID values must be unique but do not _have_ to be sequential
   addSensor( new AnalogSensor(1, SENSACT_IN1A) );
   addSensor( new AnalogSensor(2, SENSACT_IN1B) );
@@ -42,6 +42,21 @@ void Sensors::reset() {
   for(int i=0; i<nSensors; i++) {
     paSensor[i]->reset();
   }  
+}
+
+int Sensors::getHighestID() const {
+  int maxSensorID = 0;
+  
+  const SensorData *pData = getData();
+  int dataCount = pData->length();
+
+  for(int i=0; i<dataCount; i++) {
+    int ID = pData->getValue(i)->sensorID;
+    if (ID > maxSensorID) {
+      maxSensorID = ID;
+    }
+  }
+  return maxSensorID;
 }
 
 const SensorData* Sensors::getData() const {

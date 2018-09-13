@@ -21,7 +21,7 @@
 #include <Wire.h>
 
 #ifdef MEMCHECK
-#define MEMCHECK_SIZE 400
+#define MEMCHECK_SIZE 652
 brkPoints BreakPoints;
 char memcheck_done = 0;
 char memcheck_started = 0;
@@ -52,7 +52,7 @@ void setup() {
 #endif
   sensors.init();
   actors.init();
-  triggers.init();
+  triggers.init(sensors.getHighestID());
 #ifdef MEMCHECK
   BreakPoints.triggersInit = (int) __brkval;
 #endif
@@ -221,7 +221,7 @@ int freeRam ()  {
 char *memBuf;
 void startMemCheck() {
   memBuf = new char[MEMCHECK_SIZE];
-  for(int i=0; i<370; i++) {
+  for(int i=0; i<MEMCHECK_SIZE; i++) {
     memBuf[i] = 1;
   }
 }
