@@ -175,6 +175,9 @@ class KeyboardControl: public Actor {
     KeyboardControl() {}
     void doAction(long param);
     virtual void kc_write(char character) = 0;
+    // press and release are for HID only.  Not bluetooth.
+    virtual void kc_press(char key) {}
+    virtual void kc_release(char key) {}
 };
 
 #ifdef __AVR_ATmega32U4__  // Leonardo
@@ -195,6 +198,8 @@ class HIDKeyboard: public KeyboardControl {
       id = i;
     }
     void kc_write(char character);
+    void kc_press(char key);
+    void kc_release(char key);
 };
 #endif
 

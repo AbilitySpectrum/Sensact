@@ -18,7 +18,9 @@ public class W_Combo extends W_Base {
         super();
         
         theBox = new JComboBox();
-        theBox.setMaximumRowCount(items.length);
+        int length = items.length;
+        if (length > 20) length = 15;
+        theBox.setMaximumRowCount(length);
         
         for(Object obj: items) {
             theBox.addItem(obj);

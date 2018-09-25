@@ -8,13 +8,18 @@
 EEPROMInputStream EEIn;
 EEPROMOutputStream EEOut;
 
-void Triggers::init() {
+void Triggers::init(int maxSID) {
   // See if there are triggers stored in EEPROM and read them.
   EEIn.init();
   char T = EEIn.getChar();
   if (T == START_OF_TRIGGER_BLOCK) { // There are triggers in EEProm
     readTriggers(&EEIn);
-  }  
+  }
+
+  // Initialize sensor states.
+  maxSensorID = maxSID;
+  paSensorStates = new int[maxSensorID+1];
+  reset();
 }
 
 void Triggers::reset() {
@@ -27,35 +32,10 @@ void Triggers::reset() {
   }
 }
 
-// The first time the Triggers object gets sensor data 
-// this code is run to set up the sensor state array.
-void Triggers::setupStates(const SensorData *pData) {
-  maxSensorID = 0;
-  
-  // Find the highest sensor ID
-  int dataCount = pData->length();
-
-  for(int i=0; i<dataCount; i++) {
-    int ID = pData->getValue(i)->sensorID;
-    if (ID > maxSensorID) {
-      maxSensorID = ID;
-    }
-  }
-    
-  // Initialize sensor states.
-  paSensorStates = new int[maxSensorID+1];
-  reset();
-}
-
 const ActionData* Triggers::getActions(const SensorData *pData) {
-      
-  if (maxSensorID == 0) { // First time we setup sensor states
-    setupStates(pData);
-  }
-  
+
   // Empty the actions container, preparing for new actions.
   actions.reset();    
-  
   // Check each sensor against each trigger, looking for matches 
   // and associated actions.
   int nSensors = pData->length();
@@ -71,7 +51,7 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
       if (ID != (int) pTrigger->sensorID) {
         continue; // Wrong sensor ID - forget it.
       }
-
+  
       // Check for disconnected sensor
       if (pTrigger->flags & DISCONNECTED) {
         if (value < 10 && value > -10) {

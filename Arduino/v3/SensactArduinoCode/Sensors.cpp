@@ -12,7 +12,7 @@ PCInputSensor *pcInput;
 
 void Sensors::init() {
   // This code defines the set of sensors.
-  // It must match the sensor definitions in the JavaScript control code.
+  // It must match the sensor definitions in the Java control code.
   // ID values must be unique but do not _have_ to be sequential
   addSensor( new AnalogSensor(1, SENSACT_IN1A) );
   addSensor( new AnalogSensor(2, SENSACT_IN1B) );
@@ -23,7 +23,9 @@ void Sensors::init() {
   pcInput = new PCInputSensor(7);
   addSensor( pcInput );
   addSensor( new GyroSensor(8, 9, 10, 11, 12, 13, 14) );
-
+#ifdef MEMCHECK
+  BreakPoints.sensorsAlloc = (int) __brkval;
+#endif  
   int dataUnits = 0;
   for(int i=0; i<nSensors; i++) {
     paSensor[i]->init();
@@ -31,12 +33,30 @@ void Sensors::init() {
   }
   
   data.init(dataUnits);
+#ifdef MEMCHECK
+  BreakPoints.sensorsInit = (int) __brkval;
+#endif
 }
 
 void Sensors::reset() {
   for(int i=0; i<nSensors; i++) {
     paSensor[i]->reset();
   }  
+}
+
+int Sensors::getHighestID() const {
+  int maxSensorID = 0;
+  
+  const SensorData *pData = getData();
+  int dataCount = pData->length();
+
+  for(int i=0; i<dataCount; i++) {
+    int ID = pData->getValue(i)->sensorID;
+    if (ID > maxSensorID) {
+      maxSensorID = ID;
+    }
+  }
+  return maxSensorID;
 }
 
 const SensorData* Sensors::getData() const {

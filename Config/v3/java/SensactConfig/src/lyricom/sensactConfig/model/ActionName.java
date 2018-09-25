@@ -14,6 +14,8 @@ public enum ActionName {
     BT_MOUSE,
     HID_KEYBOARD,
     HID_SPECIAL,
+    HID_KEYPRESS,
+    HID_KEYRELEASE,
     HID_MOUSE,
     BUZZER,
     IR,

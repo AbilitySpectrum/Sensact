@@ -8,11 +8,26 @@
 // timeDiff function.  Defined in Actions.cpp
 unsigned int timeDiff(unsigned int now, unsigned int prev);
 
+// #define MEMCHECK 1
+#ifdef MEMCHECK
+struct brkPoints {
+  int atStart;
+  int sensorsAlloc;
+  int sensorsInit;
+  int actorsAlloc;
+  int actorsInit;
+  int triggersInit;
+};
+
+extern int *__brkval;
+extern brkPoints BreakPoints;
+#endif
+
 // Various Constants used throughout the code //
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
-#define VERSION         "4.3"
+#define VERSION         "4.4"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
@@ -68,9 +83,9 @@ unsigned int timeDiff(unsigned int now, unsigned int prev);
 #define SENSACT_RELAY_2 12
 
 // ==== Some Limits === //
-#define MAX_TRIGGERS 20           // Maximum number of triggers allowed.
-#define MAX_ACTIONS 5            // Maximum number of actions allowed per trigger check.
-#define MAX_SENSORS 8
-#define MAX_ACTORS  10
+#define MAX_TRIGGERS 35          // Maximum number of triggers allowed - 15 bytes each.
+#define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check - 5 bytes each.
+#define MAX_SENSORS 8            // 2 bytes each
+#define MAX_ACTORS  10           // 2 bytes each
 
 #endif
