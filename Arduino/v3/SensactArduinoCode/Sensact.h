@@ -8,7 +8,7 @@
 // timeDiff function.  Defined in Actions.cpp
 unsigned int timeDiff(unsigned int now, unsigned int prev);
 
-#define MEMCHECK 1
+// #define MEMCHECK 1
 #ifdef MEMCHECK
 struct brkPoints {
   int atStart;
@@ -83,8 +83,8 @@ extern brkPoints BreakPoints;
 #define SENSACT_RELAY_2 12
 
 // ==== Some Limits === //
-#define MAX_TRIGGERS 30          // Maximum number of triggers allowed - 15 bytes each.
-#define MAX_ACTIONS 5            // Maximum number of actions allowed per trigger check - 5 bytes each.
+#define MAX_TRIGGERS 35          // Maximum number of triggers allowed - 15 bytes each.
+#define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check - 5 bytes each.
 #define MAX_SENSORS 8            // 2 bytes each
 #define MAX_ACTORS  10           // 2 bytes each
 
