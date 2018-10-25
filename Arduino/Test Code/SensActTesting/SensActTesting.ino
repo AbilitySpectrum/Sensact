@@ -170,7 +170,13 @@ int getNextToken() {
 }
 
 void doBeep() {
-  tone( BUZZER, 400, 500);
+  tone( BUZZER, 400, 250);
+  delay(250);
+  tone( BUZZER, 500, 250);
+  delay(250);
+  tone( BUZZER, 600, 250);
+  delay(250);
+  tone( BUZZER, 800, 500);
 }
 
 void setLED(int color) {
