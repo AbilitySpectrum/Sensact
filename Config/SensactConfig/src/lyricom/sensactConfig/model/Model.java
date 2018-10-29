@@ -133,7 +133,20 @@ public class Model {
             grp.add( new Sensor(14, MRes.getStr("GYRO_ANY"), 0, 13000, true) );            
         }
         sensorGroups.add(grp);
-
+        
+        if (versionID >= 405) {
+            grp = new SensorGroup("Joystick");
+            grp.add( new Sensor(15, "Joystick-1", 0, 1600, true));
+            grp.add( new Sensor(16, "Joystick-2", 0, 1600, true));
+            grp.add( new Sensor(17, "Joystick-3", 0, 1600, true));
+            grp.add( new Sensor(18, "Joystick-4", 0, 1600, true));
+            grp.add( new Sensor(19, "Button-1", 0, 1600, true));
+            grp.add( new Sensor(20, "Button-2", 0, 1600, true));
+            grp.add( new Sensor(21, "Button-3", 0, 1600, true));
+            grp.add( new Sensor(22, "Button-4", 0, 1600, true));
+            sensorGroups.add(grp);
+        }
+        
         grp = new SensorGroup(MRes.getStr("USB_PORT"));
         grp.add( new Sensor(7, MRes.getStr("USB_INPUT"), 0, 255, false) );
         sensorGroups.add(grp);
