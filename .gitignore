@@ -1,4 +1,6 @@
 *.pyc
+*.class
+build
 private.xml
 
 
