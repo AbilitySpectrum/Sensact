@@ -40,6 +40,8 @@ void Sensors::init() {
   pcInput = new PCInputSensor(7);
   addSensor( pcInput );
   addSensor( new GyroSensor(8, 9, 10, 11, 12, 13, 14) );
+  addSensor( new ADS_1015(0x48, 15, 16, 17, 18) );
+  addSensor( new ADS_1015(0x49, 19, 20, 21, 22) );
 #ifdef MEMCHECK
   BreakPoints.sensorsAlloc = (int) __brkval;
 #endif  
@@ -162,6 +164,17 @@ void GyroSensor::getValues(SensorData *pData) {
   // Max value for anyMotion observed at this point is 28,377.92
   // which is about sqrt(32676 ^ 2 * 3) / 2
   pData->addValue(gyroAny, (int)anyMotion);
+}
+
+void ADS_1015::init() {
+  device = new Adafruit_ADS1015(address);
+}
+
+void ADS_1015::getValues(SensorData *pData) {
+  pData->addValue(id1, device->readADC_SingleEnded(0));
+  pData->addValue(id2, device->readADC_SingleEnded(1));
+  pData->addValue(id3, device->readADC_SingleEnded(2));
+  pData->addValue(id4, device->readADC_SingleEnded(3));
 }
 
 

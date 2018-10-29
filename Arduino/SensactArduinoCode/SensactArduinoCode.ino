@@ -25,6 +25,7 @@
 #include <SoftwareSerial.h>
 //#include <IRLib2.h>
 #include <Wire.h>
+//#include <Adafruit_ADS1015.h>
 
 #ifdef MEMCHECK
 #define MEMCHECK_SIZE 652

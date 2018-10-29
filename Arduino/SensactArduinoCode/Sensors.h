@@ -22,6 +22,7 @@
 #ifndef SensorData_H
 #define SensorData_H
 #include "Sensact.h"
+#include <Adafruit_ADS1015.h>
 
 // SensorDatum - Holds data from a single logical sensor
 struct SensorDatum {  
@@ -156,7 +157,26 @@ class GyroSensor: public Sensor {
     void getValues(SensorData *pData);
     int nDataUnits() { return 7; }
 };
-  
+
+class ADS_1015: public Sensor {
+  private:
+    Adafruit_ADS1015 *device;
+    int address;
+    int id1, id2, id3, id4;
+
+  public:
+    ADS_1015(int addr, int i1, int i2, int i3, int i4) {
+      address = addr;
+      id1 = i1;
+      id2 = i2;
+      id3 = i3;
+      id4 = i4;
+    }
+    void init();
+    void getValues(SensorData *pData);
+    int nDataUnits() { return 4; }
+};
+
 // Sensors - a container for all sensors.
 class Sensors {
   private:
