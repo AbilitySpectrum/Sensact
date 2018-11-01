@@ -40,12 +40,28 @@ public class Triggers {
     }
     
     private List<Trigger> triggers = new ArrayList<>();
+    private List<TriggerCallback> callbacks = new ArrayList<>();
     
     private Triggers() {        
     }
     
     public int length() {
         return triggers.size();
+    }
+    
+    private void sizeChanged() {
+        for(TriggerCallback tc: callbacks) {
+            tc.newTriggerCount(length());
+        }
+    }
+    
+    public void addCallback(TriggerCallback tc) {
+        callbacks.add(tc);
+        tc.newTriggerCount(length());
+    }
+    
+    public void removeCallback(TriggerCallback tc) {
+        callbacks.remove(tc);
     }
     
     public Trigger get(int index) {
@@ -58,18 +74,21 @@ public class Triggers {
     
     public void replace(List<Trigger> newList) {
         triggers = newList;
+        sizeChanged();
     }
     
     public Trigger newTrigger(Sensor s) {
         DATA_IN_SYNC = false;
         Trigger t = new Trigger(s);
         triggers.add(t);
+        sizeChanged();
         return t;
     }
     
     public void deleteAll() {
         DATA_IN_SYNC = false;
         triggers = new ArrayList<>();
+        sizeChanged();
     }
     
     public void deleteTriggerSet(Sensor s) {
@@ -81,11 +100,13 @@ public class Triggers {
             }
         }
         triggers = list;
+        sizeChanged();
     }
     
     public void deleteTrigger(Trigger t) {
         DATA_IN_SYNC = false;
         triggers.remove(t);
+        sizeChanged();
     }
     
     // Move the trigger so that it is immediately following the
@@ -139,7 +160,7 @@ public class Triggers {
         DATA_IN_SYNC = true;
     }
     
-    public void readTriggers(List<Trigger> tmp, InStream in) throws IOError {
+    private void readTriggers(List<Trigger> tmp, InStream in) throws IOError {
         if (!Objects.equals(in.getChar(), Model.START_OF_TRIGGERS)) {
             throw new IOError("Invalid start of transmission");
         }

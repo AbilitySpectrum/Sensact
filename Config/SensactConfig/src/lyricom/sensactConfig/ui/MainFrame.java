@@ -46,6 +46,7 @@ import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.OutStream;
 import lyricom.sensactConfig.model.SensorGroup;
 import lyricom.sensactConfig.model.Triggers;
+import lyricom.sensactConfig.model.TriggerCallback;
 
 /**
  * Defines the main frame of the application, its control buttons
@@ -53,7 +54,7 @@ import lyricom.sensactConfig.model.Triggers;
  * Holds a list of SensorGroupPanel items.
  * @author Andrew
  */
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements TriggerCallback {
     
     public static JFrame TheFrame;
     private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
@@ -79,7 +80,8 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
 
         JComponent vLabel = versionLabel(version);
-        add(buttonPanel(vLabel), BorderLayout.WEST); 
+        JComponent tc = triggerCount();
+        add(buttonPanel(vLabel, tc), BorderLayout.WEST); 
 
         add(tabbedPanes(), BorderLayout.CENTER);
         pack();
@@ -101,12 +103,36 @@ public class MainFrame extends JFrame {
     private static final int BTN_SPACING = 10;
     
     private JComponent versionLabel(String version) {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 10));
-//        p.setBorder(new LineBorder(Color.YELLOW, 1));
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
         JLabel l = new JLabel("V" + version);
         p.add(l);
         return p;
     }
+    
+    private JLabel triggerCnt;
+    private JComponent triggerCount() {
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
+        triggerCnt = new JLabel("");
+        p.add(triggerCnt);
+        JLabel l = new JLabel(" triggers");
+        p.add(l);
+        Triggers t = Triggers.getInstance();
+        t.addCallback(this);
+        return p;
+    }
+    
+    @Override
+    public void newTriggerCount(int count) {
+        final int c = count;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                triggerCnt.setText( Integer.toString(c) );
+            }
+            
+        });
+    }
+
     
     private JButton getBtn;
     private JButton saveBtn;
@@ -118,7 +144,7 @@ public class MainFrame extends JFrame {
     private JButton exitBtn;
 //    private JButton testBtn;
     
-    private JComponent buttonPanel(JComponent vLabel) {
+    private JComponent buttonPanel(JComponent vLabel, JComponent tc) {
         JPanel p = new JPanel();
         Border boarder = new LineBorder(Color.BLACK, 2);
         Border margin = new EmptyBorder(0, 10, 10, 10);
@@ -126,6 +152,8 @@ public class MainFrame extends JFrame {
         
         Box vb = Box.createVerticalBox();
         vb.add(vLabel);
+        vb.add(tc);
+        vb.add(Box.createVerticalStrut(15));
         
         JButton[] buttons = createButtons();
         
@@ -375,4 +403,4 @@ public class MainFrame extends JFrame {
         return true;
     }
 
-    }
+}
