@@ -378,6 +378,13 @@ public class MainFrame extends JFrame implements TriggerCallback {
         
         JPanel p = new MouseSpeedPanel();
         pane.add(MRes.getStr("MOUSE_SPEED"), p);
+        
+
+        if (Model.getVersionID() >= 406) {
+            p = new TVSelectionPanel();
+            pane.add("TV Selection", p);
+        }
+            
         return pane;
     }
         

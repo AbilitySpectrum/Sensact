@@ -232,7 +232,7 @@ public class ActionUI {
         }
     } 
     
-    ValueLabelPair IRActions[] = {
+    ValueLabelPair OldIRActions[] = {
         new ValueLabelPair(Model.TV_ON_OFF,     "On/Off"),
         new ValueLabelPair(Model.VOLUME_UP,     "Volume Up"),
         new ValueLabelPair(Model.VOLUME_DOWN,   "Volume Down"),
@@ -240,12 +240,40 @@ public class ActionUI {
         new ValueLabelPair(Model.CHANNEL_DOWN,  "Channel Down")
     };
     
+    ValueLabelPair V2IRActions[] = {
+        new ValueLabelPair(Model.IR_TV_ON_OFF,     "TV On/Off"),
+        new ValueLabelPair(Model.IR_VOLUME_UP,     "Volume Up"),
+        new ValueLabelPair(Model.IR_VOLUME_DOWN,   "Volume Down"),
+        new ValueLabelPair(Model.IR_MUTE,          "Mute"),
+        new ValueLabelPair(Model.IR_BOX_ON_OFF,    "Box On/Off"),
+        new ValueLabelPair(Model.IR_CHANNEL_UP,    "Channel Up"),
+        new ValueLabelPair(Model.IR_CHANNEL_DOWN,  "Channel Down"),
+        new ValueLabelPair(Model.IR_DIGIT_0,  "Digit 0"),
+        new ValueLabelPair(Model.IR_DIGIT_1,  "Digit 1"),
+        new ValueLabelPair(Model.IR_DIGIT_2,  "Digit 2"),
+        new ValueLabelPair(Model.IR_DIGIT_3,  "Digit 3"),
+        new ValueLabelPair(Model.IR_DIGIT_4,  "Digit 4"),
+        new ValueLabelPair(Model.IR_DIGIT_5,  "Digit 5"),
+        new ValueLabelPair(Model.IR_DIGIT_6,  "Digit 6"),
+        new ValueLabelPair(Model.IR_DIGIT_7,  "Digit 7"),
+        new ValueLabelPair(Model.IR_DIGIT_8,  "Digit 8"),
+        new ValueLabelPair(Model.IR_DIGIT_9,  "Digit 9")
+    };
+    
     public static class IRActionUI extends ActionUI {        
         @Override
          public W_Base createUI(Trigger t) {
+             ValueLabelPair[] actionMap;
+
+             if (Model.getVersionID() >= 406) {
+                 actionMap = V2IRActions;
+             } else {
+                 actionMap = OldIRActions;
+             }
+             
              W_Composite comp = new W_Composite();
              W_Base irOption = 
-                     new WT_ValueLabelOption("IR Action:", t, IRActions, false);
+                     new WT_ValueLabelOption("IR Action:", t, actionMap, false);
              W_Base repeat = new WT_Repeat("Repeat:", t);
              
              comp.addPart(irOption);

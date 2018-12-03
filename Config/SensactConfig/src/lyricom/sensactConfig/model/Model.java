@@ -63,12 +63,31 @@ public class Model {
     static public final int NUDGE_RIGHT = 13;
     static public final int NUDGE_STOP = 14;
     
-    // IR TV Control values	
+    // OLD IR TV Control values	
     static public final int TV_ON_OFF = 1;
     static public final int VOLUME_UP = 2;
     static public final int VOLUME_DOWN = 3;
     static public final int CHANNEL_UP = 4;
     static public final int CHANNEL_DOWN = 5;
+    
+    // NEW IR TV Control values
+    static public final int IR_TV_ON_OFF = 1;
+    static public final int IR_VOLUME_UP = 2;
+    static public final int IR_VOLUME_DOWN = 3;
+    static public final int IR_MUTE = 4;
+    static public final int IR_BOX_ON_OFF = 101;
+    static public final int IR_CHANNEL_UP = 102;
+    static public final int IR_CHANNEL_DOWN = 103;
+    static public final int IR_DIGIT_0 = 110;
+    static public final int IR_DIGIT_1 = 111;
+    static public final int IR_DIGIT_2 = 112;
+    static public final int IR_DIGIT_3 = 113;
+    static public final int IR_DIGIT_4 = 114;
+    static public final int IR_DIGIT_5 = 115;
+    static public final int IR_DIGIT_6 = 116;
+    static public final int IR_DIGIT_7 = 117;
+    static public final int IR_DIGIT_8 = 118;
+    static public final int IR_DIGIT_9 = 119;
     
     // Relay values (starting with V4.3)
     static public final int RELAY_PULSE = 0;
@@ -79,6 +98,9 @@ public class Model {
     static public final int KEY_PRESS = 0xff000000;
     static public final int KEY_RELEASE = 0xfe000000;
 
+    static private int VERSION_ID;
+    static public int getVersionID() { return VERSION_ID; }
+    
     // Lists of Sensors and Actions.
     // Created once by initModel.
     public static List<Sensor> sensorList;
@@ -87,8 +109,10 @@ public class Model {
     public static Map<ActionName,SaAction> actionMap;
     
     public static void initModel(int versionID) {
+        VERSION_ID = versionID;
         initSensorList(versionID);
         initActionList(versionID);
+        TVInfo.getInstance().init();
     }
     
     // Define sensors and sensor groupings.
@@ -146,6 +170,9 @@ public class Model {
         }
     }
     
+    // IR_ACTION_ID is needed in Triggers code.
+    public static final int IR_ACTION_ID = 8;
+    
     // Define possible Actions.
     // Order is important.  This will be the order in the combo box.
     private static void initActionList(int versionID) {
@@ -177,7 +204,7 @@ public class Model {
         }
         actionList.add(new SaAction(5, ActionName.HID_MOUSE, MOUSE_UP,       ActionUI.MOUSE_OPTION, null));
         actionList.add(new SaAction(7, ActionName.BUZZER, (400 << 16) + 250, ActionUI.BUZZER,       null));
-        actionList.add(new SaAction(8, ActionName.IR, TV_ON_OFF,             ActionUI.IR_OPTION,    null));
+        actionList.add(new SaAction(IR_ACTION_ID, ActionName.IR, TV_ON_OFF,  ActionUI.IR_OPTION,    null));
         if (versionID >= 400) {
             actionList.add(new SaAction(6, ActionName.SERIAL, 65, ActionUI.KEY_OPTION, null));
         }

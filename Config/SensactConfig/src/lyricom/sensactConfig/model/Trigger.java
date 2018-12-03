@@ -110,6 +110,15 @@ public class Trigger {
         os.putCondition(condition);
         os.putID(action.getId(), 2);
         os.putID(actionState, 1);
+
+        if (Model.getVersionID() >= 406) { 
+            if (action.getId() == Model.IR_ACTION_ID) {
+                // Map IR Action code parameter into the IR code signal
+                // needed for the selected TV type.
+                actionParam = TVInfo.getInstance().ID2Code(actionParam);
+            }
+        }
+        
         os.putNum(actionParam, 4);
         os.putNum(delay, 2);
         os.putBoolean(repeat);
@@ -135,6 +144,15 @@ public class Trigger {
         action = Model.getActionByID(actionID, actionParam);
         if (action == null) {
             throw new IOError("Invalid action ID");
+        }
+        if (action.getId() == Model.IR_ACTION_ID) {
+            if (Model.getVersionID() >= 406) {
+                // Map action paramter from IR code to an action ID
+                actionParam = TVInfo.getInstance().Code2ID(actionParam);
+                if (actionParam == 0) {
+                    throw new IOError("Invalid TV Code");
+                }
+            }
         }
         delay = is.getNum(2);
         repeat = is.getBoolean();
