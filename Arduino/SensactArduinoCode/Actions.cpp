@@ -31,18 +31,23 @@
 #include <Mouse.h>
 #endif
 #include "Wire.h"
+#include <avr/pgmspace.h>
 
 #include <IRLibSendBase.h>
 #include <IRLib_P01_NEC.h>   // Lowest numbers must be first
 //#include <IRLib_P02_Sony.h>
 //#include <IRLib_P03_RC5.h>
 //#include <IRLib_P04_RC6.h>
-//#include <IRLib_P05_Panasonic_Old.h>
+#include <IRLib_P05_Panasonic_Old.h>
 //#include <IRLib_P06_JVC.h>
 #include <IRLib_P07_NECx.h>
 //#include <IRLib_P08_Samsung36.h>
 //#include <IRLib_P09_GICable.h>
 //#include <IRLib_P10_DirecTV.h>
+//#include <IRLib_P11_RCMM.h>
+//#include <IRLib_P12_CYKM.h>
+#include <IRLib_P13_BellFibe.h>
+#include <IRLib_P14_RCA.h>
 #include <IRLibCombo.h>     // Combine them into "IRsend"
 #include <IRLibProtocols.h>
 
@@ -519,34 +524,22 @@ void BTKeyboard::kc_write(char character) {
 }
 
 // === IR TV === //
-#define TV_ON_OFF    1
-#define VOLUME_UP    2
-#define VOLUME_DOWN  3
-#define CHANNEL_UP   4
-#define CHANNEL_DOWN 5
 
-// Hard-wired IR values - for now.
-#ifdef MY_TV
-// Codes for Andrew's home TV - an LG
-byte protocol    = NEC;
-byte bits        = 32;
-byte khz         = 38;
-unsigned long code_OnOff        = 0x20DF10EF;
-unsigned long code_VolumeUp     = 0x20DF40BF;
-unsigned long code_VolumeDown   = 0x20DFC03F;
-unsigned long code_ChannelUp    = 0;
-unsigned long code_ChannelDown  = 0;
-#else
-// Codes for Bruyere TVs
-byte protocol    = NECX;
-byte bits        = 32;
-byte khz         = 38;
-unsigned long code_OnOff        = 0xE0E040BF;
-unsigned long code_VolumeUp     = 0xE0E0E01F;
-unsigned long code_VolumeDown   = 0xE0E0D02F;
-unsigned long code_ChannelUp    = 0xE0E048B7;
-unsigned long code_ChannelDown  = 0xE0E008F7;
-#endif
+struct tv_info {
+  byte protocol;
+  byte bits;
+  byte khz;
+  byte prefix;
+};
+
+// INDEX into this array must match TV ID defined in TVInfo of the Java code.
+const tv_info tv_info_map[] PROGMEM = {
+  {14, 24, 38, 0x00}, // 0 - RCA
+  { 7, 32, 38, 0xE0}, // 1 = Samsung
+  { 1, 32, 38, 0x20}, // 2 - LG
+  { 5, 22, 57, 0x00}, // 3 - Rogers
+  {13, 32, 38, 0x25}  // 4 - Bell
+};
 
 IRsend irSender;
 
@@ -554,26 +547,31 @@ void IRTV::init() {
 }
 
 void IRTV::doAction(long param) {
-  int option = param & 0xff;
+  int tvType = (param & 0xFF000000) >> 24;
   
-  switch(option) {
-    case TV_ON_OFF:
-      irSender.send(protocol, code_OnOff, bits, khz);
-      break;
-    case VOLUME_UP:
-      irSender.send(protocol, code_VolumeUp, bits, khz);
-      break;
-    case VOLUME_DOWN:
-      irSender.send(protocol, code_VolumeDown, bits, khz);
-      break;
-    case CHANNEL_UP:
-      irSender.send(protocol, code_ChannelUp, bits, khz);
-      break;
-    case CHANNEL_DOWN:
-      irSender.send(protocol, code_ChannelDown, bits, khz);
-      break;
+  if (tvType < 0 || tvType > 4) {
+    // Invalid
+    return;
   }
+  byte prefix    = pgm_read_byte_far( &tv_info_map[tvType].prefix );
+  byte protocol  = pgm_read_byte_far( &tv_info_map[tvType].protocol );
+  byte bits      = pgm_read_byte_far( &tv_info_map[tvType].bits );
+  byte khz       = pgm_read_byte_far( &tv_info_map[tvType].khz );
+  
+  long code = (param & 0xFFFFFF) | (((long)prefix) << 24);
+
+/*
+  Serial.print("Param:"); Serial.println(param);
+  Serial.print("Code: "); Serial.println(code);
+  Serial.print("TV ID: "); Serial.println(tvType);
+  Serial.print("Protocolx:"); Serial.println(protocol);
+  Serial.print("Bits:  "); Serial.println(bits);
+  Serial.print("KHz:   "); Serial.println(khz);
+*/  
+  irSender.send(protocol, code, bits, khz);
 }
+
+
 
 void SerialSend::kc_write(char ch) {
   Serial.print(ch);

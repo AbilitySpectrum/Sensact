@@ -45,7 +45,7 @@ extern brkPoints BreakPoints;
 
 // === Protocol Values === //
 // -- Commands and Block Headers -- //
-#define VERSION         "4.4"
+#define VERSION         "4.6"
 #define REPORT_MODE       'Q'
 #define RUN_SENSACT       'R'
 #define START_OF_SENSOR_DATA 'S'
