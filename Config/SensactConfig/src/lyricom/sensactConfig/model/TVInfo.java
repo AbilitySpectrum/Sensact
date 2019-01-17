@@ -2,6 +2,7 @@ package lyricom.sensactConfig.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * A singleton class which holds, organizes and controls TV control
@@ -67,6 +68,8 @@ import java.util.List;
  * @author Andrew
  */
 public class TVInfo {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+
     // TV ID codes.  These are used to map into an array of TV information
     // on the Leonardo.  They are NOT the IRLib TV protocol codes.
     // *** These values must match index locations used in the arduino code.
@@ -114,7 +117,7 @@ public class TVInfo {
         map.addMapping(Model.IR_DIGIT_7, 0xf370c8);
         map.addMapping(Model.IR_DIGIT_8, 0xf380c7);
         map.addMapping(Model.IR_DIGIT_9, 0xf390c6);
-        tvTypes.add(new TVType("RCA TV", RCA_TV, map, true));
+        tvTypes.add(new TVType(RES.getString("TV_RCA"), RCA_TV, map, true));
         
         // Samsung TV Codes - prefix is xE0
         map = new TVCodeMap();
@@ -135,7 +138,7 @@ public class TVInfo {
         map.addMapping(Model.IR_DIGIT_7, 0xE030CF);
         map.addMapping(Model.IR_DIGIT_8, 0xE0B04F);
         map.addMapping(Model.IR_DIGIT_9, 0xE0708F);
-        tvTypes.add(new TVType("Samsung TV", SAMSUNG_TV, map, true));
+        tvTypes.add(new TVType(RES.getString("TV_SAMSUNG"), SAMSUNG_TV, map, true));
         
         // LG TV Codes - prefix is x20
         map = new TVCodeMap();
@@ -156,7 +159,7 @@ public class TVInfo {
         map.addMapping(Model.IR_DIGIT_7, 0xDFE817);
         map.addMapping(Model.IR_DIGIT_8, 0xDF18E7);
         map.addMapping(Model.IR_DIGIT_9, 0xDF9867);
-        tvTypes.add(new TVType("LG TV", LG_TV, map, true));
+        tvTypes.add(new TVType(RES.getString("TV_LG"), LG_TV, map, true));
         
         // Bell Fibe - prefix is x25
         map = new TVCodeMap();
@@ -177,7 +180,7 @@ public class TVInfo {
         map.addMapping(Model.IR_DIGIT_7, 0x002607);
         map.addMapping(Model.IR_DIGIT_8, 0x002608);
         map.addMapping(Model.IR_DIGIT_9, 0x002609);
-        tvTypes.add(new TVType("Bell Fibe Cable Box", BELL_BOX, map, true));
+        tvTypes.add(new TVType(RES.getString("TV_BELL_BOX"), BELL_BOX, map, true));
 
         // Rogers
         map = new TVCodeMap();
@@ -194,7 +197,7 @@ public class TVInfo {
         map.addMapping(Model.IR_DIGIT_7, 0x36D125);
         map.addMapping(Model.IR_DIGIT_8, 0x37D105);
         map.addMapping(Model.IR_DIGIT_9, 0x363139);
-        tvTypes.add(new TVType("CISCO 4642HD Cable Box (Rogers)", ROGERS_BOX, map, false));
+        tvTypes.add(new TVType(RES.getString("TV_ROGERS_BOX"), ROGERS_BOX, map, false));
     }
     
     public List<TVType> getTVTypes() {

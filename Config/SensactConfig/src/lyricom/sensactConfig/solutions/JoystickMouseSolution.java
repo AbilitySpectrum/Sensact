@@ -29,10 +29,10 @@ import lyricom.sensactConfig.ui.SensorPanel;
  *
  * @author Andrew
  */
-@RegisterInfo(
-        name = "Joystick Mouse",
-        applicaton = {"Input 1", "Input 2", "Input 3"}
-)
+//@RegisterInfo(
+//        name = "Joystick Mouse",
+//        applicaton = {"Input 1", "Input 2", "Input 3"}
+//)
 
 public class JoystickMouseSolution extends SolutionBase {    
     

@@ -18,9 +18,11 @@
 package lyricom.sensactConfig.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.ui.ActionUI;
 
 /**
@@ -30,6 +32,8 @@ import lyricom.sensactConfig.ui.ActionUI;
  * @author Andrew
  */
 public class Model {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+
     // Commands sent to sensact
     public static final Byte CMD_VERSION        = (byte) 'V';
     public static final Byte CMD_RUN            = (byte) 'R';
@@ -177,7 +181,7 @@ public class Model {
     // Order is important.  This will be the order in the combo box.
     private static void initActionList(int versionID) {
         actionList = new ArrayList<>();
-        actionMap = new HashMap<>();
+        actionMap = new EnumMap<>(ActionName.class);
         
         actionList.add(new SaAction(0, ActionName.NONE,    0, ActionUI.NONE, null));
         if (versionID >= 403) {
@@ -263,7 +267,7 @@ public class Model {
     // This is called when sensor data is received.
     public static void updateSensorValues(InStream in) throws IOError {
         if (in.getChar() != START_OF_DATA) {
-            throw new IOError("Invalid start of sensor data");
+            throw new IOError(RES.getString("CDE_INVALID_SENSOR_DATA"));
         }
         
         int sensorCount = in.getNum(2);
@@ -274,7 +278,7 @@ public class Model {
             if (s != null) {
                 s.setCurrentValue(value);
             } else {
-                System.out.print("No sensor with id ");
+                System.out.print(RES.getString("CDE_INVALID_SENSOR_ID") + ' ');
                 System.out.println(id);
             }
         }       

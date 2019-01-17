@@ -382,7 +382,7 @@ public class MainFrame extends JFrame implements TriggerCallback {
 
         if (Model.getVersionID() >= 406) {
             p = new TVSelectionPanel();
-            pane.add("TV Selection", p);
+            pane.add(MRes.getStr("TV_SELECTION"), p);
         }
             
         return pane;

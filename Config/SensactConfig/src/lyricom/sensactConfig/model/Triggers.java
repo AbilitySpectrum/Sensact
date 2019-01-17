@@ -20,6 +20,7 @@ package lyricom.sensactConfig.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * Holds the list of triggers.
@@ -27,6 +28,8 @@ import java.util.Objects;
  * @author Andrew
  */
 public class Triggers {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+
     public static boolean DATA_IN_SYNC;
     
     // singleton pattern
@@ -162,7 +165,7 @@ public class Triggers {
     
     private void readTriggers(List<Trigger> tmp, InStream in) throws IOError {
         if (!Objects.equals(in.getChar(), Model.START_OF_TRIGGERS)) {
-            throw new IOError("Invalid start of transmission");
+            throw new IOError(RES.getString("CDE_INVALID_START"));
         }
         int triggerCount = in.getNum(2);
         for(int i=0; i<triggerCount; i++) {
@@ -177,7 +180,7 @@ public class Triggers {
             ch = in.getChar();
         }
         if (ch != Model.END_OF_BLOCK) {
-            throw new IOError("Invalid end of transmission");
+            throw new IOError(RES.getString("CDE_INVALID_END"));
         }
     }
     

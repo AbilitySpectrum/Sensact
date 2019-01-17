@@ -18,6 +18,7 @@
 package lyricom.sensactConfig.solutions;
 
 import java.util.List;
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.comms.Serial;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.Sensor;
@@ -29,6 +30,8 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class Calibrator {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+    
     private class Sampling {
         int minval;
         int maxval;
@@ -151,7 +154,7 @@ public class Calibrator {
             target.takeSample();
         }
         
-        theUI.presentMessage("Thank you");
+        theUI.presentMessage(RES.getString("SW_THANK_YOU"));
         if (sleepAndCancelCheck(1000)) return null;
         
         if (target.midPoint() < restValue.midPoint()) {
