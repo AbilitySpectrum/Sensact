@@ -54,7 +54,7 @@ public class SensorGroupPanel extends JPanel {
         
         Box b = Box.createVerticalBox();
         if (SolutionRegister.getInstance()
-                .getApplicableSolutions(group.getName()).length > 0) {        
+                .getApplicableSolutions(group.getID()).length > 0) {        
             b.add(solutionsBtn());
         } else {
             b.add(new JLabel(" "));

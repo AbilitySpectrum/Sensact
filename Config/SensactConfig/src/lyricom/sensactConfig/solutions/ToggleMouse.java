@@ -18,7 +18,7 @@
 package lyricom.sensactConfig.solutions;
 
 import javax.swing.JOptionPane;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -71,12 +71,12 @@ public class ToggleMouse extends SolutionBase {
             param2 = Model.MOUSE_RIGHT;
         }
 
-        SaAction none = Model.getActionByName(ActionName.NONE);
+        SaAction none = Model.getActionByType(ActionType.NONE);
         
         SaAction actionOnChange;
         int paramOnChange;
         if (beep.equals(YES)) {
-            actionOnChange = Model.getActionByName(ActionName.BUZZER);
+            actionOnChange = Model.getActionByType(ActionType.BUZZER);
             paramOnChange = (200 << 16) + 100;
         } else {
             actionOnChange = none;

@@ -18,37 +18,28 @@
 package lyricom.sensactConfig.model;
 
 /**
- * The ActionName is used to provide a string name to each action
- * and is also the key needed to retrieve an action by name.
+ * The GrouID is used to provide a localizable string name to each sensor
+ * group and also provides a key for to retrieval and identification of 
+ * a group (in Solutions).
+ * 
  * @author Andrew
  */
-public enum ActionName {
-    NONE,
-    RELAY_A,
-    RELAY_B,
-    BT_KEYBOARD,
-    BT_SPECIAL,
-    BT_MOUSE,
-    HID_KEYBOARD,
-    HID_SPECIAL,
-    HID_KEYPRESS,
-    HID_KEYRELEASE,
-    HID_MOUSE,
-    BUZZER,
-    IR,
-    SERIAL,
-    SET_STATE,
-    LIGHT_BOX;
-
+public enum GroupID {
+    SENSOR1,
+    SENSOR2,
+    SENSOR3,
+    ACCEL,
+    GYRO,
+    USB_PORT;
     
-    private final String localizedName;
-    ActionName() {
+    String localizedName;
+    
+    GroupID() {
         localizedName = MRes.getStr(this.name());
     }
     
-    @Override
     public String toString() {
         return localizedName;
     }
- 
+
 }

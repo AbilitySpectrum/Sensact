@@ -59,7 +59,7 @@ public class TriggersTest {
         assertEquals(t.getReqdState(), 2);
         assertEquals(t.getActionState(), 2);
         assertEquals(t.getDelay(), 0);
-        assertEquals(t.getAction(), Model.getActionByName(ActionName.HID_MOUSE));
+        assertEquals(t.getAction(), Model.getActionByType(ActionType.HID_MOUSE));
         assertEquals(t.getActionParam(), Model.MOUSE_LEFT);
         
         t = trigs.get(2);
@@ -123,7 +123,7 @@ public class TriggersTest {
         assertEquals(t.getReqdState(), 2);
         assertEquals(t.getActionState(), 2);
         assertEquals(t.getDelay(), 0);
-        assertEquals(t.getAction(), Model.getActionByName(ActionName.HID_MOUSE));
+        assertEquals(t.getAction(), Model.getActionByType(ActionType.HID_MOUSE));
         assertEquals(t.getActionParam(), Model.MOUSE_UP);
         
         t = trigs.get(2);

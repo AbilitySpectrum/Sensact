@@ -31,7 +31,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.Trigger;
 import lyricom.sensactConfig.model.Triggers;
@@ -94,7 +94,7 @@ public class TriggerPanel extends JPanel {
         if (ACTION_WIDTH == 0) {
             // Calibrate the size of actionUI.
             Trigger tmp = new Trigger(t.getSensor());
-            tmp.setAction(Model.getActionByName(ActionName.IR));
+            tmp.setAction(Model.getActionByType(ActionType.IR));
             tmp.setActionParam( 2 );
             WT_Action tmpUI = new WT_Action("DO", tmp);
             Dimension dim = tmpUI.getPreferredSize();

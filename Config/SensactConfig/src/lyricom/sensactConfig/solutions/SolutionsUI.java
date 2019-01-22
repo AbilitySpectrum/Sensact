@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import javax.swing.*;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SensorGroup;
 import lyricom.sensactConfig.model.Trigger;
@@ -75,7 +75,7 @@ public class SolutionsUI extends JDialog {
         
         messageBox.setText("Choose a solution");
         showSolutions( SolutionRegister.getInstance().
-                getApplicableSolutions(theGroup.getName()) );
+                getApplicableSolutions(theGroup.getID()) );
         
         pack();
         // Center on screen
@@ -115,12 +115,12 @@ public class SolutionsUI extends JDialog {
     }
     
     // Used to show solution options
-    private void showSolutions(String[] opts) {
+    private void showSolutions(SolutionID[] opts) {
         clearOptions();
         options.add(Box.createVerticalStrut(10));
-        for(String s: opts) {
-            final String fs = s;
-            JButton b = new JButton(fs);
+        for(SolutionID id: opts) {
+            final SolutionID theID = id;
+            JButton b = new JButton(id.getName());
             b.setAlignmentX(Component.CENTER_ALIGNMENT);
             b.addActionListener(e -> {
                 if (popupDesc != null) {
@@ -130,7 +130,7 @@ public class SolutionsUI extends JDialog {
                 // This is the response to "Select a solution"
                 // Start the solution thread.
                 theSolution = SolutionRegister.getInstance()
-                        .startSolution(fs, thisDlg, theGroup);
+                        .startSolution(theID, thisDlg, theGroup);
                 if (theSolution == null) {
                     JOptionPane.showMessageDialog(
                         thisDlg,
@@ -144,7 +144,7 @@ public class SolutionsUI extends JDialog {
             b.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    if (popupDesc != null && !popupTarget.equals(fs)) {
+                    if (popupDesc != null && !popupTarget.equals(theID.getName())) {
                         popupDesc.dispose();
                         popupTarget = null;
                         popupDesc = null;
@@ -153,8 +153,8 @@ public class SolutionsUI extends JDialog {
                         // Only popup once for a given button
                         // This is to supress multiple mouseEnter events 
                         // on the Mac - poor Mac!
-                        popupDesc = new Description(thisDlg, SolutionRegister.getInstance().getToolTip(fs));
-                        popupTarget = fs;
+                        popupDesc = new Description(thisDlg, SolutionRegister.getInstance().getToolTip(theID));
+                        popupTarget = theID.getName();
                     }
                 }
                 @Override
@@ -397,7 +397,7 @@ public class SolutionsUI extends JDialog {
         if (ACTION_SIZE == null) {
             // Calibration - done once.
             Trigger t = new Trigger(Model.getSensorByID(1));
-            t.setAction(Model.getActionByName(ActionName.IR));
+            t.setAction(Model.getActionByType(ActionType.IR));
             t.setActionParam(2);
             WT_Action actionUI = new WT_Action("Prompt 1:", t);
             ACTION_SIZE = actionUI.getPreferredSize();  

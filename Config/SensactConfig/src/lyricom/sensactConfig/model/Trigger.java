@@ -116,7 +116,7 @@ public class Trigger {
         os.putID(actionState, 1);
 
         if (Model.getVersionID() >= 406) { 
-            if (action.getId() == Model.IR_ACTION_ID) {
+            if (action.getType() == ActionType.IR) {
                 // Map IR Action code parameter into the IR code signal
                 // needed for the selected TV type.
                 actionParam = TVInfo.getInstance().ID2Code(actionParam);
@@ -149,7 +149,7 @@ public class Trigger {
         if (action == null) {
             throw new IOError(RES.getString("CDE_INVALID_ACTION_ID"));
         }
-        if (action.getId() == Model.IR_ACTION_ID) {
+        if (action.getType() == ActionType.IR) {
             if (Model.getVersionID() >= 406) {
                 // Map action paramter from IR code to an action ID
                 actionParam = TVInfo.getInstance().Code2ID(actionParam);

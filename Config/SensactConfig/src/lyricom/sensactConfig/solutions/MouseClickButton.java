@@ -17,7 +17,7 @@
  */ 
 package lyricom.sensactConfig.solutions;
 
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -43,8 +43,8 @@ public class MouseClickButton extends SolutionBase {
         SaAction mouse = mouseSelection();       
         if (cancelling) return false;
 
-        SaAction buzz = Model.getActionByName(ActionName.BUZZER);
-        SaAction none = Model.getActionByName(ActionName.NONE);
+        SaAction buzz = Model.getActionByType(ActionType.BUZZER);
+        SaAction none = Model.getActionByType(ActionType.NONE);
         // ... and the required button positions.        
         btnLocHi.level = Trigger.Level.LEVEL1;        
         Location btnLocLo = btnLocHi.getReverse();

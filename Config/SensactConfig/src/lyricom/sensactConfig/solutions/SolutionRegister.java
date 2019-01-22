@@ -19,11 +19,10 @@ package lyricom.sensactConfig.solutions;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import lyricom.sensactConfig.model.GroupID;
 import lyricom.sensactConfig.model.SensorGroup;
 
 /**
@@ -32,33 +31,26 @@ import lyricom.sensactConfig.model.SensorGroup;
  */
 public class SolutionRegister {
     static private boolean initDone = false;
-    static private final Map<String, String> toolTips = new HashMap<>();
-    
-    private static final String JOYSTICK_MOUSE = "Joystick Mouse";
-    private static final String ONE_BTN_MOUSE = "One Button Mouse";
-    private static final String TOGGLE_MOUSE = "Toggle Mouse";
-    private static final String MOUSE_CLICK_BUTTON = "Mouse Click Button";
-    private static final String PRESS_HOLD_SELECT = "Press-Hold-Select";
-    private static final String PRESS_RELEASE_WAIT_SELECT = "Press-Release-Wait-Select";
-    
+    static private final Map<SolutionID, String> toolTips = new EnumMap<>(SolutionID.class);
+        
     public static void init() {
         if (initDone) return;
         SolutionRegister reg = getInstance();
-        String[] group1 = {"Sensor 1", "Sensor 2", "Sensor 3"};
-        String[] group2 = {"Sensor 1", "Sensor 2", "Sensor 3", "Accel"};
-        reg.register( JoystickMouseSolution.class, JOYSTICK_MOUSE, group1);
-        reg.register( OneBtnMouse.class, ONE_BTN_MOUSE, group2);
-        reg.register( ToggleMouse.class, TOGGLE_MOUSE, group2);
-        reg.register( MouseClickButton.class, MOUSE_CLICK_BUTTON, group2);
-        reg.register( PressHoldSelect.class, PRESS_HOLD_SELECT, group2);
-        reg.register( PressReleaseWaitSelect.class, PRESS_RELEASE_WAIT_SELECT, group2);
+        GroupID[] group1 = {GroupID.SENSOR1, GroupID.SENSOR2, GroupID.SENSOR3};
+        GroupID[] group2 = {GroupID.SENSOR1, GroupID.SENSOR2, GroupID.SENSOR3, GroupID.ACCEL};
+        reg.register( SolutionID.JOYSTICK_MOUSE, group1);
+        reg.register( SolutionID.ONE_BTN_MOUSE, group2);
+        reg.register( SolutionID.TOGGLE_MOUSE, group2);
+        reg.register( SolutionID.MOUSE_CLICK_BUTTON, group2);
+        reg.register( SolutionID.PRESS_HOLD_SELECT, group2);
+        reg.register( SolutionID.PRESS_RELEASE_WAIT_SELECT, group2);
         
-        toolTips.put(JOYSTICK_MOUSE, "<html><b>Joystick Mouse</b><br/>"
+        toolTips.put(SolutionID.JOYSTICK_MOUSE, "<html><b>Joystick Mouse</b><br/>"
                 + "<i>Use a joystick to control mouse motion.</i><br/>"
                 + "You can use a joystick to control mouse movement.<br/>"
                 + "The wizard will determine the joystick orientation. </html>");
         
-        toolTips.put(MOUSE_CLICK_BUTTON, "<html><b>Mouse Click Button</b><br/>"
+        toolTips.put(SolutionID.MOUSE_CLICK_BUTTON, "<html><b>Mouse Click Button</b><br/>"
                 + "<i>One button generates all mouse clicks.</i><br/>"
                 + "<ul>"
                 + "<li> Press and release generates a left mouse click.<br/>"
@@ -72,7 +64,7 @@ public class SolutionRegister {
                 + "</li>"
                 + "</ul></html>");
         
-        toolTips.put(ONE_BTN_MOUSE, "<html><b>One Button Mouse</b><br/>"
+        toolTips.put(SolutionID.ONE_BTN_MOUSE, "<html><b>One Button Mouse</b><br/>"
                 + "<i>Control a computer with a single button</i><br/>"
                 + "<ul>"
                 + "<li> Press and release generates a left mouse click.<br/>"
@@ -90,7 +82,7 @@ public class SolutionRegister {
                 + "Add an on-screen keyboard to support typing and most<br/>"
                 + "computer functions can be performed.</html>");
        
-        toolTips.put(TOGGLE_MOUSE, "<html><b>Toggle Mouse</b><br/>"
+        toolTips.put(SolutionID.TOGGLE_MOUSE, "<html><b>Toggle Mouse</b><br/>"
                 + "<i>One button controls one axis of mouse motion</i><br/>"
                 + "One button controls either the up/down or the <br/>"
                 + "left/right motion of the mouse.  You would typically<br/>"
@@ -101,7 +93,7 @@ public class SolutionRegister {
                 + "or after a short delay.  The delay is useful.  It allows you<br/>"
                 + "to nudge the mouse in one direction with repeated quick taps.</html>");
         
-        toolTips.put(PRESS_HOLD_SELECT, "<html><b>Press - Hold - Select</b><br/>"
+        toolTips.put(SolutionID.PRESS_HOLD_SELECT, "<html><b>Press - Hold - Select</b><br/>"
                 + "<i>Create a multi-function button</i><br/>"
                 + "This wizard guides you in the creation of a multi-function<br/>"
                 + "button, where functions are selected by holding the button<br/>"
@@ -115,7 +107,7 @@ public class SolutionRegister {
                 + "define a <i>reset prompt</i> which tells the user when the system has reset.<br/>"
                 + "</html>");
         
-        toolTips.put(PRESS_RELEASE_WAIT_SELECT, "<html><b>Press - Release - Wait - Select</b><br/>"
+        toolTips.put(SolutionID.PRESS_RELEASE_WAIT_SELECT, "<html><b>Press - Release - Wait - Select</b><br/>"
                 + "<i>Create a multi-function button</i><br/>"
                 + "What if you have a client who can touch a button but cannot<br/>"
                 + "hold it?  This wizards guides you in the creation of a<br/>"
@@ -149,47 +141,45 @@ public class SolutionRegister {
     }
     
     private class RegisterEntry {
-        Class clazz;
-        String solutionName;
-        String[] applicableGroups;
+        SolutionID solution;
+        GroupID[] applicableGroups;
         
-        RegisterEntry(Class c, String s, String[] a) {
-            clazz = c;
-            solutionName = s;
+        RegisterEntry(SolutionID s, GroupID[] a) {
+            solution = s;
             applicableGroups = a;
         }
     }
     
-    private Map<String, RegisterEntry> entryMap = new LinkedHashMap<>();
+    private Map<SolutionID, RegisterEntry> entryMap = new EnumMap<>(SolutionID.class);
     
-    void register(Class clazz, String solutionName, String[] app) {
-        RegisterEntry reg = new RegisterEntry(clazz, solutionName, app);
-        entryMap.put(solutionName, reg);
+    void register(SolutionID s, GroupID[] app) {
+        RegisterEntry reg = new RegisterEntry(s, app);
+        entryMap.put(s, reg);
     }
     
-    public String[] getApplicableSolutions(String groupName) {
-        List<String> names = new ArrayList<>();
+    public SolutionID[] getApplicableSolutions(GroupID groupID) {
+        List<SolutionID> solutions = new ArrayList<>();
         for(RegisterEntry r: entryMap.values()) {
-            for(String s: r.applicableGroups) {
-                if (s.equals(groupName)) {
-                    names.add(r.solutionName);
+            for(GroupID gid: r.applicableGroups) {
+                if (gid == groupID) {
+                    solutions.add(r.solution);
                     break;
                 }
             }
         }
-        String[] values = new String[names.size()];
-        return names.toArray(values);
+        SolutionID[] values = new SolutionID[solutions.size()];
+        return solutions.toArray(values);
     }
     
-    public String getToolTip(String name) {
-        return toolTips.get(name);
+    public String getToolTip(SolutionID id) {
+        return toolTips.get(id);
     }
     
-    SolutionBase startSolution(String solutionName, SolutionsUI sui, SensorGroup sg) {
-        RegisterEntry r = entryMap.get(solutionName);
+    SolutionBase startSolution(SolutionID solutionID, SolutionsUI sui, SensorGroup sg) {
+        RegisterEntry r = entryMap.get(solutionID);
         if (r != null) {
             try {
-                Class theClass = r.clazz;
+                Class theClass = r.solution.getImplementation();
                 Constructor constructor 
                         = theClass.getConstructor(SolutionsUI.class, SensorGroup.class);
                 SolutionBase solution = (SolutionBase) constructor.newInstance(sui, sg);

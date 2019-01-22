@@ -25,11 +25,11 @@ import java.util.List;
  * @author Andrew
  */
 public class SensorGroup {
-    private final String name;
+    private final GroupID groupID;
     private final List<Sensor> members = new ArrayList<>();
     
-    public SensorGroup(String name) {
-        this.name = name;
+    public SensorGroup(GroupID id) {
+        this.groupID = id;
     }
     
     public void add(Sensor s) {
@@ -37,7 +37,11 @@ public class SensorGroup {
     }
     
     public String getName() {
-        return name;
+        return groupID.toString();
+    }
+    
+    public GroupID getID() {
+        return groupID;
     }
     
     public List<Sensor> getMembers() {

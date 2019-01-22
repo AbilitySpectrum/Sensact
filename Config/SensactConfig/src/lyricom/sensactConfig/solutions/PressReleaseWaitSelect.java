@@ -18,7 +18,7 @@
 package lyricom.sensactConfig.solutions;
 
 import java.util.List;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -56,7 +56,7 @@ public class PressReleaseWaitSelect extends SolutionBase {
         Trigger endAction = theUI.getSingleAction("What is the reset action?");
         if (cancelling) return false;
         
-        SaAction none = Model.getActionByName(ActionName.NONE);
+        SaAction none = Model.getActionByType(ActionType.NONE);
         Triggers.getInstance().deleteTriggerSet(btnLocHi.sensor);
 
         makeTrigger(1, btnLocHi, 0, none, 0, 2);

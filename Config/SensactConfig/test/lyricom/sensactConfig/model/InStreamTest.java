@@ -23,7 +23,7 @@ public class InStreamTest {
             is.getNum(2);
             fail("IOError expected");
         } catch (IOError ex) {
-            assertEquals(ex.getMessage(), "Invalid number");
+            assertEquals(ex.getMessage(), "Invalid Number");
        }
         try {   // Check for end of stream.
             is.getNum(2);

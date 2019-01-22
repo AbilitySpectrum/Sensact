@@ -25,7 +25,7 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.*;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.Trigger;
@@ -157,7 +157,7 @@ public class TriggerEditDlg extends JDialog {
         if (ACTION_SIZE == null) {
             // Calibration
             SaAction savedAction = tmpTrig.getAction();
-            tmpTrig.setAction(Model.getActionByName(ActionName.IR));
+            tmpTrig.setAction(Model.getActionByType(ActionType.IR));
             int savedParam = tmpTrig.getActionParam();
             tmpTrig.setActionParam(2);
             WT_Action actionUI = new WT_Action("", tmpTrig);
