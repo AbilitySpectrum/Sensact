@@ -50,13 +50,13 @@ public class JoystickMouseSolution extends SolutionBase {
         upLocation = downLocation = leftLocation = rightLocation = null;
         
         boolean success = false;
-        upLocation = c.getLocation("Hold joystick in the UP position.");
+        upLocation = c.getLocation(SRes.getStr("JW_UP"));
         if (upLocation != null) {
-            downLocation = c.getLocation("Hold joystick in the DOWN position.");
+            downLocation = c.getLocation(SRes.getStr("JW_DOWN"));
             if (downLocation != null) {
-                leftLocation = c.getLocation("Hold joystick in the LEFT position.");
+                leftLocation = c.getLocation(SRes.getStr("JW_LEFT"));
                 if (leftLocation != null) {
-                    rightLocation = c.getLocation("Hold joystick in the RIGHT position.");
+                    rightLocation = c.getLocation(SRes.getStr("JW_RIGHT"));
                     if (rightLocation != null) {
                         success = true;
                     }
@@ -68,8 +68,8 @@ public class JoystickMouseSolution extends SolutionBase {
         
         if (!success) {
             JOptionPane.showMessageDialog(theUI,
-                    "Sorry. Joystick motion was not detected.",
-                    "Solution Failure",
+                    SRes.getStr("JW_FAIL_MSG"),
+                    SRes.getStr("SW_SOLUTION_FAIL_TITLE"),
                     JOptionPane.ERROR_MESSAGE);
             return false;
         }

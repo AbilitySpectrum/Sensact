@@ -30,7 +30,6 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class Calibrator {
-    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     
     private class Sampling {
         int minval;
@@ -154,7 +153,7 @@ public class Calibrator {
             target.takeSample();
         }
         
-        theUI.presentMessage(RES.getString("SW_THANK_YOU"));
+        theUI.presentMessage(SRes.getStr("SW_THANK_YOU"));
         if (sleepAndCancelCheck(1000)) return null;
         
         if (target.midPoint() < restValue.midPoint()) {

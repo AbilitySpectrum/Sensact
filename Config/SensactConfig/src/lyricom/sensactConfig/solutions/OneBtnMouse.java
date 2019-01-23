@@ -40,7 +40,7 @@ public class OneBtnMouse extends SolutionBase {
         Location btnLocHi = getButton();
         if (btnLocHi == null) return false;
                         
-        int delay = theUI.getDelay("Enter delay between beeps.", 1000);
+        int delay = theUI.getDelay(SRes.getStr("OBM_DELAY_QUESTION"), 1000);
         
         if (cancelling) return false;
         

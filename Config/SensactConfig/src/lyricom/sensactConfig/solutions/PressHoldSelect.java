@@ -44,7 +44,7 @@ public class PressHoldSelect extends SolutionBase {
         Location btnLocLo = btnLocHi.getReverse();
         if (cancelling) return false;
         
-        int actionCount = theUI.getActionCount("How many actions?");
+        int actionCount = theUI.getActionCount(SRes.getStr("PHS_ACTION_COUNT"));
         if (cancelling) return false;
         
         List<ActionRow> actions = theUI.getActions(actionCount, false);
@@ -53,19 +53,19 @@ public class PressHoldSelect extends SolutionBase {
                 latching = true;
             }
         }
-        int delay = theUI.getDelay("Enter the delay between prompts", 1000);
+        int delay = theUI.getDelay(SRes.getStr("PHS_PROMPT_DELAY"), 1000);
         if (cancelling) return false;
         
         int endDelay = 0;
         Trigger endAction = null;
         if (latching) {
-            endDelay = theUI.getDelay("Enter the reset delay", delay*2);
+            endDelay = theUI.getDelay(SRes.getStr("PHS_RESET_DELAY"), delay*2);
             if (cancelling) return false;
             
-            endAction = theUI.getSingleAction("What is the reset action?");
+            endAction = theUI.getSingleAction(SRes.getStr("PHS_RESET_ACTION"));
             if (cancelling) return false;
         }
-        
+
         SaAction none = Model.getActionByType(ActionType.NONE);
         Triggers.getInstance().deleteTriggerSet(btnLocHi.sensor);
 

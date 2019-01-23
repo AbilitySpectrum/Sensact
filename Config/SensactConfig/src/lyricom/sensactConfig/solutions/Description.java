@@ -37,7 +37,6 @@ import lyricom.sensactConfig.ui.ScreenInfo;
  * @author Andrew
  */
 public class Description extends JDialog {
-    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");    
 
     public Description(JDialog parent, String txt) {
        super(parent, false);
@@ -71,7 +70,7 @@ public class Description extends JDialog {
     
     private JPanel closeBtn() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton b = new JButton(RES.getString("SW_CLOSE_BTN"));
+        JButton b = new JButton(SRes.getStr("SW_CLOSE_BTN"));
         final Description thisPanel = this;
         b.addActionListener(e -> {
             thisPanel.dispose();

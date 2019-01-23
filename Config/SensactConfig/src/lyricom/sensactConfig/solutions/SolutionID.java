@@ -24,27 +24,33 @@ package lyricom.sensactConfig.solutions;
  * @author Andrew
  */
 public enum SolutionID {   
-    JOYSTICK_MOUSE("Joystick Mouse", JoystickMouseSolution.class),
-    ONE_BTN_MOUSE("One Button Mouse", OneBtnMouse.class),
-    TOGGLE_MOUSE("Toggle Mouse", ToggleMouse.class),
-    MOUSE_CLICK_BUTTON("Mouse Click Button", MouseClickButton.class),
-    PRESS_HOLD_SELECT("Press-Hold-Select", PressHoldSelect.class),
-    PRESS_RELEASE_WAIT_SELECT("Press-Release-Wait-Select", PressReleaseWaitSelect.class);
+    JOYSTICK_MOUSE(JoystickMouseSolution.class),
+    ONE_BTN_MOUSE(OneBtnMouse.class),
+    TOGGLE_MOUSE(ToggleMouse.class),
+    MOUSE_CLICK_BUTTON(MouseClickButton.class),
+    PRESS_HOLD_SELECT(PressHoldSelect.class),
+    PRESS_RELEASE_WAIT_SELECT(PressReleaseWaitSelect.class);
     
-    private final String name;
+    private final String localizedName;
+    private final String toolTipText;
     private final Class implementation;
     
-    SolutionID(String name, Class implementation) {
-        this.name = name;
+    SolutionID(Class implementation) {
+        localizedName = SRes.getStr(this.name());
+        toolTipText = SRes.getStr(this.name() + "_TTT");
         this.implementation = implementation;
     }
     
     public String getName() {
-        return name;
+        return localizedName;
     }
     
     public String toString() {
-        return name;
+        return localizedName;
+    }
+    
+    public String getToolTipText() {
+        return toolTipText;
     }
     
     public Class getImplementation() {

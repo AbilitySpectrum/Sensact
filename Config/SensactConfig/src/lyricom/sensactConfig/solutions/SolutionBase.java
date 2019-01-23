@@ -89,29 +89,29 @@ public abstract class SolutionBase implements Runnable {
         c.startCalibration();
         c.getRestValues();
         
-        Location btnLocHi = c.getLocation("Please press and hold the button.");
+        Location btnLocHi = c.getLocation(SRes.getStr("SW_PRESS_BTN"));
         c.endCalibration();
         if (cancelling) return null;
         
         if (btnLocHi == null) {
             JOptionPane.showMessageDialog(theUI,
-                    "Sorry. Button press was not detected.",
-                    "Solution Failure",
+                    SRes.getStr("SW_BUTTON_FAIL_MSG"),
+                    SRes.getStr("SW_SOLUTION_FAIL_TITLE"),
                     JOptionPane.ERROR_MESSAGE);
             return null;
         } else {
             return btnLocHi;
         }       
     }
-    
-    private static final String HID_MOUSE = "HID Mouse";
-    private static final String BT_MOUSE = "Bluetooth Mouse";
+
+    private static final String HID_MOUSE = SRes.getStr("SW_HID_MOUSE");
+    private static final String BT_MOUSE = SRes.getStr("SW_BT_MOUSE");
     private static final String[] MOUSE_OPTS = {HID_MOUSE, BT_MOUSE};
     
     // Get the type of mouse
     protected SaAction mouseSelection() {
         if (cancelling) return null;
-        String option = theUI.getOption("What kind of mouse?", MOUSE_OPTS);
+        String option = theUI.getOption(SRes.getStr("SW_MOUSE_TYPE"), MOUSE_OPTS);
         if (option == null || cancelling) return null;
         if (option.equals(HID_MOUSE)) {
             return Model.getActionByType(ActionType.HID_MOUSE);
