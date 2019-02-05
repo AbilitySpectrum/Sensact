@@ -239,6 +239,9 @@ public class Triggers {
         
         // For each sensor ...
         for(Sensor s: Model.sensorList) {
+            if (!s.isContinuous()) {
+                continue;
+            }
             int clusterWidth = ((s.getMaxval() - s.getMinval()) * 15) / 100;
             group1.reset(clusterWidth);
             group2.reset(clusterWidth);
