@@ -195,6 +195,9 @@ public class Trigger {
         if (sensor.isContinuous()) {
             this.condition = condition;
             Triggers.DATA_IN_SYNC = false;
+        } else if (condition == TRIGGER_ON_EQUAL) {
+            this.condition = condition;
+            Triggers.DATA_IN_SYNC = false;
         }
     }
 

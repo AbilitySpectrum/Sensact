@@ -236,12 +236,19 @@ public class Triggers {
     // is clusters in that group.
     // Two groups are collected.
     // Data belonging to neither group is put into the nearest group.
+    // DO NOT apply this to sensors that are not continuous.
+    // This code was needed to support the transition to fixed levels.
+    // That transition is long-ago complete, so perhaps this is no longer
+    // needed??
     private void groupLevels(List<Trigger> tmp) {
         Cluster group1 = new Cluster();
         Cluster group2 = new Cluster();
         
         // For each sensor ...
         for(Sensor s: Model.sensorList) {
+            if (!s.isContinuous()) {
+                continue;
+            }
             int clusterWidth = ((s.getMaxval() - s.getMinval()) * 15) / 100;
             group1.reset(clusterWidth);
             group2.reset(clusterWidth);
