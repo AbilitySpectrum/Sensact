@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.model.Trigger;
 
 /**
@@ -24,10 +25,11 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_Duration extends W_Number {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     private final Trigger theTrigger;
     public WT_Duration(String label, Trigger t) {
-        super(label, "Duration", 4, 20, 1000);
+        super(label, RES.getString("NE_FLD_DURATION"), 4, 20, 1000);
         theTrigger = t;
         update();
     }

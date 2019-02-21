@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.model.Trigger;
 
 /**
@@ -24,10 +25,11 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_LightBox extends W_Number {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     private final Trigger theTrigger;
     public WT_LightBox(String label, Trigger t) {
-        super(label, "Value", 3, 0, 255);
+        super(label, RES.getString("NE_FLD_VALUE"), 3, 0, 255);
         theTrigger = t;
         update();
     }

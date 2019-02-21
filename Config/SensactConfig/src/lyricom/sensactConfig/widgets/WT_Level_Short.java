@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.model.Trigger;
 
 /**
@@ -24,8 +25,9 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_Level_Short extends W_Combo {
-    private static final String LEV1 = "lev 1";
-    private static final String LEV2 = "lev 2";
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+    private static final String LEV1 = RES.getString("T_LEVEL_1_SHORT");
+    private static final String LEV2 = RES.getString("T_LEVEL_1_SHORT");
     private static final Object[] SHORT_NAMES = {LEV1, LEV2};
     
     
@@ -39,17 +41,13 @@ public class WT_Level_Short extends W_Combo {
     @Override
     public void widgetChanged() {
         String p = (String) theBox.getSelectedItem();
-        switch(p) {
-            case LEV1:
+        if (p == LEV1) {
                 theTrigger.setLevel(Trigger.Level.LEVEL1);
                 theTrigger.setTriggerValue( theTrigger.getSensor().getLevel(Trigger.Level.LEVEL1) );
-                break;
-                
-            case LEV2:
+        
+        } else if (p == LEV2) {
                 theTrigger.setLevel(Trigger.Level.LEVEL2);
                 theTrigger.setTriggerValue( theTrigger.getSensor().getLevel(Trigger.Level.LEVEL2) );
-                break;
-                
         }
     }
     

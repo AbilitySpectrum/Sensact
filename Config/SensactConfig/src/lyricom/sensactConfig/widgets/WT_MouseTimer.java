@@ -17,14 +17,17 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
+
 /**
  * Timer for intervals between mouse speed changes.
  * @author Andrew
  */
 public class WT_MouseTimer extends W_Number {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     public WT_MouseTimer(String label) {
-        super(label, "Interval", 5, 0, 10000);
+        super(label, RES.getString("NE_MOUSE_INTERVAL"), 5, 0, 10000);
     }
     
     public void setNewValue(int val) {

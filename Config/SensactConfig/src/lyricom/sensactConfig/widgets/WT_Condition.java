@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.model.Trigger;
 
 /**
@@ -24,8 +25,9 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_Condition extends W_Combo {
-    private static final String GREATER = "greater than";
-    private static final String LESSER = "less than";
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+    private static final String GREATER = RES.getString("T_LEVEL_GREATER_THAN");
+    private static final String LESSER = RES.getString("T_LEVEL_LESS_THAN");
     private static final Object[] LONG_NAMES = {GREATER, LESSER};    
     
     private final Trigger theTrigger;
@@ -38,15 +40,10 @@ public class WT_Condition extends W_Combo {
     @Override
     public void widgetChanged() {
         String p = (String) theBox.getSelectedItem();
-        switch(p) {
-            case GREATER:
-                theTrigger.setCondition(Trigger.TRIGGER_ON_HIGH);
-                break;
-                
-            case LESSER:
-                theTrigger.setCondition(Trigger.TRIGGER_ON_LOW);
-                break;
-                
+        if (p == GREATER) {
+                theTrigger.setCondition(Trigger.TRIGGER_ON_HIGH);              
+        } else if (p == LESSER) {
+                theTrigger.setCondition(Trigger.TRIGGER_ON_LOW);                             
         }
     }
     

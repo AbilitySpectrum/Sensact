@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.model.Trigger;
 
 /**
@@ -24,8 +25,9 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_ReqdState extends W_Spinner {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
-    private static final String ANY = "Any";
+    private static final String ANY = RES.getString("ANY_STATE");
     private static final String STATE_KEYS[] =
         {ANY, "1", "2", "3", "4", "5", "6", "7", "8", "9", 
             "10", "11", "12", "13", "14", "15"};

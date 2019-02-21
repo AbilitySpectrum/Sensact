@@ -20,6 +20,7 @@ package lyricom.sensactConfig.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import lyricom.sensactConfig.model.MouseSpeedTransfer;
 import lyricom.sensactConfig.model.MouseSpeedTransferInterface;
@@ -29,6 +30,7 @@ import lyricom.sensactConfig.widgets.WT_MouseTimer;
  * @author Andrew
  */
 public class MouseSpeedPanel extends JPanel implements MouseSpeedTransferInterface {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     SpeedSlider speed1;
     SpeedSlider speed2;
@@ -41,14 +43,14 @@ public class MouseSpeedPanel extends JPanel implements MouseSpeedTransferInterfa
         
         Box box = Box.createVerticalBox();
         
-        JLabel title = new JLabel("Mouse Speed");
+        JLabel title = new JLabel(RES.getString("MS_MOUSE_SPEED"));
         title.setFont(Utils.TITLE_FONT);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(title);
         
-        speed1 = new SpeedSlider("Start speed:", 420);
-        speed2 = new SpeedSlider("change to:", 480);
-        speed3 = new SpeedSlider("change to:", 540);
+        speed1 = new SpeedSlider(RES.getString("MS_START"), 420);
+        speed2 = new SpeedSlider(RES.getString("MS_CHANGE_TO"), 480);
+        speed3 = new SpeedSlider(RES.getString("MS_CHANGE_TO"), 540);
                
         box.add( speed1 );
         box.add(timer1());
@@ -64,10 +66,10 @@ public class MouseSpeedPanel extends JPanel implements MouseSpeedTransferInterfa
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        JLabel start = new JLabel("after");
+        JLabel start = new JLabel(RES.getString("MS_AFTER"));
         timer1 = new WT_MouseTimer("");
         timer1.setNewValue(500);
-        JLabel after = new JLabel("milliseconds");
+        JLabel after = new JLabel(RES.getString("MS_MSEC"));
         
         p.add(start);
         p.add(timer1);
@@ -79,10 +81,10 @@ public class MouseSpeedPanel extends JPanel implements MouseSpeedTransferInterfa
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        JLabel start = new JLabel("after on additional");
+        JLabel start = new JLabel(RES.getString("MS_AFTER_ADDITIONAL"));
         timer2 = new WT_MouseTimer("");
         timer2.setNewValue(500);
-        JLabel after = new JLabel("milliseconds");
+        JLabel after = new JLabel(RES.getString("MS_MSEC"));
         
         p.add(start);
         p.add(timer2);
@@ -157,15 +159,15 @@ public class MouseSpeedPanel extends JPanel implements MouseSpeedTransferInterfa
         private void setSpeedLabel() {           
             int val = slider.getValue();
             if (val < 400) {
-                speedLabel.setText("Very slow");
+                speedLabel.setText(RES.getString("MS_SPEED_VERY_SLOW"));
             } else if (val < 470) {
-                speedLabel.setText("Slow");
+                speedLabel.setText(RES.getString("MS_SPEED_SLOW"));
             } else if (val < 540) {
-                speedLabel.setText("Medium");
+                speedLabel.setText(RES.getString("MS_SPEED_MEDIUM"));
             } else if (val < 610) {
-                speedLabel.setText("Fast");
+                speedLabel.setText(RES.getString("MS_SPEED_FAST"));
             } else {
-                speedLabel.setText("Very fast");
+                speedLabel.setText(RES.getString("MS_SPEED_VERY_FAST"));
             }
         }
         

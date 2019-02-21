@@ -20,6 +20,7 @@ package lyricom.sensactConfig.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -36,6 +37,7 @@ import lyricom.sensactConfig.model.TVTypeUI;
  * @author Andrew
  */
 public class TVSelectionPanel extends JPanel implements TVTypeUI {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     
     private JComboBox volumeControlSelectionBox;
     private JComboBox channelControlSelectionBox;
@@ -60,11 +62,7 @@ public class TVSelectionPanel extends JPanel implements TVTypeUI {
     private JComponent textBox() {
         JTextPane text = new JTextPane();
         text.setEditable(false);
-        text.setText("Use this panel to select the type of TV you are using.\n"
-                + "If you have a set-top box to control the channel\n"
-                + "set the \"Volume Control\" to match your TV type\n"
-                + "and the \"Channel Control\" to match the set-top box type.\n"
-                + "If you just need to control a TV set both to your TV type.");
+        text.setText(RES.getString("TV_INSTRUCTIONS"));
         text.setFont(Utils.STATE_FONT);
         
         // All this just to center the text??  This is a real 'pane'.
@@ -86,7 +84,7 @@ public class TVSelectionPanel extends JPanel implements TVTypeUI {
     
     private JComponent volumeCombo() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel l = new JLabel("Volume Control: ");
+        JLabel l = new JLabel(RES.getString("TV_VOLUME_CONTROL") + ": ");
         p.add(l);
         volumeControlSelectionBox = new JComboBox();
         for(TVType t: tvinfo.getTVTypes()) {
@@ -103,7 +101,7 @@ public class TVSelectionPanel extends JPanel implements TVTypeUI {
     
     private JComponent channelCombo() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel l = new JLabel("Channel Control: ");
+        JLabel l = new JLabel(RES.getString("TV_CHANNEL_CONTROL") + ": ");
         p.add(l);
         channelControlSelectionBox = new JComboBox();
         for(TVType t: tvinfo.getTVTypes()) {
