@@ -24,6 +24,7 @@ import java.awt.FlowLayout;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
@@ -36,6 +37,7 @@ import lyricom.sensactConfig.widgets.*;
  * @author Andrew
  */
 public class TriggerEditDlg extends JDialog {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     private static Dimension ACTION_SIZE = null;
     
     private final Trigger tmpTrig;
@@ -57,7 +59,7 @@ public class TriggerEditDlg extends JDialog {
         
         // Work out the size for all the labels.
         // based on the longest string.
-        JLabel text = new JLabel("   and go to state ");        
+        JLabel text = new JLabel(RES.getString("TDLG_LONGEST_STRING") + "    ");        
         lblSize = text.getPreferredSize();
  //       lblSize.width += 5;
         
@@ -99,7 +101,9 @@ public class TriggerEditDlg extends JDialog {
     
     private JPanel title() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JLabel l = new JLabel("Edit Trigger for " + theTrigger.getSensor().getName());
+        JLabel l = new JLabel(
+                RES.getString("TDLG_EDIT_TRIGGER_FOR") + " "
+                    + theTrigger.getSensor().getName());
         l.setFont(Utils.TITLE_FONT);
         p.add(l);
         return p;
@@ -109,16 +113,16 @@ public class TriggerEditDlg extends JDialog {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        p.add( Utils.getLabel("IF state is ", lblSize) );
+        p.add( Utils.getLabel(RES.getString("TDLG_IF_STATE_IS"), lblSize) );
         p.add(new WT_ReqdState("", tmpTrig));
         return p;
     }
         
     private JPanel sigLevelLine() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        p.add( Utils.getLabel("   and signal is ", lblSize) );
+        p.add( Utils.getLabel("   " + RES.getString("TDLG_AND_SIGNAL_IS"), lblSize) );
         
         W_Composite wc = new W_Composite();
         wc.add(new WT_Condition("", tmpTrig));
@@ -133,7 +137,7 @@ public class TriggerEditDlg extends JDialog {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        p.add( Utils.getLabel("   and signal is ", lblSize) );
+        p.add( Utils.getLabel("   " + RES.getString("TDLG_AND_SIGNAL_IS"), lblSize) );
         p.add(new WT_SensorValue("", tmpTrig));
         
         return p;
@@ -143,7 +147,7 @@ public class TriggerEditDlg extends JDialog {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        p.add( Utils.getLabel("   for more than ", lblSize) );
+        p.add( Utils.getLabel("   " + RES.getString("TDLG_FOR_MORE_THAN"), lblSize) );
         p.add(new WT_Delay("", tmpTrig));
         return p;
     }
@@ -152,7 +156,7 @@ public class TriggerEditDlg extends JDialog {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        p.add( Utils.getLabel("THEN do action ", lblSize) );
+        p.add( Utils.getLabel(RES.getString("TDLG_THEN_DO_ACTION"), lblSize) );
         
         if (ACTION_SIZE == null) {
             // Calibration
@@ -182,7 +186,7 @@ public class TriggerEditDlg extends JDialog {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
         
-        p.add( Utils.getLabel("   and go to state ", lblSize) );        
+        p.add( Utils.getLabel("   " + RES.getString("TDLG_AND_GO_TO_STATE"), lblSize) );        
         p.add(new WT_ActionState("", tmpTrig));
         return p;
     }
@@ -190,7 +194,7 @@ public class TriggerEditDlg extends JDialog {
     private JPanel buttons() {
         JPanel p = new JPanel();
         
-        JButton close = new JButton("Done");
+        JButton close = new JButton(RES.getString("BTN_DONE"));
         close.addActionListener(e -> {
             theTrigger.copyValue(tmpTrig);
             cancelled = false;
@@ -199,7 +203,7 @@ public class TriggerEditDlg extends JDialog {
         p.add(close);
         getRootPane().setDefaultButton(close);
         
-        JButton cancel = new JButton("Cancel");
+        JButton cancel = new JButton(RES.getString("BTN_CANCEL"));
         cancel.addActionListener(e -> {
             cancelled = true;
             thisDlg.dispose();

@@ -22,6 +22,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import lyricom.sensactConfig.model.Sensor;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -35,6 +36,7 @@ import lyricom.sensactConfig.solutions.SolutionsUI;
  * @author Andrew
  */
 public class SensorGroupPanel extends JPanel {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     private final List<SensorPanel> sensorPanels = new ArrayList<>();
     private final SensorGroup thisGroup;
@@ -95,7 +97,7 @@ public class SensorGroupPanel extends JPanel {
     private JComponent solutionsBtn() {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JButton solution = new JButton("Solutions");
+        JButton solution = new JButton(RES.getString("BTN_SOLUTIONS"));
         solution.addActionListener(e -> {
             new SolutionsUI(thisGroup);
         });

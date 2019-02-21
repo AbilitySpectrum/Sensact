@@ -29,6 +29,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.GeneralPath;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import lyricom.sensactConfig.model.ActionType;
@@ -42,6 +43,7 @@ import lyricom.sensactConfig.widgets.*;
  * @author Andrew
  */
 public class TriggerPanel extends JPanel {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     private static int ACTION_WIDTH = 0;
     private static int ACTION_HEIGHT = 0;
     
@@ -63,7 +65,7 @@ public class TriggerPanel extends JPanel {
         isContinuous = t.getSensor().isContinuous();
         thisPanel = this;
         
-        setToolTipText("Right-click for options.");
+        setToolTipText(RES.getString("TPANEL_TOOL_TIP"));
         
         parent = p;
         setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -72,7 +74,7 @@ public class TriggerPanel extends JPanel {
         setBorder(new LineBorder(Color.LIGHT_GRAY, 1));
         createMenus();
         
-        reqdState = new WT_ReqdState("IF", t);
+        reqdState = new WT_ReqdState(RES.getString("TPANEL_IF"), t);
         add( reqdState );
 //        add( new ThickBar(10));
         if (isContinuous) {
@@ -86,7 +88,7 @@ public class TriggerPanel extends JPanel {
         }
         add( signalLevel );
 //        add( new ThickBar(10));
-        delay = new WT_Delay("for", t);
+        delay = new WT_Delay(RES.getString("TPANEL_FOR"), t);
         add(delay);
         
 //        add(new Arrow(35));
@@ -96,17 +98,17 @@ public class TriggerPanel extends JPanel {
             Trigger tmp = new Trigger(t.getSensor());
             tmp.setAction(Model.getActionByType(ActionType.IR));
             tmp.setActionParam( 2 );
-            WT_Action tmpUI = new WT_Action("DO", tmp);
+            WT_Action tmpUI = new WT_Action(RES.getString("TPANEL_DO"), tmp);
             Dimension dim = tmpUI.getPreferredSize();
 //            System.out.println("Calibration - H: " + Integer.toString(dim.height) + " W: " + Integer.toString(dim.width));
             ACTION_WIDTH = dim.width + 5;
             ACTION_HEIGHT = dim.height;
         }
         
-        actionUI = new WT_Action("DO", t);
+        actionUI = new WT_Action(RES.getString("TPANEL_DO"), t);
         actionUI.setPreferredSize(new Dimension(ACTION_WIDTH, ACTION_HEIGHT)); // Enough for PI
         add( actionUI );
-        actionState = new WT_ActionState("go to", t);
+        actionState = new WT_ActionState(RES.getString("TPANEL_GO_TO"), t);
         add( actionState );
         
         MouseListener pListener = new PopupListener();
@@ -124,10 +126,10 @@ public class TriggerPanel extends JPanel {
     
     private void createMenus() {
         popup = new JPopupMenu();
-        editMI = new JMenuItem("Edit");
-        deleteMI = new JMenuItem("Delete");
-        moveUpMI = new JMenuItem("Move Up");
-        moveDownMI = new JMenuItem("Move Down");
+        editMI = new JMenuItem(RES.getString("TPANEL_DD_EDIT"));
+        deleteMI = new JMenuItem(RES.getString("TPANEL_DD_DELETE"));
+        moveUpMI = new JMenuItem(RES.getString("TPANEL_DD_MOVE_UP"));
+        moveDownMI = new JMenuItem(RES.getString("TPANEL_DD_MOVE_DOWN"));
         popup.add(editMI);
         popup.add(deleteMI);
         popup.add(moveUpMI);

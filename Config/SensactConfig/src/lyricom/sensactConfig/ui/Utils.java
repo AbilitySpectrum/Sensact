@@ -20,6 +20,7 @@ package lyricom.sensactConfig.ui;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ import lyricom.sensactConfig.widgets.WT_Action;
  * @author Andrew
  */
 public class Utils {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     public static final Font STD_FONT = new Font("Dialog", Font.PLAIN, 12);
     public static final Font STD_BOLD_FONT = new Font("Dialog", Font.BOLD, 12);
     public static final Font STATE_FONT = new Font("Dialog", Font.PLAIN, 14);
@@ -93,7 +95,7 @@ public class Utils {
         if (imgURL != null) {
             return new ImageIcon(imgURL, "");
         } else {
-            System.err.println("Couldn't find file: " + path);
+            System.err.println(RES.getString("SYS_ERR_COULD_NOT_FIND_FILE") + " " + path);
             return null;
         }
     } 
