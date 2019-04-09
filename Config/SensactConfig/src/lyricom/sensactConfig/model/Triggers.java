@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
 
 /**
  * Holds the list of triggers.
@@ -184,7 +185,7 @@ public class Triggers {
         }
     }
     
-    public OutStream getTriggerData() {
+    public OutStream getTriggerData() throws DataFormatException {
         OutStream os = new OutStream();
         os.putChar(Model.START_OF_TRIGGERS);
         os.putNum(Triggers.getInstance().length(), 2);

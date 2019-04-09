@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -266,7 +267,16 @@ public class MainFrame extends JFrame implements TriggerCallback {
     }
     
     private void doSave() {
-        OutStream os = Triggers.getInstance().getTriggerData();
+        OutStream os;
+        try {
+            os = Triggers.getInstance().getTriggerData();
+        } catch (DataFormatException ex) {
+            JOptionPane.showMessageDialog(MainFrame.TheFrame, 
+                RES.getString("INTERNAL_ERROR"),
+                RES.getString("DATA_ERROR_TITLE"),
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         Serial.getInstance().writeList(os.getBuffer());
         Triggers.DATA_IN_SYNC = true;
     }
@@ -338,8 +348,17 @@ public class MainFrame extends JFrame implements TriggerCallback {
                 writeIt = true;
             }
             if (writeIt) {
-                OutStream os = Triggers.getInstance().getTriggerData();
+                OutStream os;
                 try {
+                    os = Triggers.getInstance().getTriggerData();
+                } catch (DataFormatException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.TheFrame, 
+                        RES.getString("INTERNAL_ERROR"),
+                        RES.getString("DATA_ERROR_TITLE"),
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                        try {
                     FileOutputStream fos = new FileOutputStream(output);
                     for(Byte b: os.getBuffer()) {
                         fos.write(b);
@@ -356,7 +375,16 @@ public class MainFrame extends JFrame implements TriggerCallback {
     }
     
     private void displayTriggers() {
-        OutStream os = Triggers.getInstance().getTriggerData();
+        OutStream os;
+        try {
+            os = Triggers.getInstance().getTriggerData();
+        } catch (DataFormatException ex) {
+            JOptionPane.showMessageDialog(MainFrame.TheFrame, 
+                RES.getString("INTERNAL_ERROR"),
+                RES.getString("DATA_ERROR_TITLE"),
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         byte[] bytes = Utils.listToArray(os.getBuffer());
         String s = new String(bytes);
         System.out.println(s);

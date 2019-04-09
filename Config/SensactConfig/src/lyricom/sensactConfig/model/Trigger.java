@@ -18,6 +18,7 @@
 package lyricom.sensactConfig.model;
 
 import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
 
 /**
  *
@@ -105,7 +106,7 @@ public class Trigger {
         }
     }
     
-    public void toStream(OutStream os) {
+    public void toStream(OutStream os) throws DataFormatException {
         os.putChar((byte)'\n');
         os.putChar(TRIGGER_START);
         os.putID(sensor.getId(), 2);
@@ -115,15 +116,16 @@ public class Trigger {
         os.putID(action.getId(), 2);
         os.putID(actionState, 1);
 
+        int transmittedActionParam = actionParam;
         if (Model.getVersionID() >= 406) { 
             if (action.getType() == ActionType.IR) {
                 // Map IR Action code parameter into the IR code signal
                 // needed for the selected TV type.
-                actionParam = TVInfo.getInstance().ID2Code(actionParam);
+                transmittedActionParam = TVInfo.getInstance().ID2Code(actionParam);
             }
         }
         
-        os.putNum(actionParam, 4);
+        os.putNum(transmittedActionParam, 4);
         os.putNum(delay, 2);
         os.putBoolean(repeat);
         os.putChar(TRIGGER_END);

@@ -3,6 +3,7 @@ package lyricom.sensactConfig.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
 
 /**
  * A singleton class which holds, organizes and controls TV control
@@ -225,7 +226,7 @@ public class TVInfo {
     
     // Called when a trigger is being sent out.  Uses the TV type and
     // the action ID to generate the appropriate IR codes.
-    public int ID2Code(int actionID) {
+    public int ID2Code(int actionID) throws DataFormatException {
         int tvid;
         int irCode;
         if (actionID < 100) { // Volume Control
@@ -235,6 +236,9 @@ public class TVInfo {
             tvid = currentChannelControl.getTVId();
             irCode = currentChannelControl.getMap().getIRCode(actionID);
             
+        }
+        if(irCode == 0) {
+            throw new DataFormatException();
         }
         return (tvid << 24) | irCode;
     }
