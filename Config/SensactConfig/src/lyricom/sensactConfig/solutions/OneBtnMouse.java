@@ -18,7 +18,7 @@
 package lyricom.sensactConfig.solutions;
 
 import javax.swing.JOptionPane;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -40,7 +40,7 @@ public class OneBtnMouse extends SolutionBase {
         Location btnLocHi = getButton();
         if (btnLocHi == null) return false;
                         
-        int delay = theUI.getDelay("Enter delay between beeps.", 1000);
+        int delay = theUI.getDelay(SRes.getStr("OBM_DELAY_QUESTION"), 1000);
         
         if (cancelling) return false;
         
@@ -48,8 +48,8 @@ public class OneBtnMouse extends SolutionBase {
         SaAction mouse = mouseSelection();       
         if (cancelling) return false;
 
-        SaAction buzz = Model.getActionByName(ActionName.BUZZER);
-        SaAction none = Model.getActionByName(ActionName.NONE);
+        SaAction buzz = Model.getActionByType(ActionType.BUZZER);
+        SaAction none = Model.getActionByType(ActionType.NONE);
         // ... and the required button positions.        
         btnLocHi.level = Trigger.Level.LEVEL1;        
         Location btnLocLo = btnLocHi.getReverse();

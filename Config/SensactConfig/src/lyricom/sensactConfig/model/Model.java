@@ -18,9 +18,11 @@
 package lyricom.sensactConfig.model;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.ui.ActionUI;
 
 /**
@@ -30,6 +32,8 @@ import lyricom.sensactConfig.ui.ActionUI;
  * @author Andrew
  */
 public class Model {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+
     // Commands sent to sensact
     public static final Byte CMD_VERSION        = (byte) 'V';
     public static final Byte CMD_RUN            = (byte) 'R';
@@ -63,12 +67,31 @@ public class Model {
     static public final int NUDGE_RIGHT = 13;
     static public final int NUDGE_STOP = 14;
     
-    // IR TV Control values	
+    // OLD IR TV Control values	
     static public final int TV_ON_OFF = 1;
     static public final int VOLUME_UP = 2;
     static public final int VOLUME_DOWN = 3;
     static public final int CHANNEL_UP = 4;
     static public final int CHANNEL_DOWN = 5;
+    
+    // NEW IR TV Control values
+    static public final int IR_TV_ON_OFF = 1;
+    static public final int IR_VOLUME_UP = 2;
+    static public final int IR_VOLUME_DOWN = 3;
+    static public final int IR_MUTE = 4;
+    static public final int IR_BOX_ON_OFF = 101;
+    static public final int IR_CHANNEL_UP = 102;
+    static public final int IR_CHANNEL_DOWN = 103;
+    static public final int IR_DIGIT_0 = 110;
+    static public final int IR_DIGIT_1 = 111;
+    static public final int IR_DIGIT_2 = 112;
+    static public final int IR_DIGIT_3 = 113;
+    static public final int IR_DIGIT_4 = 114;
+    static public final int IR_DIGIT_5 = 115;
+    static public final int IR_DIGIT_6 = 116;
+    static public final int IR_DIGIT_7 = 117;
+    static public final int IR_DIGIT_8 = 118;
+    static public final int IR_DIGIT_9 = 119;
     
     // Relay values (starting with V4.3)
     static public final int RELAY_PULSE = 0;
@@ -79,16 +102,21 @@ public class Model {
     static public final int KEY_PRESS = 0xff000000;
     static public final int KEY_RELEASE = 0xfe000000;
 
+    static private int VERSION_ID;
+    static public int getVersionID() { return VERSION_ID; }
+    
     // Lists of Sensors and Actions.
     // Created once by initModel.
     public static List<Sensor> sensorList;
     public static List<SensorGroup> sensorGroups;
     public static List<SaAction> actionList;
-    public static Map<ActionName,SaAction> actionMap;
+    public static Map<ActionType,SaAction> actionMap;
     
     public static void initModel(int versionID) {
+        VERSION_ID = versionID;
         initSensorList(versionID);
         initActionList(versionID);
+        TVInfo.getInstance().init();
     }
     
     // Define sensors and sensor groupings.
@@ -96,22 +124,22 @@ public class Model {
         sensorList = new ArrayList<>();
         sensorGroups = new ArrayList<>();
         
-        SensorGroup grp = new SensorGroup(MRes.getStr("SENSOR1"));
+        SensorGroup grp = new SensorGroup(GroupID.SENSOR1);
         grp.add( new Sensor(5, MRes.getStr("SENSOR1A"), 0, 1023, true) );
         grp.add( new Sensor(6, MRes.getStr("SENSOR1B"), 0, 1023, true) );
         sensorGroups.add(grp);
 
-        grp = new SensorGroup(MRes.getStr("SENSOR2"));
+        grp = new SensorGroup(GroupID.SENSOR2);
         grp.add( new Sensor(3, MRes.getStr("SENSOR2A"), 0, 1023, true) );
         grp.add( new Sensor(4, MRes.getStr("SENSOR2B"), 0, 1023, true) );
         sensorGroups.add(grp);
         
-        grp = new SensorGroup(MRes.getStr("SENSOR3"));
+        grp = new SensorGroup(GroupID.SENSOR3);
         grp.add( new Sensor(1, MRes.getStr("SENSOR3A"), 0, 1023, true) );
         grp.add( new Sensor(2, MRes.getStr("SENSOR3B"), 0, 1023, true) );
         sensorGroups.add(grp);
         
-        grp = new SensorGroup(MRes.getStr("ACCEL"));
+        grp = new SensorGroup(GroupID.ACCEL);
         grp.add( new Sensor(8,  MRes.getStr("ACCELX"), -16000, 16000, true) );
         grp.add( new Sensor(9,  MRes.getStr("ACCELY"), -16000, 16000, true) );
         grp.add( new Sensor(10, MRes.getStr("ACCELZ"), -16000, 16000, true) );
@@ -125,7 +153,7 @@ public class Model {
 	* Simlarly the "Any Motion sensor will deliver values from
 	* 0 to 28,377 but we chop off the most violent motions.
         */
-        grp = new SensorGroup(MRes.getStr("GYRO"));
+        grp = new SensorGroup(GroupID.GYRO);
         grp.add( new Sensor(11, MRes.getStr("GYROX"), -15000, 15000, true) );
         grp.add( new Sensor(12, MRes.getStr("GYROY"), -15000, 15000, true) );
         grp.add( new Sensor(13, MRes.getStr("GYROZ"), -15000, 15000, true) );
@@ -134,7 +162,7 @@ public class Model {
         }
         sensorGroups.add(grp);
 
-        grp = new SensorGroup(MRes.getStr("USB_PORT"));
+        grp = new SensorGroup(GroupID.USB_PORT);
         grp.add( new Sensor(7, MRes.getStr("USB_INPUT"), 0, 255, false) );
         sensorGroups.add(grp);
         
@@ -150,46 +178,46 @@ public class Model {
     // Order is important.  This will be the order in the combo box.
     private static void initActionList(int versionID) {
         actionList = new ArrayList<>();
-        actionMap = new HashMap<>();
+        actionMap = new EnumMap<>(ActionType.class);
         
-        actionList.add(new SaAction(0, ActionName.NONE,    0, ActionUI.NONE, null));
+        actionList.add(new SaAction(ActionType.NONE,    0, ActionUI.NONE, null));
         if (versionID >= 403) {
-            actionList.add(new SaAction(1, ActionName.RELAY_A, 0, ActionUI.RELAY_OPTION, null));            
-            actionList.add(new SaAction(2, ActionName.RELAY_B, 0, ActionUI.RELAY_OPTION, null));
+            actionList.add(new SaAction(ActionType.RELAY_A, 0, ActionUI.RELAY_OPTION, null));            
+            actionList.add(new SaAction(ActionType.RELAY_B, 0, ActionUI.RELAY_OPTION, null));
         } else {
-            actionList.add(new SaAction(1, ActionName.RELAY_A, 0, ActionUI.NONE, null));
-            actionList.add(new SaAction(2, ActionName.RELAY_B, 0, ActionUI.NONE, null));
+            actionList.add(new SaAction(ActionType.RELAY_A, 0, ActionUI.NONE, null));
+            actionList.add(new SaAction(ActionType.RELAY_B, 0, ActionUI.NONE, null));
         }
         
-        actionList.add(new SaAction(3, ActionName.BT_KEYBOARD, 65, ActionUI.KEY_OPTION, (p) -> p >= 32));
-        actionList.add(new SaAction(3, ActionName.BT_SPECIAL,  10, ActionUI.BT_SPECIAL, (p) -> p <  32));
+        actionList.add(new SaAction(ActionType.BT_KEYBOARD, 65, ActionUI.KEY_OPTION, (p) -> p >= 32));
+        actionList.add(new SaAction(ActionType.BT_SPECIAL,  10, ActionUI.BT_SPECIAL, (p) -> p <  32));
         
-        actionList.add(new SaAction(9, ActionName.BT_MOUSE, MOUSE_UP, ActionUI.MOUSE_OPTION, null));
-        actionList.add(new SaAction(4, ActionName.HID_KEYBOARD,  65,  ActionUI.KEY_OPTION, 
+        actionList.add(new SaAction(ActionType.BT_MOUSE, MOUSE_UP, ActionUI.MOUSE_OPTION, null));
+        actionList.add(new SaAction(ActionType.HID_KEYBOARD,  65,  ActionUI.KEY_OPTION, 
                 (p) -> (((p & 0x80000000) == 0) && !((0x100 > p) && (p > 0x7f))) ) );
-        actionList.add(new SaAction(4, ActionName.HID_SPECIAL, 0xB0,  ActionUI.HID_SPECIAL, 
+        actionList.add(new SaAction(ActionType.HID_SPECIAL, 0xB0,  ActionUI.HID_SPECIAL, 
                 (p) ->  ((0xfe > p) && (p > 0x7f))));
         if (versionID >= 404) {
-            actionList.add(new SaAction(4, ActionName.HID_KEYPRESS, 0xFF000061,  ActionUI.HID_KEYPRESS, 
+            actionList.add(new SaAction(ActionType.HID_KEYPRESS, 0xFF000061,  ActionUI.HID_KEYPRESS, 
                 (p) ->  ((p & 0xff000000) == KEY_PRESS)));
-            actionList.add(new SaAction(4, ActionName.HID_KEYRELEASE, 0xFE000061,  ActionUI.HID_KEYRELEASE, 
+            actionList.add(new SaAction(ActionType.HID_KEYRELEASE, 0xFE000061,  ActionUI.HID_KEYRELEASE, 
                 (p) ->  ((p & 0xff000000) == KEY_RELEASE)));
         }
-        actionList.add(new SaAction(5, ActionName.HID_MOUSE, MOUSE_UP,       ActionUI.MOUSE_OPTION, null));
-        actionList.add(new SaAction(7, ActionName.BUZZER, (400 << 16) + 250, ActionUI.BUZZER,       null));
-        actionList.add(new SaAction(8, ActionName.IR, TV_ON_OFF,             ActionUI.IR_OPTION,    null));
+        actionList.add(new SaAction(ActionType.HID_MOUSE, MOUSE_UP,       ActionUI.MOUSE_OPTION, null));
+        actionList.add(new SaAction(ActionType.BUZZER, (400 << 16) + 250, ActionUI.BUZZER,       null));
+        actionList.add(new SaAction(ActionType.IR, TV_ON_OFF,  ActionUI.IR_OPTION,    null));
         if (versionID >= 400) {
-            actionList.add(new SaAction(6, ActionName.SERIAL, 65, ActionUI.KEY_OPTION, null));
+            actionList.add(new SaAction(ActionType.SERIAL, 65, ActionUI.KEY_OPTION, null));
         }
-        actionList.add(new SaAction(10, ActionName.SET_STATE, 0x101, ActionUI.SET_STATE, null));
+        actionList.add(new SaAction(ActionType.SET_STATE, 0x101, ActionUI.SET_STATE, null));
         
         if (versionID >= 402) {
-            actionList.add(new SaAction(11, ActionName.LIGHT_BOX, 0, ActionUI.LIGHT_BOX, null));
+            actionList.add(new SaAction(ActionType.LIGHT_BOX, 0, ActionUI.LIGHT_BOX, null));
         }
         
         // Create a map of actions for lookup-by-name
         for (SaAction a: actionList) {
-            actionMap.put(a.getName(), a);
+            actionMap.put(a.getType(), a);
         }
     }
     
@@ -225,8 +253,8 @@ public class Model {
         return null;
     }
     
-    public static SaAction getActionByName(ActionName name) {
-        return actionMap.get(name);
+    public static SaAction getActionByType(ActionType type) {
+        return actionMap.get(type);
     }
     
     public static List<SaAction> getActionList() {
@@ -236,7 +264,7 @@ public class Model {
     // This is called when sensor data is received.
     public static void updateSensorValues(InStream in) throws IOError {
         if (in.getChar() != START_OF_DATA) {
-            throw new IOError("Invalid start of sensor data");
+            throw new IOError(RES.getString("CDE_INVALID_SENSOR_DATA"));
         }
         
         int sensorCount = in.getNum(2);
@@ -247,7 +275,7 @@ public class Model {
             if (s != null) {
                 s.setCurrentValue(value);
             } else {
-                System.out.print("No sensor with id ");
+                System.out.print(RES.getString("CDE_INVALID_SENSOR_ID") + ' ');
                 System.out.println(id);
             }
         }       

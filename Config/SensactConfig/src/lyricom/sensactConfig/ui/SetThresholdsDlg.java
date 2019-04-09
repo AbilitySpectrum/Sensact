@@ -26,6 +26,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import lyricom.sensactConfig.comms.Serial;
 import lyricom.sensactConfig.model.Model;
@@ -37,6 +38,7 @@ import lyricom.sensactConfig.model.SensorSignalLevelChangeListener;
  * @author Andrew
  */
 public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChangeListener {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     private final Sensor theSensor;
     private final SetThresholdsDlg thisDlg;
     
@@ -108,7 +110,7 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
     private JComponent header() {
         FlowLayout layout = new FlowLayout(FlowLayout.CENTER, 5, 10);
         JPanel p = new JPanel(layout);
-        JLabel l = new JLabel("Set Thresholds for " + theSensor.getName());
+        JLabel l = new JLabel(RES.getString("THRES_SET_FOR") + " " + theSensor.getName());
         l.setFont(Utils.TITLE_FONT);
         p.add(l);
 ////        p.add(new JSeparator(JSeparator.HORIZONTAL));
@@ -118,8 +120,8 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
     private JComponent buttons() {
         FlowLayout layout = new FlowLayout(FlowLayout.CENTER, 5, 10);
         JPanel p = new JPanel(layout);
-        JButton done = new JButton("Done");
-        JButton cancel = new JButton("Cancel");
+        JButton done = new JButton(RES.getString("BTN_DONE"));
+        JButton cancel = new JButton(RES.getString("BTN_CANCEL"));
         done.addActionListener(e -> {
             theSensor.removeListener();
             Serial.getInstance().writeByte(Model.CMD_VERSION);
@@ -144,28 +146,28 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
         Box b = Box.createVerticalBox();
         
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        p.add(newLabel("Current Signal Level"));
+        p.add(newLabel(RES.getString("THRES_CURRENT_LEVEL")));
         currentSlider =  new mySlider(theSensor.getMinval(), theSensor.getMaxval(), 0);
 //        currentSlider = newSlider(ltValue);
         p.add(currentSlider);
         b.add(p);
 
         p = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        p.add(newLabel("Level 1 threshold"));
+        p.add(newLabel(RES.getString("THRES_LEVEL_1")));
         gtSlider = newSlider(level1);
         p.add(gtSlider);
         b.add(p);
         
         p = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
-        p.add(newLabel("Level 2 threshold"));
+        p.add(newLabel(RES.getString("THRES_LEVEL_2")));
         ltSlider = newSlider(level2);
         p.add(ltSlider);
         b.add(p);
         
         p = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 0));
         p.add(newLabel(""));
-        p.add(new JLabel(" MIN"));
-        JLabel max = new JLabel("MAX ");
+        p.add(new JLabel(" " + RES.getString("THRES_MIN")));
+        JLabel max = new JLabel(RES.getString("THRES_MAX") + " ");
         Dimension d = max.getPreferredSize();
         d.width = 450;
         max.setPreferredSize(d);
@@ -182,14 +184,7 @@ public class SetThresholdsDlg extends JDialog implements SensorSignalLevelChange
         area.setEditable(false);
         area.setBackground(p.getBackground());
         
-        area.setText("Use this interface to set the signal levels for a sensor.\n"
-                + "The two sliders let you set the levels.\n"
-                + "The top line shows the current signal level coming from the sensact.\n"
-                + "The color of the top line indicates the signal level relative to "
-                + "the sliders:\n"
-                + "  RED - the signal is higher than both of the sliders.\n"
-                + "  GREEN - the signal is lower than both of the sliders.\n"
-                + "  BLUE - the signal level is between the two sliders.");
+        area.setText(RES.getString("THRES_INSTRUCTIONS"));
         p.add(Box.createHorizontalStrut(20));
         p.add(area);
         return p;

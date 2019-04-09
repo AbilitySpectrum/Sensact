@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import javax.swing.*;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SensorGroup;
 import lyricom.sensactConfig.model.Trigger;
@@ -73,9 +73,9 @@ public class SolutionsUI extends JDialog {
         add(options, BorderLayout.CENTER);
         add(cancelBtn(), BorderLayout.SOUTH);
         
-        messageBox.setText("Choose a solution");
+        messageBox.setText(SRes.getStr("SW_CHOOSE"));
         showSolutions( SolutionRegister.getInstance().
-                getApplicableSolutions(theGroup.getName()) );
+                getApplicableSolutions(theGroup.getID()) );
         
         pack();
         // Center on screen
@@ -96,7 +96,7 @@ public class SolutionsUI extends JDialog {
     
     private JPanel cancelBtn() {
         JPanel p = new JPanel();
-        cancelBtn = new JButton("Cancel");
+        cancelBtn = new JButton(SRes.getStr("SW_CANCEL"));
         cancelBtn.addActionListener(e -> {
             if (theSolution != null) {
                 theSolution.cancel();
@@ -115,12 +115,12 @@ public class SolutionsUI extends JDialog {
     }
     
     // Used to show solution options
-    private void showSolutions(String[] opts) {
+    private void showSolutions(SolutionID[] opts) {
         clearOptions();
         options.add(Box.createVerticalStrut(10));
-        for(String s: opts) {
-            final String fs = s;
-            JButton b = new JButton(fs);
+        for(SolutionID id: opts) {
+            final SolutionID theID = id;
+            JButton b = new JButton(id.getName());
             b.setAlignmentX(Component.CENTER_ALIGNMENT);
             b.addActionListener(e -> {
                 if (popupDesc != null) {
@@ -130,12 +130,12 @@ public class SolutionsUI extends JDialog {
                 // This is the response to "Select a solution"
                 // Start the solution thread.
                 theSolution = SolutionRegister.getInstance()
-                        .startSolution(fs, thisDlg, theGroup);
+                        .startSolution(theID, thisDlg, theGroup);
                 if (theSolution == null) {
                     JOptionPane.showMessageDialog(
                         thisDlg,
-                        "Solution failed to launch",
-                        "Solution error",
+                        SRes.getStr("SW_FAILURE_MSG"),
+                        SRes.getStr("SW_FAILURE_TITLE"),
                         JOptionPane.ERROR_MESSAGE);
                     thisDlg.dispose();
                 }
@@ -144,7 +144,7 @@ public class SolutionsUI extends JDialog {
             b.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    if (popupDesc != null && !popupTarget.equals(fs)) {
+                    if (popupDesc != null && !popupTarget.equals(theID.getName())) {
                         popupDesc.dispose();
                         popupTarget = null;
                         popupDesc = null;
@@ -153,8 +153,8 @@ public class SolutionsUI extends JDialog {
                         // Only popup once for a given button
                         // This is to supress multiple mouseEnter events 
                         // on the Mac - poor Mac!
-                        popupDesc = new Description(thisDlg, SolutionRegister.getInstance().getToolTip(fs));
-                        popupTarget = fs;
+                        popupDesc = new Description(thisDlg, theID.getToolTipText());
+                        popupTarget = theID.getName();
                     }
                 }
                 @Override
@@ -261,13 +261,13 @@ public class SolutionsUI extends JDialog {
     
     private void showNumberOption(int dft) {
         clearOptions();
-        final W_Number numberFld = new W_Number("", "Delay", 5, 0, 30000);
+        final W_Number numberFld = new W_Number("", SRes.getStr("SW_DELAY"), 5, 0, 30000);
         numberFld.setAlignmentX(Component.CENTER_ALIGNMENT);
         numberFld.setLayout(new FlowLayout(FlowLayout.CENTER));
         numberFld.setMaximumSize(new Dimension(100, 20));
 
         numberFld.setValue(dft);
-        JButton doneBtn = new JButton("Done");
+        JButton doneBtn = new JButton(SRes.getStr("SW_DONE"));
         doneBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         options.add(Box.createVerticalStrut(10));
@@ -313,7 +313,7 @@ public class SolutionsUI extends JDialog {
         spinner.setLayout(new FlowLayout(FlowLayout.CENTER));
         spinner.setMaximumSize(new Dimension(150, 30));
 
-        JButton doneBtn = new JButton("Done");
+        JButton doneBtn = new JButton(SRes.getStr("SW_DONE"));
         doneBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         options.add(Box.createVerticalStrut(10));
@@ -358,7 +358,7 @@ public class SolutionsUI extends JDialog {
         p.setPreferredSize(ACTION_SIZE);
         options.add(p);
         
-        JButton doneBtn = new JButton("Done");
+        JButton doneBtn = new JButton(SRes.getStr("SW_DONE"));
         doneBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         options.add(Box.createVerticalStrut(10));
         options.add(doneBtn);
@@ -388,7 +388,7 @@ public class SolutionsUI extends JDialog {
     
     private void presentActionUI(int actionCount, boolean showAction1) {
         SwingUtilities.invokeLater(() -> {
-            messageBox.setText("Define the prompts and actions");
+            messageBox.setText(SRes.getStr("PHS_DEFINE_PROMPTS_AND_ACTIONS"));
             showActionUI(actionCount, showAction1);
         });
     }
@@ -397,9 +397,9 @@ public class SolutionsUI extends JDialog {
         if (ACTION_SIZE == null) {
             // Calibration - done once.
             Trigger t = new Trigger(Model.getSensorByID(1));
-            t.setAction(Model.getActionByName(ActionName.IR));
+            t.setAction(Model.getActionByType(ActionType.IR));
             t.setActionParam(2);
-            WT_Action actionUI = new WT_Action("Prompt 1:", t);
+            WT_Action actionUI = new WT_Action(SRes.getStr("PHS_PROMPT1"), t);
             ACTION_SIZE = actionUI.getPreferredSize();  
 //            System.out.println("Action - H: " + Integer.toString(ACTION_SIZE.height) + " W: " + Integer.toString(ACTION_SIZE.width));
         }
@@ -420,16 +420,16 @@ public class SolutionsUI extends JDialog {
                 pr = new JPanel();
             } else {
                 tp = new Trigger(Model.getSensorByID(1));
-                pr = new WT_Action("Prompt " + num + ":", tp);
+                pr = new WT_Action(SRes.getStr("PHS_PROMPT") + " " + num + ":", tp);
             }
-            JComponent ac = new WT_Action("Action " + num + ":", ta);
+            JComponent ac = new WT_Action(SRes.getStr("PHS_ACTION") + " " + num + ":", ta);
             pr.setPreferredSize(ACTION_SIZE);
             ac.setPreferredSize(ACTION_SIZE);
             p.add(pr);
             p.add(ac);
             JCheckBox cb;
             if (i != 1 || showAction1) {
-                p.add(new JLabel("Latch:"));
+                p.add(new JLabel(SRes.getStr("PHS_LATCH") + ":"));
                 cb = new JCheckBox("");
                 p.add(cb);
             } else {
@@ -440,7 +440,7 @@ public class SolutionsUI extends JDialog {
             box.add(p);
         }
         
-        JButton doneBtn = new JButton("Done");
+        JButton doneBtn = new JButton(SRes.getStr("SW_DONE"));
         doneBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         options.add(Box.createVerticalStrut(10));
         options.add(doneBtn);

@@ -18,7 +18,7 @@
 package lyricom.sensactConfig.solutions;
 
 import java.util.List;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -42,21 +42,21 @@ public class PressReleaseWaitSelect extends SolutionBase {
         Location btnLocLo = btnLocHi.getReverse();
         if (cancelling) return false;
         
-        int actionCount = theUI.getActionCount("How many actions?");
+        int actionCount = theUI.getActionCount(SRes.getStr("PHS_ACTION_COUNT"));
         if (cancelling) return false;
                 
         List<ActionRow> actions = theUI.getActions(actionCount, true);
 
-        int delay = theUI.getDelay("Enter the delay between prompts", 1000);
+        int delay = theUI.getDelay(SRes.getStr("PHS_PROMPT_DELAY"), 1000);
         if (cancelling) return false;
         
-        int endDelay = theUI.getDelay("Enter the reset delay", delay*2);
+        int endDelay = theUI.getDelay(SRes.getStr("PHS_RESET_DELAY"), delay*2);
         if (cancelling) return false;
         
-        Trigger endAction = theUI.getSingleAction("What is the reset action?");
+        Trigger endAction = theUI.getSingleAction(SRes.getStr("PHS_RESET_ACTION"));
         if (cancelling) return false;
         
-        SaAction none = Model.getActionByName(ActionName.NONE);
+        SaAction none = Model.getActionByType(ActionType.NONE);
         Triggers.getInstance().deleteTriggerSet(btnLocHi.sensor);
 
         makeTrigger(1, btnLocHi, 0, none, 0, 2);

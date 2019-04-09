@@ -202,7 +202,7 @@ public class Connection implements SerialCallback {
             try {
                 Model.updateSensorValues(in);
             } catch (IOError e) {
-                System.out.println("Unexpected IO Error: " + e.getMessage());
+                System.out.println(RES.getString("CM_UNKNOWN") + ' ' + e.getMessage());
             }
             
         // Process Trigger Data
@@ -215,8 +215,8 @@ public class Connection implements SerialCallback {
                 Triggers.DATA_IN_SYNC = true;
             } catch(IOError e) {
                 JOptionPane.showMessageDialog(MainFrame.TheFrame, 
-                        "Error receiving data.\n" + e.getMessage(),
-                        "Data Error",
+                        RES.getString("CM_DATA_ERROR") + e.getMessage(),
+                        RES.getString("CMT_DATA_ERROR"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }

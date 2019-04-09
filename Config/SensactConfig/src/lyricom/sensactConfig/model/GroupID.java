@@ -15,34 +15,31 @@
  * along with this Sensact Arduino software.  
  * If not, see <https://www.gnu.org/licenses/>.   
  */ 
-package lyricom.sensactConfig.widgets;
-
-import java.util.ResourceBundle;
-import lyricom.sensactConfig.model.Trigger;
+package lyricom.sensactConfig.model;
 
 /**
- *
+ * The GrouID is used to provide a localizable string name to each sensor
+ * group and also provides a key for to retrieval and identification of 
+ * a group (in Solutions).
+ * 
  * @author Andrew
  */
-public class WT_LightBox extends W_Number {
-    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
-
-    private final Trigger theTrigger;
-    public WT_LightBox(String label, Trigger t) {
-        super(label, RES.getString("NE_FLD_VALUE"), 3, 0, 255);
-        theTrigger = t;
-        update();
-    }
-
-    @Override
-    public void widgetChanged() {
-        int value = getValue();
-        theTrigger.setActionParam( value );
+public enum GroupID {
+    SENSOR1,
+    SENSOR2,
+    SENSOR3,
+    ACCEL,
+    GYRO,
+    USB_PORT;
+    
+    String localizedName;
+    
+    GroupID() {
+        localizedName = MRes.getStr(this.name());
     }
     
-    @Override
-    public void update() {
-        int value = theTrigger.getActionParam() & 0xff;
-        setValue(value);
+    public String toString() {
+        return localizedName;
     }
+
 }

@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
@@ -35,6 +36,7 @@ import lyricom.sensactConfig.ui.Utils;
  * @author Andrew
  */
 public class W_Number extends W_Base {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     protected final JTextField field;
     private final int maxWidth;
@@ -78,8 +80,9 @@ public class W_Number extends W_Base {
         public boolean verify(JComponent input) {
             if (getValue() < minValue) {
                 JOptionPane.showMessageDialog(MainFrame.TheFrame,
-                        fldName + " may be not less than " + Integer.toString(minValue),
-                        "Input Error",
+                        fldName + " " + RES.getString("NE_MSG_TOO_SMALL") 
+                                + " " + Integer.toString(minValue),
+                        RES.getString("NE_MSG_TITLE"),
                         JOptionPane.ERROR_MESSAGE);
                 setValue(minValue);  
                 return false;
@@ -116,8 +119,8 @@ public class W_Number extends W_Base {
             super.replace(fb, offset, len, str, attrs);
             if (getValue() > maxValue) {
                 JOptionPane.showMessageDialog(MainFrame.TheFrame,
-                        fldName + " may be not more than " + Integer.toString(maxValue),
-                        "Input Error",
+                        fldName + " " + RES.getString("NE_MSG_TOO_LARGE") + " " + Integer.toString(maxValue),
+                        RES.getString("NE_MSG_TITLE"),
                         JOptionPane.ERROR_MESSAGE);
                 setValue(maxValue);
             }

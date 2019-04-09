@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import lyricom.sensactConfig.model.Trigger;
 
 /**
@@ -24,10 +25,11 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_Frequency extends W_Number {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     private final Trigger theTrigger;
     public WT_Frequency(String label, Trigger t) {
-        super(label, "Frequency", 4, 50, 2000);
+        super(label, RES.getString("NE_FLD_FREQUENCY"), 4, 50, 2000);
         theTrigger = t;
         update();
     }

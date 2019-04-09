@@ -19,12 +19,14 @@ package lyricom.sensactConfig.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author Andrew
  */
 public class InStream {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     
     private final List<Byte> bytes;
     private int index;
@@ -48,7 +50,7 @@ public class InStream {
             index++;
             return b;
         } else {
-            throw new IOError("End of stream");
+            throw new IOError(RES.getString("CDE_END_OF_STREAM"));
         }
     }
     
@@ -73,7 +75,7 @@ public class InStream {
 	for (int i=0; i < length*2; i++) {
             int tmp = ((int) getChar() & 0xff) - Model.NUMBER_MASK;
             if (tmp < 0 || tmp > 15) {
-		throw new IOError("Invalid number");
+		throw new IOError(RES.getString("CDE_INVALID_NUMBER"));
             }
             value = (value << 4) + tmp;
             if ((i == 0) && (tmp & 0x8) == 0x8) {
@@ -94,7 +96,7 @@ public class InStream {
         for(int i=0; i<nibbles; i++) {
             int tmp = ((int) getChar() & 0xff) - Model.ID_MASK;
              if (tmp < 0 || tmp > 15) {
-		throw new IOError("Invalid ID");
+		throw new IOError(RES.getString("CDE_INVALID_ID"));
             }
             value = (value << 4) + tmp;
         }     
@@ -104,7 +106,7 @@ public class InStream {
     public int getCondition() throws IOError {
         int tmp = ((int) getChar() & 0xff) - Model.CONDITION_MASK;
         if (tmp < 1 || tmp > 3) {
-            throw new IOError("Invalid Condition");
+            throw new IOError(RES.getString("CDE_INVALID_CONDITION"));
         }
         return tmp;
     }
@@ -116,7 +118,7 @@ public class InStream {
             case Model.BOOL_FALSE:
                 return false;
             default:
-                throw new IOError("Invalid Boolean");
+                throw new IOError(RES.getString("CDE_INVALID_BOOLEAN"));
         }
     }
 }

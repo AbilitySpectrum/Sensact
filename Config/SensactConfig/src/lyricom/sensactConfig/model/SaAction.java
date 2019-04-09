@@ -25,15 +25,13 @@ import lyricom.sensactConfig.ui.ActionUI;
  * @author Andrew
  */
 public class SaAction {
-    private final int id;
-    private final ActionName name;
+    private final ActionType type;
     private final int defaultVal;
     private final ActionUI optionUI;
     private final ParameterCheck pCheck;
 
-    public SaAction(int id, ActionName name, int defaultVal, ActionUI optionUI, ParameterCheck pCheck) {
-        this.id = id;
-        this.name = name;
+    public SaAction(ActionType type, int defaultVal, ActionUI optionUI, ParameterCheck pCheck) {
+        this.type = type;
         this.defaultVal = defaultVal;
         this.optionUI = optionUI;
         this.pCheck = pCheck;
@@ -52,11 +50,11 @@ public class SaAction {
     }
 
     public int getId() {
-        return id;
+        return type.getActionID();
     }
 
-    public ActionName getName() {
-        return name;
+    public ActionType getType() {
+        return type;
     }
 
     public int getDefaultVal() {
@@ -64,6 +62,6 @@ public class SaAction {
     }
     
     public String toString() {
-        return name.toString();
+        return type.toString();
     }
 }

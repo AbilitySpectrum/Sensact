@@ -18,7 +18,7 @@
 package lyricom.sensactConfig.solutions;
 
 import javax.swing.JOptionPane;
-import lyricom.sensactConfig.model.ActionName;
+import lyricom.sensactConfig.model.ActionType;
 import lyricom.sensactConfig.model.Model;
 import lyricom.sensactConfig.model.SaAction;
 import lyricom.sensactConfig.model.SensorGroup;
@@ -30,11 +30,11 @@ import lyricom.sensactConfig.model.Triggers;
  * @author Andrew
  */
 public class ToggleMouse extends SolutionBase {
-    private static final String UP_DOWN = "Up-Down";
-    private static final String LEFT_RIGHT = "Left-Right";
+    private static final String UP_DOWN = SRes.getStr("TMW_UP_DOWN");
+    private static final String LEFT_RIGHT = SRes.getStr("TMW_LEFT_RIGHT");
     private static final String[] ORIENTATION = {UP_DOWN, LEFT_RIGHT};
-    private static final String YES = "Yes";
-    private static final String NO = "No";
+    private static final String YES = SRes.getStr("TMW_YES");
+    private static final String NO = SRes.getStr("TMW_NO");
     private static final String[] YES_NO = {YES, NO};
     
     public ToggleMouse( SolutionsUI ui, SensorGroup sg ) {
@@ -49,13 +49,13 @@ public class ToggleMouse extends SolutionBase {
         SaAction mouse = mouseSelection();
         if (cancelling) return false;
         
-        String orientation = theUI.getOption("Select the orientation.", ORIENTATION);
+        String orientation = theUI.getOption(SRes.getStr("TMW_ORIENTATION"), ORIENTATION);
         if (cancelling) return false;
 
-        int delay = theUI.getDelay("Enter delay between direction changes.", 500);
+        int delay = theUI.getDelay(SRes.getStr("TWM_DELAY"), 500);
         if (cancelling) return false;
         
-        String beep = theUI.getOption("Do you want a sound on direction change.", YES_NO);
+        String beep = theUI.getOption(SRes.getStr("TWM_SOUND"), YES_NO);
         if (cancelling) return false;
         
         btnLocHi.level = Trigger.Level.LEVEL1;        
@@ -71,12 +71,12 @@ public class ToggleMouse extends SolutionBase {
             param2 = Model.MOUSE_RIGHT;
         }
 
-        SaAction none = Model.getActionByName(ActionName.NONE);
+        SaAction none = Model.getActionByType(ActionType.NONE);
         
         SaAction actionOnChange;
         int paramOnChange;
         if (beep.equals(YES)) {
-            actionOnChange = Model.getActionByName(ActionName.BUZZER);
+            actionOnChange = Model.getActionByType(ActionType.BUZZER);
             paramOnChange = (200 << 16) + 100;
         } else {
             actionOnChange = none;

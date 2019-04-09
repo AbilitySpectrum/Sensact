@@ -15,40 +15,19 @@
  * along with this Sensact Arduino software.  
  * If not, see <https://www.gnu.org/licenses/>.   
  */ 
-package lyricom.sensactConfig.model;
+package lyricom.sensactConfig.solutions;
+
+import java.util.ResourceBundle;
 
 /**
- * The ActionName is used to provide a string name to each action
- * and is also the key needed to retrieve an action by name.
+ *
  * @author Andrew
  */
-public enum ActionName {
-    NONE,
-    RELAY_A,
-    RELAY_B,
-    BT_KEYBOARD,
-    BT_SPECIAL,
-    BT_MOUSE,
-    HID_KEYBOARD,
-    HID_SPECIAL,
-    HID_KEYPRESS,
-    HID_KEYRELEASE,
-    HID_MOUSE,
-    BUZZER,
-    IR,
-    SERIAL,
-    SET_STATE,
-    LIGHT_BOX;
+public class SRes {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("solutions");    
 
-    
-    private final String localizedName;
-    ActionName() {
-        localizedName = MRes.getStr(this.name());
+    static public String getStr(String key) {
+        return RES.getString(key);
     }
-    
-    @Override
-    public String toString() {
-        return localizedName;
-    }
- 
 }
+

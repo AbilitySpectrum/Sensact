@@ -17,6 +17,7 @@
  */ 
 package lyricom.sensactConfig.widgets;
 
+import java.util.ResourceBundle;
 import javax.swing.JLabel;
 import lyricom.sensactConfig.model.Trigger;
 
@@ -25,11 +26,12 @@ import lyricom.sensactConfig.model.Trigger;
  * @author Andrew
  */
 public class WT_Delay extends W_Number {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
 
     private final Trigger theTrigger;
     public WT_Delay(String label, Trigger t) {
-        super(label, "Hold time", 5, 0, 60000);
-        add(new JLabel("msec"));
+        super(label, RES.getString("NE_FLD_DELAY"), 5, 0, 60000);
+        add(new JLabel(RES.getString("TIME_MSEC")));
         theTrigger = t;
         update();
     }

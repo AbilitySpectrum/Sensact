@@ -17,11 +17,16 @@
  */ 
 package lyricom.sensactConfig.model;
 
+import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
+
 /**
  *
  * @author Andrew
  */
 public class Trigger {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+
     public static enum Level {
         LEVEL1, LEVEL2
     }
@@ -101,7 +106,7 @@ public class Trigger {
         }
     }
     
-    public void toStream(OutStream os) {
+    public void toStream(OutStream os) throws DataFormatException {
         os.putChar((byte)'\n');
         os.putChar(TRIGGER_START);
         os.putID(sensor.getId(), 2);
@@ -110,7 +115,17 @@ public class Trigger {
         os.putCondition(condition);
         os.putID(action.getId(), 2);
         os.putID(actionState, 1);
-        os.putNum(actionParam, 4);
+
+        int transmittedActionParam = actionParam;
+        if (Model.getVersionID() >= 406) { 
+            if (action.getType() == ActionType.IR) {
+                // Map IR Action code parameter into the IR code signal
+                // needed for the selected TV type.
+                transmittedActionParam = TVInfo.getInstance().ID2Code(actionParam);
+            }
+        }
+        
+        os.putNum(transmittedActionParam, 4);
         os.putNum(delay, 2);
         os.putBoolean(repeat);
         os.putChar(TRIGGER_END);
@@ -118,12 +133,12 @@ public class Trigger {
     
     public void fromStream(InStream is) throws IOError {
         if (is.getChar() != TRIGGER_START) {
-            throw new IOError("Invalid start of trigger");
+            throw new IOError(RES.getString("CDE_INVALID_TRIGGER_START"));
         }
         int sensorID = is.getID(2);
         Sensor tmp = Model.getSensorByID(sensorID);
         if (tmp == null) {
-            throw new IOError("Invalid sensor ID");
+            throw new IOError(RES.getString("CDE_INVALID_SENSOR_ID"));
         }
         setSensor(tmp);
         reqdState = is.getID(1);
@@ -134,12 +149,21 @@ public class Trigger {
         actionParam = is.getNum(4);
         action = Model.getActionByID(actionID, actionParam);
         if (action == null) {
-            throw new IOError("Invalid action ID");
+            throw new IOError(RES.getString("CDE_INVALID_ACTION_ID"));
+        }
+        if (action.getType() == ActionType.IR) {
+            if (Model.getVersionID() >= 406) {
+                // Map action paramter from IR code to an action ID
+                actionParam = TVInfo.getInstance().Code2ID(actionParam);
+                if (actionParam == 0) {
+                    throw new IOError(RES.getString("CDE_INVALID_TV_CODE"));
+                }
+            }
         }
         delay = is.getNum(2);
         repeat = is.getBoolean();
         if (is.getChar() != TRIGGER_END) {
-            throw new IOError("Invalid end of trigger");
+            throw new IOError(RES.getString("CDE_INVALID_TRIGGER_END"));
         }
     }
 

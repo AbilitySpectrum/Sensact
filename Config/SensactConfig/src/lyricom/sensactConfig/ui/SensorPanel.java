@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import lyricom.sensactConfig.model.Sensor;
 import lyricom.sensactConfig.model.Trigger;
@@ -38,6 +39,7 @@ import lyricom.sensactConfig.model.Triggers;
  * @author Andrew
  */
 public class SensorPanel extends JPanel {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
     protected static final List<SensorPanel> theSensorPanels = new ArrayList<>();
     
     public static void reloadTriggers() {
@@ -99,12 +101,12 @@ public class SensorPanel extends JPanel {
         p.add(name);
         
         if (theSensor.isContinuous()) {
-            JButton setThresholdsBtn = new JButton("Set Thresholds");
+            JButton setThresholdsBtn = new JButton(RES.getString("BTN_SET_THRESHOLDS"));
             p.add(setThresholdsBtn);
             setThresholdsBtn.addActionListener(e -> setThresholds());
         }
         
-        JButton newTrigger = new JButton("New Trigger");
+        JButton newTrigger = new JButton(RES.getString("BTN_NEW_TRIGGER"));
         p.add(newTrigger);
         newTrigger.addActionListener(e -> {
             addTrigger();
@@ -113,12 +115,14 @@ public class SensorPanel extends JPanel {
         
         p.add(Box.createHorizontalStrut(15));
         
-        JButton deleteAll = new JButton("Delete All");
+        JButton deleteAll = new JButton(RES.getString("BTN_DELETE_ALL"));
         p.add(deleteAll);
         deleteAll.addActionListener(e -> {
             int result = JOptionPane.showConfirmDialog(MainFrame.TheFrame,
-                "This will erase all triggers for "+theSensor.getName()+".\nDo you want to continue?",
-                "Delete Triggers",
+                RES.getString("DELETE_ALL_TEXT1") 
+                        + " " + theSensor.getName() 
+                        + RES.getString("DELETE_ALL_TEXT2"),
+                RES.getString("DELETE_ALL_TITLE"),
                 JOptionPane.YES_NO_OPTION); 
             if (result == JOptionPane.NO_OPTION) {
                 return;

@@ -20,6 +20,8 @@ package lyricom.sensactConfig.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
 
 /**
  * Holds the list of triggers.
@@ -27,6 +29,8 @@ import java.util.Objects;
  * @author Andrew
  */
 public class Triggers {
+    private static final ResourceBundle RES = ResourceBundle.getBundle("strings");
+
     public static boolean DATA_IN_SYNC;
     
     // singleton pattern
@@ -162,7 +166,7 @@ public class Triggers {
     
     private void readTriggers(List<Trigger> tmp, InStream in) throws IOError {
         if (!Objects.equals(in.getChar(), Model.START_OF_TRIGGERS)) {
-            throw new IOError("Invalid start of transmission");
+            throw new IOError(RES.getString("CDE_INVALID_START"));
         }
         int triggerCount = in.getNum(2);
         for(int i=0; i<triggerCount; i++) {
@@ -177,11 +181,11 @@ public class Triggers {
             ch = in.getChar();
         }
         if (ch != Model.END_OF_BLOCK) {
-            throw new IOError("Invalid end of transmission");
+            throw new IOError(RES.getString("CDE_INVALID_END"));
         }
     }
     
-    public OutStream getTriggerData() {
+    public OutStream getTriggerData() throws DataFormatException {
         OutStream os = new OutStream();
         os.putChar(Model.START_OF_TRIGGERS);
         os.putNum(Triggers.getInstance().length(), 2);
@@ -233,6 +237,10 @@ public class Triggers {
     // is clusters in that group.
     // Two groups are collected.
     // Data belonging to neither group is put into the nearest group.
+    // DO NOT apply this to sensors that are not continuous.
+    // This code was needed to support the transition to fixed levels.
+    // That transition is long-ago complete, so perhaps this is no longer
+    // needed??
     private void groupLevels(List<Trigger> tmp) {
         Cluster group1 = new Cluster();
         Cluster group2 = new Cluster();

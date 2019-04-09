@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.zip.DataFormatException;
 import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -114,7 +115,7 @@ public class MainFrame extends JFrame implements TriggerCallback {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
         triggerCnt = new JLabel("");
         p.add(triggerCnt);
-        JLabel l = new JLabel(" triggers");
+        JLabel l = new JLabel(" " + RES.getString("TRIGGER_COUNT"));
         p.add(l);
         Triggers t = Triggers.getInstance();
         t.addCallback(this);
@@ -266,15 +267,24 @@ public class MainFrame extends JFrame implements TriggerCallback {
     }
     
     private void doSave() {
-        OutStream os = Triggers.getInstance().getTriggerData();
+        OutStream os;
+        try {
+            os = Triggers.getInstance().getTriggerData();
+        } catch (DataFormatException ex) {
+            JOptionPane.showMessageDialog(MainFrame.TheFrame, 
+                RES.getString("INTERNAL_ERROR"),
+                RES.getString("DATA_ERROR_TITLE"),
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         Serial.getInstance().writeList(os.getBuffer());
         Triggers.DATA_IN_SYNC = true;
     }
     
     private void doClearAll() {
         int result = JOptionPane.showConfirmDialog(MainFrame.this,
-            "This will erase all triggers in all tabs.\nDo you want to continue?",
-            "Clear All",
+            RES.getString("CLEAR_ALL_TRIGGERS_TEXT"),
+            RES.getString("CLEAR_ALL_TRIGGERS_TITLE"),
             JOptionPane.YES_NO_OPTION); 
         if (result == JOptionPane.NO_OPTION) {
             return;
@@ -307,15 +317,15 @@ public class MainFrame extends JFrame implements TriggerCallback {
                                
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(MainFrame.this,
-                    "File reading failed. ",
-                    "Import failed",
+                    RES.getString("IMPORT_FAILED_TEXT"),
+                    RES.getString("IMPORT_FAILED_TITLE"),
                     JOptionPane.ERROR_MESSAGE);
             
             } catch(IOError e) {
                 JOptionPane.showMessageDialog(MainFrame.TheFrame, 
-                        "Error loading data.\n" + e.getMessage(),
-                        "Data Error",
-                        JOptionPane.ERROR_MESSAGE);
+                    RES.getString("DATA_ERROR_TEXT") + "\n" + e.getMessage(),
+                    RES.getString("DATA_ERROR_TITLE"),
+                    JOptionPane.ERROR_MESSAGE);
             }
         }        
     }
@@ -328,9 +338,9 @@ public class MainFrame extends JFrame implements TriggerCallback {
             boolean writeIt = false;
             if (output.exists()) {
                 result = JOptionPane.showConfirmDialog(MainFrame.this,
-                        "That file exists.\nDo you want to overwrite it?",
-                        "File Exists",
-                        JOptionPane.YES_NO_OPTION);
+                    RES.getString("FILE_EXISTS_TEXT"),
+                    RES.getString("FILE_EXISTS_TITLE"),
+                    JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     writeIt = true;
                 }
@@ -338,8 +348,17 @@ public class MainFrame extends JFrame implements TriggerCallback {
                 writeIt = true;
             }
             if (writeIt) {
-                OutStream os = Triggers.getInstance().getTriggerData();
+                OutStream os;
                 try {
+                    os = Triggers.getInstance().getTriggerData();
+                } catch (DataFormatException ex) {
+                    JOptionPane.showMessageDialog(MainFrame.TheFrame, 
+                        RES.getString("INTERNAL_ERROR"),
+                        RES.getString("DATA_ERROR_TITLE"),
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                        try {
                     FileOutputStream fos = new FileOutputStream(output);
                     for(Byte b: os.getBuffer()) {
                         fos.write(b);
@@ -347,16 +366,25 @@ public class MainFrame extends JFrame implements TriggerCallback {
                     fos.close();
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(MainFrame.this, 
-                            "Write failed.",
-                            "IO Error",
-                            JOptionPane.ERROR_MESSAGE);
+                        RES.getString("IO_ERROR_TEXT"),
+                        RES.getString("IO_ERROR_TITLE"),
+                        JOptionPane.ERROR_MESSAGE);
                 }
             }
         }        
     }
     
     private void displayTriggers() {
-        OutStream os = Triggers.getInstance().getTriggerData();
+        OutStream os;
+        try {
+            os = Triggers.getInstance().getTriggerData();
+        } catch (DataFormatException ex) {
+            JOptionPane.showMessageDialog(MainFrame.TheFrame, 
+                RES.getString("INTERNAL_ERROR"),
+                RES.getString("DATA_ERROR_TITLE"),
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         byte[] bytes = Utils.listToArray(os.getBuffer());
         String s = new String(bytes);
         System.out.println(s);
@@ -378,6 +406,13 @@ public class MainFrame extends JFrame implements TriggerCallback {
         
         JPanel p = new MouseSpeedPanel();
         pane.add(MRes.getStr("MOUSE_SPEED"), p);
+        
+
+        if (Model.getVersionID() >= 406) {
+            p = new TVSelectionPanel();
+            pane.add(MRes.getStr("TV_SELECTION"), p);
+        }
+            
         return pane;
     }
         
@@ -386,9 +421,8 @@ public class MainFrame extends JFrame implements TriggerCallback {
     private boolean inSyncCheck() {
         if (Triggers.DATA_IN_SYNC == false) {
             int opt = JOptionPane.showConfirmDialog(this, 
-                    "There are unsaved changes.\n"
-                  + "Do you want to save them before continuing?",
-                    "Warning", 
+                    RES.getString("UNSAVED_TEXT"),
+                    RES.getString("UNSAVED_TITLE"),
                     JOptionPane.YES_NO_CANCEL_OPTION
             );
             if (opt == JOptionPane.YES_OPTION) {
