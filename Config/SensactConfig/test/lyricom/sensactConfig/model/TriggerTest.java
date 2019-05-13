@@ -6,6 +6,7 @@
 package lyricom.sensactConfig.model;
 
 import java.util.List;
+import java.util.zip.DataFormatException;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -48,7 +49,11 @@ public class TriggerTest {
         t.setTriggerValue(700);
         
         OutStream os = new OutStream();
-        t.toStream(os);
+        try {
+            t.toStream(os);
+        } catch (DataFormatException ex) {
+            assertFalse("Data Format Error", Boolean.TRUE);
+        }
         
         String result = BufToString(os.getBuffer());
         assertEquals("\nt@BA`bkl2@GB`ai```oj`aodqz", result);
