@@ -1,0 +1,28 @@
+
+#
+# Port should be all or part of the descriptive string for the
+# port.  Leonardo is a good default, but this may not work if 
+# drivers are not installed.  If the name does not match any
+# existing ports a dialog will appear showing which ports are
+# available, allowing you to choose.  You can then come here
+# and set the word or words to be matched for proper port selection.
+Port: Leonardo
+
+# Rows, Columns and FontSize control the size of the window
+# and the size of the text.
+Rows: 1
+Columns: 15
+FontSize: 12
+
+# Location indicates which corner of the screen the window will
+# sit in.  It can be any one of four values:
+# 'top right', 'top left', 'bottom right' or 'bottom left'
+Location: top right
+
+# Mappings - map one serial character sent from the SensAct
+# to a string to be displayed.
+u: Mouse Up
+d: Mouse Down
+l: Mouse Left
+r: Mouse Right
+R: Reset

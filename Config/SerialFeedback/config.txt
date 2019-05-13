@@ -1,0 +1,24 @@
+
+#
+# Port should be 'Leonardo' if the port will be labelled that
+# way - as it is for a Windows machine with the driver installed.
+# Otherwise it should be the name of the serial device.
+Port: Leonardo
+
+# Rows, Columns and FontSize control the size of the window
+# and the size of the text.
+Rows: 1
+Columns: 15
+FontSize: 12
+
+# Location can be any one of four values:
+# 'top right', 'top left', 'bottom right' or 'bottom left'
+Location: bottom left
+
+# Mappings - map one serial character sent from the SensAct
+# to a string to be displayed.
+u: Mouse Up
+d: Mouse Down
+l: Mouse Left
+r: Mouse Right
+R: 
