@@ -43,7 +43,9 @@ public class MyProps {
     private int rows;
     private int columns;
     private int fontSize;
+    private int displayTime;
     private ScreenLocation location;
+    private boolean titleBar;
     
     private MyProps() {
     }
@@ -70,6 +72,7 @@ public class MyProps {
         rows = getNumberParameter(props, "Rows", "2");
         columns = getNumberParameter(props, "Columns", "40");
         fontSize = getNumberParameter(props, "FontSize", "14");
+        displayTime = getNumberParameter(props, "DisplayTime", "0");
         
         String locationText = props.getProperty("Location");
         if (locationText == null) {
@@ -81,6 +84,13 @@ public class MyProps {
                     location = l;
                 }
             }
+        }
+        
+        String tmp = props.getProperty("TitleBar");
+         if ((tmp != null) && tmp.equalsIgnoreCase("yes")) {
+            titleBar = true;
+        } else {
+            titleBar = false;
         }
     }
     
@@ -112,11 +122,19 @@ public class MyProps {
         return fontSize;
     }
     
+    public int getDisplayTime() {
+        return displayTime;
+    }
+    
     public String getMapping(String ch) {
         return props.getProperty(ch);
     }
     
     public ScreenLocation getLocation() {
         return location;
+    }
+    
+    public boolean hasTitleBar() {
+        return titleBar;
     }
 }

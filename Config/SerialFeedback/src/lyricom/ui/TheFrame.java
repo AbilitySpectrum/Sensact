@@ -22,6 +22,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -45,21 +47,24 @@ public class TheFrame extends JFrame {
         
     private JTextArea text;
     private MyProps props;
+    private Timer timer = null;
     
     private TheFrame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         // setTitle("SensAct");
-        setUndecorated(true);
         props = MyProps.getInstance();
-        
+            
         setLayout(new FlowLayout());
         text = new JTextArea(props.getRows(), props.getColumns());
         text.setEditable(false);
         text.setFont(new Font("Dialog", Font.PLAIN, props.getFontSize()));
         text.setBorder(new EmptyBorder(10,10,10,10));
         add(text);
-        add(closeBox());
-        
+        if (!props.hasTitleBar()) {
+            setUndecorated(true);
+            add(closeBox());
+        }
+                
         newMessage("Starting ...");
         pack();
         
@@ -98,7 +103,17 @@ public class TheFrame extends JFrame {
         if (str == null) {
             return;
         }
+        
+        if (timer != null) {
+            timer.cancel();
+        }
         newMessage(str);
+        
+        int displayTime = props.getDisplayTime();
+        if (displayTime > 0) {
+            timer = new Timer();
+            timer.schedule(new InvisibleTask(this), displayTime * 1000);
+        }
     }
         
     public final void newMessage(String msg) {
@@ -138,5 +153,18 @@ public class TheFrame extends JFrame {
         Dimension dim = new Dimension(20, 20);
         btn.setMaximumSize(dim);
         return btn;
+    }
+    
+    class InvisibleTask extends TimerTask {
+    
+        private JFrame theFrame;
+        InvisibleTask(JFrame f) { 
+            theFrame = f;
+        }
+
+        @Override
+        public void run() {
+            theFrame.setVisible(false);
+        }
     }
 }

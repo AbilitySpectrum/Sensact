@@ -19,6 +19,20 @@ FontSize: 12
 # 'top right', 'top left', 'bottom right' or 'bottom left'
 Location: top right
 
+# If TitleBar is set to 'yes' then the message window will appear with
+# a title bar, which lets you drag the window to different locations.
+# If it is not set to 'yes' then there will be no title bar.  The message
+# window will take up less space on the screen, but you won't be able to
+# relocate it.
+TitleBar: yes
+
+# DisplayTime gives the number of seconds the window should display.
+# If there is no change to the message after that number of seconds the 
+# window disappears.  If DisplayTime is set to 0 the window will remain
+# visible always.
+# Note: The 'Connected' & 'Not Connected' messages never disappear. 
+DisplayTime: 3
+
 # Mappings - map one serial character sent from the SensAct
 # to a string to be displayed.
 u: Mouse Up
