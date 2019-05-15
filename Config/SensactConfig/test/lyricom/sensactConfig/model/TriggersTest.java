@@ -134,7 +134,7 @@ public class TriggersTest {
     }
     
     @Test
-    public void placeAfterMoveToStart() {
+    public void insertBeforeFirst() {
         InStream in = new InStream(testInput.getBytes());
         Triggers trigs = Triggers.getInstance();
         trigs.deleteAll();
@@ -149,21 +149,24 @@ public class TriggersTest {
         Trigger t1 = trigs.get(1);
         Trigger t2 = trigs.get(2);
         Trigger t3 = trigs.get(3);
+
+        Trigger tt = new Trigger();
+        tt.copyValue(t3);
          
         // Move to the front
-        trigs.placeAfter(t3, null);
+        trigs.insertTrigger(tt, t0, false);
         
          // Check that triggers have moved as expected.
-        assertEquals(t3, trigs.get(0));
+        assertEquals(tt, trigs.get(0));
         assertEquals(t0, trigs.get(1));
         assertEquals(t1, trigs.get(2));
         assertEquals(t2, trigs.get(3));
         
-        assertEquals(18, trigs.length());
+        assertEquals(19, trigs.length());
     }
 
     @Test
-    public void placeAfterMoveUp() {
+    public void insertAfterFirst() {
         InStream in = new InStream(testInput.getBytes());
         Triggers trigs = Triggers.getInstance();
         trigs.deleteAll();
@@ -178,21 +181,24 @@ public class TriggersTest {
         Trigger t1 = trigs.get(1);
         Trigger t2 = trigs.get(2);
         Trigger t3 = trigs.get(3);
+        
+        Trigger tt = new Trigger();
+        tt.copyValue(t3);
          
-        // Move up
-        trigs.placeAfter(t3, t0);
+        // Move to the front
+        trigs.insertTrigger(tt, t0, true);
         
          // Check that triggers have moved as expected.
         assertEquals(t0, trigs.get(0));
-        assertEquals(t3, trigs.get(1));
+        assertEquals(tt, trigs.get(1));
         assertEquals(t1, trigs.get(2));
         assertEquals(t2, trigs.get(3));
         
-        assertEquals(18, trigs.length());
+        assertEquals(19, trigs.length());
     }
-    
+ 
     @Test
-    public void placeAfterMoveDown() {
+    public void cutAndMoveDown() {
         InStream in = new InStream(testInput.getBytes());
         Triggers trigs = Triggers.getInstance();
         trigs.deleteAll();
@@ -209,7 +215,8 @@ public class TriggersTest {
         Trigger t3 = trigs.get(3);
          
         // Move down
-        trigs.placeAfter(t0, t3);
+        trigs.deleteTrigger(t0);
+        trigs.insertTrigger(t0, t3, true);
         
          // Check that triggers have moved as expected.
         assertEquals(t1, trigs.get(0));
@@ -219,9 +226,9 @@ public class TriggersTest {
         
         assertEquals(18, trigs.length());
     }
-    
+ 
     @Test
-    public void placeAfterToEnd() {
+    public void insertAfterEnd() {
         InStream in = new InStream(testInput.getBytes());
         Triggers trigs = Triggers.getInstance();
         trigs.deleteAll();
@@ -238,21 +245,124 @@ public class TriggersTest {
         Trigger t3 = trigs.get(3);
         Trigger t17 = trigs.get(17);
          
-        // Move to the end
-        trigs.placeAfter(t2, t17);
+        Trigger tt = new Trigger();
+        tt.copyValue(t3);
+         
+       // Move to the end
+        trigs.insertTrigger(tt, t17, true);
+        
+         // Check that triggers have moved as expected.
+        assertEquals(t0, trigs.get(0));
+        assertEquals(t1, trigs.get(1));
+        assertEquals(t2, trigs.get(2));
+        assertEquals(t17, trigs.get(17));
+        assertEquals(tt, trigs.get(18));
+        
+        assertEquals(19, trigs.length());
+    }
+
+     @Test
+    public void insertBeforeEnd() {
+        InStream in = new InStream(testInput.getBytes());
+        Triggers trigs = Triggers.getInstance();
+        trigs.deleteAll();
+        try {
+            trigs.loadTriggers(in);
+        } catch (IOError e) {
+            fail("Unexpected IOError");
+            return;
+        }
+        
+        Trigger t0 = trigs.get(0);
+        Trigger t1 = trigs.get(1);
+        Trigger t2 = trigs.get(2);
+        Trigger t3 = trigs.get(3);
+        Trigger t17 = trigs.get(17);
+         
+        Trigger tt = new Trigger();
+        tt.copyValue(t3);
+         
+       // Move to the end
+        trigs.insertTrigger(tt, t17, false);
+        
+         // Check that triggers have moved as expected.
+        assertEquals(t0, trigs.get(0));
+        assertEquals(t1, trigs.get(1));
+        assertEquals(t2, trigs.get(2));
+        assertEquals(tt, trigs.get(17));
+        assertEquals(t17, trigs.get(18));
+        
+        assertEquals(19, trigs.length());
+    }
+    
+    @Test
+    public void replaceBeforeEnd() {
+        InStream in = new InStream(testInput.getBytes());
+        Triggers trigs = Triggers.getInstance();
+        trigs.deleteAll();
+        try {
+            trigs.loadTriggers(in);
+        } catch (IOError e) {
+            fail("Unexpected IOError");
+            return;
+        }
+        
+        Trigger t0 = trigs.get(0);
+        Trigger t1 = trigs.get(1);
+        Trigger t2 = trigs.get(2);
+        Trigger t3 = trigs.get(3);
+        Trigger t17 = trigs.get(17);
+         
+        trigs.deleteTrigger(t2);
+         
+       // Move to the end
+        trigs.insertTrigger(t2, t17, false);
         
          // Check that triggers have moved as expected.
         assertEquals(t0, trigs.get(0));
         assertEquals(t1, trigs.get(1));
         assertEquals(t3, trigs.get(2));
+        assertEquals(t2, trigs.get(16));
+        assertEquals(t17, trigs.get(17));
+        
+        assertEquals(18, trigs.length());
+    }
+    
+    @Test
+    public void moveFirstToEnd() {
+        InStream in = new InStream(testInput.getBytes());
+        Triggers trigs = Triggers.getInstance();
+        trigs.deleteAll();
+        try {
+            trigs.loadTriggers(in);
+        } catch (IOError e) {
+            fail("Unexpected IOError");
+            return;
+        }
+        
+        Trigger t0 = trigs.get(0);
+        Trigger t1 = trigs.get(1);
+        Trigger t2 = trigs.get(2);
+        Trigger t3 = trigs.get(3);
+        Trigger t17 = trigs.get(17);
+         
+        trigs.deleteTrigger(t0);
+         
+       // Move to the end
+        trigs.insertTrigger(t0, t17, true);
+        
+         // Check that triggers have moved as expected.
+        assertEquals(t1, trigs.get(0));
+        assertEquals(t2, trigs.get(1));
+        assertEquals(t3, trigs.get(2));
         assertEquals(t17, trigs.get(16));
-        assertEquals(t2, trigs.get(17));
+        assertEquals(t0, trigs.get(17));
         
         assertEquals(18, trigs.length());
-    }
+    }    
     
     @Test
-    public void placeAfterBadSource() {
+    public void moveLastToStart() {
         InStream in = new InStream(testInput.getBytes());
         Triggers trigs = Triggers.getInstance();
         trigs.deleteAll();
@@ -267,82 +377,20 @@ public class TriggersTest {
         Trigger t1 = trigs.get(1);
         Trigger t2 = trigs.get(2);
         Trigger t3 = trigs.get(3);
+        Trigger t16 = trigs.get(16);
         Trigger t17 = trigs.get(17);
          
-        Trigger t = new Trigger(Model.getSensorByID(5));
-        // Source is not in the list.
-        trigs.placeAfter(t, t3);
-        
-         // Check that nothing has moved.
-        assertEquals(t0, trigs.get(0));
-        assertEquals(t1, trigs.get(1));
-        assertEquals(t2, trigs.get(2));
-        assertEquals(t3, trigs.get(3));
-        assertEquals(t17, trigs.get(17));
-       
-        assertEquals(18, trigs.length());
-    }
-    
-    @Test
-    public void placeAfterBadTarget() {
-        InStream in = new InStream(testInput.getBytes());
-        Triggers trigs = Triggers.getInstance();
-        trigs.deleteAll();
-        try {
-            trigs.loadTriggers(in);
-        } catch (IOError e) {
-            fail("Unexpected IOError");
-            return;
-        }
-        
-        Trigger t0 = trigs.get(0);
-        Trigger t1 = trigs.get(1);
-        Trigger t2 = trigs.get(2);
-        Trigger t3 = trigs.get(3);
-        Trigger t17 = trigs.get(17);
-       
-        Trigger t = new Trigger(Model.getSensorByID(5));
-                 
-        // Target is not in the list.
-        trigs.placeAfter(t2, t);
-        
-         // Check that nothing has moved.
-        assertEquals(t0, trigs.get(0));
-        assertEquals(t1, trigs.get(1));
-        assertEquals(t2, trigs.get(2));
-        assertEquals(t3, trigs.get(3));
-        assertEquals(t17, trigs.get(17));
+        trigs.deleteTrigger(t17);
          
-        assertEquals(18, trigs.length());
-    }
-    
-    @Test
-    public void placeAfterEqual() {
-        InStream in = new InStream(testInput.getBytes());
-        Triggers trigs = Triggers.getInstance();
-        trigs.deleteAll();
-        try {
-            trigs.loadTriggers(in);
-        } catch (IOError e) {
-            fail("Unexpected IOError");
-            return;
-        }
+       // Move to the end
+        trigs.insertTrigger(t17, t0, false);
         
-        Trigger t0 = trigs.get(0);
-        Trigger t1 = trigs.get(1);
-        Trigger t2 = trigs.get(2);
-        Trigger t3 = trigs.get(3);
-        Trigger t17 = trigs.get(17);
-         
-        // Source == Target
-        trigs.placeAfter(t3, t3);
-        
-         // Check that nothing has moved.
-        assertEquals(t0, trigs.get(0));
-        assertEquals(t1, trigs.get(1));
-        assertEquals(t2, trigs.get(2));
-        assertEquals(t3, trigs.get(3));
-        assertEquals(t17, trigs.get(17));
+         // Check that triggers have moved as expected.
+        assertEquals(t17, trigs.get(0));
+        assertEquals(t0, trigs.get(1));
+        assertEquals(t1, trigs.get(2));
+        assertEquals(t2, trigs.get(3));
+        assertEquals(t16, trigs.get(17));
         
         assertEquals(18, trigs.length());
     }
