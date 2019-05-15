@@ -120,20 +120,24 @@ public class TriggerPanel extends JPanel {
     }
     
     private JMenuItem editMI;
-    private JMenuItem deleteMI;
-    private JMenuItem moveUpMI;
-    private JMenuItem moveDownMI;
+    private JMenuItem cutMI;
+    private JMenuItem copyMI;
+    private JMenuItem pasteAboveMI;
+    private JMenuItem pasteBelowMI;
     
     private void createMenus() {
         popup = new JPopupMenu();
         editMI = new JMenuItem(RES.getString("TPANEL_DD_EDIT"));
-        deleteMI = new JMenuItem(RES.getString("TPANEL_DD_DELETE"));
-        moveUpMI = new JMenuItem(RES.getString("TPANEL_DD_MOVE_UP"));
-        moveDownMI = new JMenuItem(RES.getString("TPANEL_DD_MOVE_DOWN"));
+        cutMI = new JMenuItem(RES.getString("TPANEL_DD_CUT"));
+        copyMI = new JMenuItem(RES.getString("TPANEL_DD_COPY"));
+        pasteAboveMI = new JMenuItem(RES.getString("TPANEL_DD_PASTE_ABOVE"));
+        pasteBelowMI = new JMenuItem(RES.getString("TPANEL_DD_PASTE_BELOW"));
+        
         popup.add(editMI);
-        popup.add(deleteMI);
-        popup.add(moveUpMI);
-        popup.add(moveDownMI);
+        popup.add(cutMI);
+        popup.add(copyMI);
+        popup.add(pasteAboveMI);
+        popup.add(pasteBelowMI);
         
         editMI.addActionListener(e -> {
             new TriggerEditDlg(theTrigger);
@@ -143,18 +147,45 @@ public class TriggerPanel extends JPanel {
             actionUI.update();
             actionState.update();
         });
-        
-        deleteMI.addActionListener(e -> {
+            
+        cutMI.addActionListener(e -> {
+            // Copy ...
+            Trigger t = new Trigger(parent.getSensor());
+            t.copyValue(theTrigger);
+            parent.setSavedTrigger(t);
+            
+            // ... and delete
             Triggers.getInstance().deleteTrigger(theTrigger);
             parent.removeTriggerUI(this);
         });
         
-        moveUpMI.addActionListener(e -> {
-            parent.moveUp(this);
+        copyMI.addActionListener(e -> {
+            // Copy without counting this as a change to be saved.
+            boolean inSync = Triggers.DATA_IN_SYNC;
+            Trigger t = new Trigger(parent.getSensor());
+            t.copyValue(theTrigger);
+            parent.setSavedTrigger(t);
+            Triggers.DATA_IN_SYNC = inSync;
         });
         
-        moveDownMI.addActionListener(e -> {
-            parent.moveDown(this);
+        pasteAboveMI.addActionListener(e -> {
+            if (parent.getSavedTrigger() == null) {
+                // Should not happen
+                return;
+            }
+            Trigger t = new Trigger(parent.getSensor());
+            t.copyValue(parent.getSavedTrigger());
+            parent.insertTrigger(t, this, false);
+        });
+        
+        pasteBelowMI.addActionListener(e -> {
+            if (parent.getSavedTrigger() == null) {
+                // Should not happen
+                return;
+            }
+            Trigger t = new Trigger(parent.getSensor());
+            t.copyValue(parent.getSavedTrigger());
+            parent.insertTrigger(t, this, true);
         });
     }
     
@@ -180,13 +211,14 @@ public class TriggerPanel extends JPanel {
         
         private void maybeShowPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
-                moveUpMI.setEnabled(true);
-                moveDownMI.setEnabled(true);
-                if (parent.isTop(thisPanel)) {
-                    moveUpMI.setEnabled(false);
-                }
-                if (parent.isBottom(thisPanel)) {
-                    moveDownMI.setEnabled(false);
+                cutMI.setEnabled(true);
+                copyMI.setEnabled(true);
+                if (parent.getSavedTrigger() == null) {
+                    pasteAboveMI.setEnabled(false);
+                    pasteBelowMI.setEnabled(false);
+                } else {
+                    pasteAboveMI.setEnabled(true);
+                    pasteBelowMI.setEnabled(true); 
                 }
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }

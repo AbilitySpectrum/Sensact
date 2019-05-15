@@ -56,7 +56,7 @@ public class SensorPanel extends JPanel {
     }
     
     private final Sensor theSensor;
-   
+    private Trigger savedTrigger;
     private final JPanel triggersPanel;
     private final List<TriggerPanel> triggerPanelList = new ArrayList<>();
     private final SensorGroupPanel parentPanel;
@@ -74,6 +74,14 @@ public class SensorPanel extends JPanel {
 //        add(new JSeparator(JSeparator.HORIZONTAL));
         add(triggersPanel);
         SensorPanel.theSensorPanels.add(this);
+    }
+    
+    void setSavedTrigger(Trigger t) {
+        savedTrigger = t;
+    }
+    
+    Trigger getSavedTrigger() {
+        return savedTrigger;
     }
     
     public Sensor getSensor() {
@@ -212,16 +220,7 @@ public class SensorPanel extends JPanel {
         };        
     }
     
-    // Move up-down support
-    boolean isTop(TriggerPanel tp) {
-        return (tp == triggerPanelList.get(0));
-    }
-    
-    boolean isBottom(TriggerPanel tp) {
-        TriggerPanel last = triggerPanelList.get(triggerPanelList.size()-1);
-        return (tp == last);
-    }
-    
+    // Copy - Paste support  
     private int getIndexOf(TriggerPanel tp) {
         int i;
         for(i=0; i<triggerPanelList.size(); i++) {
@@ -232,41 +231,23 @@ public class SensorPanel extends JPanel {
         return -1;
     }
     
-    void moveUp(TriggerPanel tp) {
-        int index = getIndexOf(tp);
-        if (index > 0) {
-           triggerPanelList.remove(tp);
-           triggerPanelList.add(index-1, tp);
-           
-           triggersPanel.remove(tp);
-           triggersPanel.add(tp, index-1);
-           triggersPanel.revalidate();
-           
-           Trigger thisTrigger = tp.getTrigger();
-           Trigger beforeTrigger;
-           if (index == 1) {
-               beforeTrigger = null;
-           } else {
-               beforeTrigger = triggerPanelList.get(index-2).getTrigger();
-           }
-           Triggers.getInstance().placeAfter(thisTrigger, beforeTrigger);
-       }
+    void insertTrigger(Trigger t, TriggerPanel ref, boolean after) {
+        int index = getIndexOf(ref);
+        // Create a new panel to display the trigger ...
+        TriggerPanel newPanel = new TriggerPanel(t, this);
+        
+        // ... insert it ...
+        if (after) {
+            triggerPanelList.add(index+1, newPanel);
+            triggersPanel.add(newPanel, index+1);
+        } else {
+            triggerPanelList.add(index, newPanel);            
+            triggersPanel.add(newPanel, index);
+        }
+        triggersPanel.revalidate();
+            
+         // ... and update the underlying model.  
+        Triggers.getInstance().insertTrigger(t, ref.getTrigger(), after);    
     }
     
-    void moveDown(TriggerPanel tp) {
-       int index = getIndexOf(tp);
-        if (index < (triggerPanelList.size() - 1)) {
-           triggerPanelList.remove(tp);
-           triggerPanelList.add(index+1, tp);
-           
-           triggersPanel.remove(tp);
-           triggersPanel.add(tp, index+1);
-           triggersPanel.revalidate();
-           
-           Trigger thisTrigger = tp.getTrigger();
-           Trigger beforeTrigger;
-           beforeTrigger = triggerPanelList.get(index).getTrigger();           
-           Triggers.getInstance().placeAfter(thisTrigger, beforeTrigger);
-       }
-    }
 }

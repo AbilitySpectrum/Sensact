@@ -113,16 +113,13 @@ public class Triggers {
         sizeChanged();
     }
     
-    // Move the trigger so that it is immediately following the
-    // reference trigger.  If the ref trigger is null move the trigger
-    // to the front of the list.
-    public void placeAfter(Trigger t, Trigger ref) {
+    // Insert a new trigger, either before or after
+    // the reference trigger.
+    public void insertTrigger(Trigger t, Trigger ref, boolean after) {
         int refIndex = 0;
-        int tIndex;
-        
-        if (t == ref) return;
-        
+
         DATA_IN_SYNC = false;
+        // Find the reference location
         if (ref != null) {
             for(refIndex = 0; refIndex < triggers.size(); refIndex++) {  
                 if (triggers.get(refIndex) == ref) {
@@ -133,25 +130,10 @@ public class Triggers {
                 return;  // not found
             }
         }
-        for(tIndex = 0; tIndex < triggers.size(); tIndex++) {  
-            if (triggers.get(tIndex) == t) {
-                break;
-            }
-        }  
-        if (tIndex == triggers.size()) {
-            return;  // not found
-        }
         
-        if (ref == null) {
-            triggers.remove(t);
-            triggers.add(0, t);
-        } else if (refIndex < tIndex) { // move up
-            triggers.remove(t);
+        if (after) {
             triggers.add(refIndex+1, t);
-        } else if (refIndex == tIndex) { // Should not happen, but ...
-            return; // do nothing
         } else {
-            triggers.remove(t); // Will move refIndex up 1.
             triggers.add(refIndex, t);
         }
     }
