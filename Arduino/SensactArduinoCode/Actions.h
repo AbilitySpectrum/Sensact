@@ -272,4 +272,13 @@ class LightBox: public Actor {
     void init() {}
     void doAction(long param);
 };
+
+class LEDDisplay: public Actor {
+  public:
+    LEDDisplay(int i) {
+      id = i;
+    }
+    void init() {}
+    void doAction(long param);
+};
 #endif

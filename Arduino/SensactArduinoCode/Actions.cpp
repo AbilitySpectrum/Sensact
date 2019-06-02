@@ -88,6 +88,7 @@ void Actors::init() {
   addActor( new IRTV(8) );
   addActor( new SerialSend(6) );
   addActor( new LightBox(11) );
+  addActor( new LEDDisplay(12) );
 #ifdef MEMCHECK
   BreakPoints.actorsAlloc = (int) __brkval;
 #endif
@@ -592,4 +593,12 @@ void LightBox::doAction(long param) {
   Wire.endTransmission();  
 }
 
+#define DT_ADDRESS 13
+void LEDDisplay::doAction(long param) {
+  byte val = param &0xff;
+  Wire.begin();
+  Wire.beginTransmission(DT_ADDRESS);
+  Wire.write(val);
+  Wire.endTransmission();  
+}
 
