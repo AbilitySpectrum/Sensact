@@ -93,6 +93,18 @@ public class Model {
     static public final int IR_DIGIT_8 = 118;
     static public final int IR_DIGIT_9 = 119;
     
+    // Dons Thing values
+    static public final int LD_UP_ARROW = 'U';
+    static public final int LD_DOWN_ARROW = 'D';
+    static public final int LD_LEFT_ARROW = 'L';
+    static public final int LD_RIGHT_ARROW = 'R';
+    static public final int LD_VOLUME_UP = 'V';
+    static public final int LD_VOLUME_DOWN = 'v';
+    static public final int LD_CHANNEL_UP = 'C';
+    static public final int LD_CHANNEL_DOWN = 'c';
+    static public final int LD_TV_ON_OFF = 'o';
+    static public final int LD_BLANK = 'b';
+    
     // Relay values (starting with V4.3)
     static public final int RELAY_PULSE = 0;
     static public final int RELAY_ON = 1;
@@ -213,6 +225,10 @@ public class Model {
         
         if (versionID >= 402) {
             actionList.add(new SaAction(ActionType.LIGHT_BOX, 0, ActionUI.LIGHT_BOX, null));
+        }
+        
+        if (versionID >= 407) {
+            actionList.add(new SaAction(ActionType.LED_DISPLAY, LD_UP_ARROW, ActionUI.LED_DISPLAY, null));
         }
         
         // Create a map of actions for lookup-by-name

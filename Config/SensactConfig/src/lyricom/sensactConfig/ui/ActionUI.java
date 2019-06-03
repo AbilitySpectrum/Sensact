@@ -44,6 +44,7 @@ public class ActionUI {
     public static final ActionUI IR_OPTION      = new IRActionUI();
     public static final ActionUI SET_STATE      = new SetStateUI();
     public static final ActionUI LIGHT_BOX      = new LightBoxUI();
+    public static final ActionUI LED_DISPLAY     = new LEDDisplayUI();
         
     // ----------------------------------------
     // Class and sub-class definition.
@@ -315,6 +316,27 @@ public class ActionUI {
         @Override
         public W_Base createUI(Trigger t) {
             return new WT_LightBox(RES.getString("ACT_VALUE_LABEL"), t);
+        }
+    }
+
+    ValueLabelPair[] LD_Actions = {
+        new ValueLabelPair(Model.LD_UP_ARROW,    RES.getString("LD_UP_ARROW")),
+        new ValueLabelPair(Model.LD_DOWN_ARROW,  RES.getString("LD_DOWN_ARROW")),
+        new ValueLabelPair(Model.LD_LEFT_ARROW,  RES.getString("LD_LEFT_ARROW")),
+        new ValueLabelPair(Model.LD_RIGHT_ARROW, RES.getString("LD_RIGHT_ARROW")),
+        new ValueLabelPair(Model.LD_TV_ON_OFF,   RES.getString("LD_TV_ON_OFF")),
+        new ValueLabelPair(Model.LD_VOLUME_UP,   RES.getString("LD_VOLUME_UP")),
+        new ValueLabelPair(Model.LD_VOLUME_DOWN, RES.getString("LD_VOLUME_DOWN")),
+        new ValueLabelPair(Model.LD_CHANNEL_UP,  RES.getString("LD_CHANNEL_UP")),
+        new ValueLabelPair(Model.LD_CHANNEL_DOWN, RES.getString("LD_CHANNEL_DOWN")),
+        new ValueLabelPair(Model.LD_BLANK, RES.getString("LD_BLANK"))
+    };
+    
+    public static class LEDDisplayUI extends ActionUI {
+        @Override
+        public W_Base createUI(Trigger t) {
+            return new WT_ValueLabelOption(
+                             RES.getString("ACT_RELAY_LABEL"), t, LD_Actions, false);
         }
     }
 }
