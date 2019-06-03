@@ -72,7 +72,8 @@ public class Trigger {
         
         reqdState = other.reqdState;
 //        triggerValue = other.triggerValue;
-        triggerValue = sensor.getLevel(level);
+        triggerValue = sensor.getLevel(other.level);
+        level = other.level;
         condition = other.condition;
         delay = other.delay;
         repeat = other.repeat;
