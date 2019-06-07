@@ -228,7 +228,7 @@ public class Model {
         }
         
         if (versionID >= 407) {
-            actionList.add(new SaAction(ActionType.LED_DISPLAY, LD_UP_ARROW, ActionUI.LED_DISPLAY, null));
+            actionList.add(new SaAction(ActionType.LCD_DISPLAY, LD_UP_ARROW, ActionUI.LCD_DISPLAY, null));
         }
         
         // Create a map of actions for lookup-by-name

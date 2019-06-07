@@ -44,7 +44,7 @@ public class ActionUI {
     public static final ActionUI IR_OPTION      = new IRActionUI();
     public static final ActionUI SET_STATE      = new SetStateUI();
     public static final ActionUI LIGHT_BOX      = new LightBoxUI();
-    public static final ActionUI LED_DISPLAY     = new LEDDisplayUI();
+    public static final ActionUI LCD_DISPLAY     = new LCDDisplayUI();
         
     // ----------------------------------------
     // Class and sub-class definition.
@@ -332,7 +332,7 @@ public class ActionUI {
         new ValueLabelPair(Model.LD_BLANK, RES.getString("LD_BLANK"))
     };
     
-    public static class LEDDisplayUI extends ActionUI {
+    public static class LCDDisplayUI extends ActionUI {
         @Override
         public W_Base createUI(Trigger t) {
             return new WT_ValueLabelOption(

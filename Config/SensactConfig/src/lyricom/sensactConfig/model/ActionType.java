@@ -48,7 +48,7 @@ public enum ActionType {
     SERIAL(6),
     SET_STATE(10),
     LIGHT_BOX(11),
-    LED_DISPLAY(12);
+    LCD_DISPLAY(12);
 
     
     private final String localizedName;
