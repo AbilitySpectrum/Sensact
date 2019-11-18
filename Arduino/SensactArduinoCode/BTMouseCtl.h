@@ -22,18 +22,15 @@
 #ifndef BTMouseCtl_H
 #define BTMouseCtl_H
 
-#include <SoftwareSerial.h>
-
 #define BT_LEFT_BUTTON 1
 #define BT_RIGHT_BUTTON 2
 #define BT_CENTER_BUTTON 4
 
 class BTMouseCtl {
-  SoftwareSerial *pBTHID;
   char buttonState = 0;
 
   void send(char x, char y) {
-    char xmit[7];
+    unsigned char xmit[7];
     xmit[0] = 0xFD;
     xmit[1] = 5;
     xmit[2] = 2;
@@ -41,12 +38,11 @@ class BTMouseCtl {
     xmit[4] = x;
     xmit[5] = y;
     xmit[6] = 0;
-    pBTHID->write(xmit, 7);
+    Serial1.write(xmit, 7);
   }
      
   public:
-    BTMouseCtl(SoftwareSerial *p) {
-      pBTHID = p;
+    BTMouseCtl() {
     }
 
     void move(char x, char y) {

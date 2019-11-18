@@ -176,6 +176,9 @@ public class Model {
 
         grp = new SensorGroup(GroupID.USB_PORT);
         grp.add( new Sensor(7, MRes.getStr("USB_INPUT"), 0, 255, false) );
+        if (versionID >= 408) {
+            grp.add( new Sensor(15, "BT Serial", 32, 126, false) );
+        }
         sensorGroups.add(grp);
         
         // Create a single list of all sensors

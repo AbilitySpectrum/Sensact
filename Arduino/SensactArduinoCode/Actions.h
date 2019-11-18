@@ -22,7 +22,6 @@
 #ifndef ActionData_H
 #define ActionData_H
 #include "Sensact.h"
-#include <SoftwareSerial.h>
 #include "BTMouseCtl.h"
 #include "IO.h"
 
@@ -234,9 +233,6 @@ class BTMouse: public MouseControl {
 };
 
 class BTKeyboard: public KeyboardControl {
-  private:
-    SoftwareSerial *pBlueHID;
-    
   public:
     BTKeyboard(int i) {
       id = i;

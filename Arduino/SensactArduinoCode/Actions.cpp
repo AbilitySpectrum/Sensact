@@ -471,27 +471,27 @@ void HIDKeyboard::kc_release(char key) {
 
 // Make the bluetooth pointer a singleton.
 // shared by BTKeyboard and BTMouse.
-static SoftwareSerial *pBlueHID = 0;
-SoftwareSerial *getBT() {
-  if (pBlueHID == 0) {
-    pBlueHID = new SoftwareSerial(BT_TX_PIN, BT_RX_PIN);
+boolean BTinitDone = false;
+void initBT() {
+  if (!BTinitDone) {
     delay(1000);
-    pBlueHID->begin(115200);  // Bluetooth defaults to 115200bps
+    Serial1.begin(115200);  // Bluetooth defaults to 115200bps
     
-    pBlueHID->print("$");    // Print three times individually
-    pBlueHID->print("$");
-    pBlueHID->print("$");    // Enter command mode
+    Serial1.print("$");    // Print three times individually
+    Serial1.print("$");
+    Serial1.print("$");    // Enter command mode
     delay(100);    // Short delay
-    pBlueHID->println("U,9600,N"); //Change baud rate to 9600 - no parity
-    pBlueHID->begin(9600);  // Start bluetooth at 9600    
+    Serial1.println("U,9600,N"); //Change baud rate to 9600 - no parity
+    Serial1.begin(9600);  // Start bluetooth at 9600    
+    BTinitDone = true;
   }
-  return pBlueHID;
 }
 
 
 // --- Bluetooth Mouse --- //
 void BTMouse::init() {
-  pMouse = new BTMouseCtl( getBT() );
+  initBT();
+  pMouse = new BTMouseCtl();
 }
 
 void BTMouse::mc_move(int x, int y) {
@@ -517,11 +517,11 @@ void BTMouse::mc_button(int val) {
 
 // --- Bluetooth Keyboard --- //
 void BTKeyboard::init() {
-  pBlueHID = getBT();
+  initBT();
 }
 
 void BTKeyboard::kc_write(char character) {
-  pBlueHID->write(character);
+  Serial1.write(character);
 }
 
 // === IR TV === //

@@ -156,6 +156,21 @@ class GyroSensor: public Sensor {
     void getValues(SensorData *pData);
     int nDataUnits() { return 7; }
 };
+
+class BTSensor: public Sensor {
+  private:
+    int id;
+
+  public:
+  BTSensor(int i) {id = i;}
+  void init(){}  
+  void getValues(SensorData *pData) {
+    if (Serial1.available()) {      
+        pData->addValue(id, Serial1.read());
+    }
+  }
+  int nDataUnits() { return 1; }
+};
   
 // Sensors - a container for all sensors.
 class Sensors {
