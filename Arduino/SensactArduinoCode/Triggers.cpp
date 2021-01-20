@@ -30,7 +30,11 @@ void Triggers::init(int maxSID) {
   EEIn.init();
   char T = EEIn.getChar();
   if (T == START_OF_TRIGGER_BLOCK) { // There are triggers in EEProm
-    readTriggers(&EEIn);
+    if (readTriggers(&EEIn) == IO_ERROR) {
+      addExtraTrigger();
+    }
+  } else {
+    addExtraTrigger();
   }
 
   // Initialize sensor states.
@@ -41,6 +45,7 @@ void Triggers::init(int maxSID) {
 
 void Triggers::reset() {
   for(int i=0; i<=maxSensorID; i++) {
+    Serial.print("Reseting ");Serial.println(i);
     paSensorStates[i] = 1;
   }  
   for(int j=0; j<nTriggers; j++) {
@@ -63,12 +68,11 @@ const ActionData* Triggers::getActions(const SensorData *pData) {
     for(int j=0; j<nTriggers; j++) {
       Trigger *pTrigger = &aTriggers[j];
       boolean matchCondition = true;  // Assume a match until we prove otherwise
-
+      
       // Check sensor ID
       if (ID != (int) pTrigger->sensorID) {
         continue; // Wrong sensor ID - forget it.
       }
-  
       // Check for disconnected sensor
       if (pTrigger->flags & DISCONNECTED) {
         if (value < 10 && value > -10) {
@@ -168,13 +172,12 @@ int Triggers::readTriggers(InputStream *is) {
   long tCount = is->getNum();
   if (tCount == IO_NUMERROR) return IO_ERROR;
   if (tCount > MAX_TRIGGERS) return IO_ERROR;
-  
+
   for(int i=0; i<tCount; i++) {
     if (aTriggers[i].readTrigger(is) == IO_ERROR) {
       return IO_ERROR;
     }
   }
-  nTriggers = tCount;
   
   int Z = is->getChar();
   if (Z == MOUSE_SPEED) {
@@ -186,7 +189,7 @@ int Triggers::readTriggers(InputStream *is) {
   if (Z != END_OF_BLOCK) { 
     return IO_ERROR;
   }
-  
+  addExtraTrigger();
   // If triggers are read successfully - save them.
   EEOut.init();
   sendTriggers(&EEOut);
@@ -194,10 +197,29 @@ int Triggers::readTriggers(InputStream *is) {
   return 0;
 }
 
+void Triggers::addExtraTrigger() {
+      // Extra hack trigger for IR
+      int i = nTriggers;
+      aTriggers[i].sensorID = 15;
+      aTriggers[i].stateValues = (1 << 4) + 1;
+      aTriggers[i].triggerValue = 50;
+      aTriggers[i].conditions = TRIGGER_ON_EQUAL;
+      
+      aTriggers[i].actionID = 1;  // RELAY
+      aTriggers[i].actionParameters = 0; // RELAY PULSE
+//      aTriggers[i].actionID = 7;  // BUZZER
+//      aTriggers[i].actionParameters = (250L << 16) + 400L; // Pitch & Duration 
+
+      aTriggers[i].delayMs = 0;
+      
+      nTriggers++;  
+}
+  
+
 void Triggers::sendTriggers(OutputStream *os) {
   os->putChar(START_OF_TRIGGER_BLOCK);
-  os->putNum(nTriggers);
-  for(int i=0; i<nTriggers; i++) {
+  os->putNum(nTriggers - 1);  // minus 1 to drop fake IR trigger.
+  for(int i=0; i<nTriggers - 1; i++) {
     aTriggers[i].sendTrigger(os);
   }
   os->putChar(MOUSE_SPEED);

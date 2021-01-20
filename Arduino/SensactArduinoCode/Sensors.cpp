@@ -23,6 +23,19 @@
 #include "Sensors.h"
 #include "Wire.h"
 
+// ------------------------
+// Stuff required to support IR reader
+//
+#include <IRLibRecv.h>
+#include <IRLibDecodeBase.h>
+#include <IRLib_P01_NEC.h>
+#include <IRLib_P07_NECx.h>
+#include <IRLibCombo.h>
+IRrecv recv(8);
+IRdecode MyDecoder;
+//
+// ---------------------------------
+
 SensorData data;
 Sensors sensors;
 PCInputSensor *pcInput;
@@ -40,6 +53,7 @@ void Sensors::init() {
   pcInput = new PCInputSensor(7);
   addSensor( pcInput );
   addSensor( new GyroSensor(8, 9, 10, 11, 12, 13, 14) );
+  addSensor( new IRSensor(15) );
 #ifdef MEMCHECK
   BreakPoints.sensorsAlloc = (int) __brkval;
 #endif  
@@ -163,5 +177,27 @@ void GyroSensor::getValues(SensorData *pData) {
   // which is about sqrt(32676 ^ 2 * 3) / 2
   pData->addValue(gyroAny, (int)anyMotion);
 }
+
+// -------------------
+// IR Reader
+void IRSensor::init() {
+  recv.enableIRIn();  
+}
+
+void IRSensor::getValues(SensorData *pData) {
+  int value = 0;
+  if (recv.getResults()) {
+    if (MyDecoder.decode()) {
+//      Serial.print("Value: "); Serial.println(MyDecoder.value, 16);
+//      if (MyDecoder.value == 0x20DF40BF) {  // LG UP
+      if (MyDecoder.value == 0xE0E048B7) {  // Samsung UP
+        value = 50;
+      }
+    }
+    recv.enableIRIn();
+  }  
+  data.addValue(id, value);
+}
+
 
 

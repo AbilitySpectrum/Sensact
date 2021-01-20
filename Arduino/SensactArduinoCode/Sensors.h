@@ -156,6 +156,18 @@ class GyroSensor: public Sensor {
     void getValues(SensorData *pData);
     int nDataUnits() { return 7; }
 };
+
+// Detect IR signals
+class IRSensor : public Sensor {
+  private:
+    int id;
+
+  public:
+  IRSensor(int i) {id = i;}
+  void init();
+  void getValues(SensorData *pData);
+  int nDataUnits() { return 1; }
+};
   
 // Sensors - a container for all sensors.
 class Sensors {

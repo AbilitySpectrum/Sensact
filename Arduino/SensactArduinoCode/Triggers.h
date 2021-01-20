@@ -71,13 +71,14 @@ class Trigger {
 // Triggers - A collection of all triggers
 class Triggers {
   private:
-    Trigger aTriggers[MAX_TRIGGERS];
+    Trigger aTriggers[MAX_TRIGGERS + 1];
     int nTriggers;
     int *paSensorStates;  // One state value per sensor, indexed by sensor ID 
     int maxSensorID; // The highest index into paSensorStates
     ActionData actions;
     
     void setupStates(const SensorData *);
+    void addExtraTrigger();
     
   public:
     Triggers() {
