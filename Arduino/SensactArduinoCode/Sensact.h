@@ -84,7 +84,7 @@ extern brkPoints BreakPoints;
 // === LED Values === //
 #define LED_RED    5
 #define LED_GREEN  6
-#define LED_BLUE   7
+#define LED_BLUE   4
 
 // === Sensor Pins === //
 #define SENSACT_IN1A A0
@@ -97,7 +97,7 @@ extern brkPoints BreakPoints;
 // === Action Pins === //
 #define SENSACT_IR_OUT  9
 #define SENSACT_BUZZER  10
-#define SENSACT_RELAY_1 11
+#define SENSACT_RELAY_1 12
 #define SENSACT_RELAY_2 12
 
 // ==== Some Limits === //
