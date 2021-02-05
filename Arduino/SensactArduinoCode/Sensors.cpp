@@ -44,12 +44,13 @@ void Sensors::init() {
   // This code defines the set of sensors.
   // It must match the sensor definitions in the Java control code.
   // ID values must be unique but do not _have_ to be sequential
-  addSensor( new AnalogSensor(1, SENSACT_IN1A) );
-  addSensor( new AnalogSensor(2, SENSACT_IN1B) );
+  // -- Modified for netCle V2 hub.
+  addSensor( new AnalogSensor(5, SENSACT_IN1A) );
+  addSensor( new AnalogSensor(6, SENSACT_IN1B) );
   addSensor( new AnalogSensor(3, SENSACT_IN2A) );
   addSensor( new AnalogSensor(4, SENSACT_IN2B) );
-  addSensor( new AnalogSensor(5, SENSACT_IN3A) );
-  addSensor( new AnalogSensor(6, SENSACT_IN3B) );
+  addSensor( new AnalogSensor(1, SENSACT_IN3A) );
+  addSensor( new AnalogSensor(2, SENSACT_IN3B) );
   pcInput = new PCInputSensor(7);
   addSensor( pcInput );
   addSensor( new GyroSensor(8, 9, 10, 11, 12, 13, 14) );
@@ -190,7 +191,11 @@ void IRSensor::getValues(SensorData *pData) {
     if (MyDecoder.decode()) {
 //      Serial.print("Value: "); Serial.println(MyDecoder.value, 16);
 //      if (MyDecoder.value == 0x20DF40BF) {  // LG UP
-      if (MyDecoder.value == 0xE0E048B7) {  // Samsung UP
+      if (MyDecoder.value == 0xE0E048B7) {  // Samsung Channel UP
+//      if (MyDecoder.value == 0xE0E0E01F) {  // Samsung Volume UP
+//      if (MyDecoder.value == 0xE0E08877) {  // Samsung Digit 0
+//      if (MyDecoder.value == 0xE0E020DF) {  // Samsung Digit 1
+//      if (MyDecoder.value == 0xE0E0A05F) {  // Samsung Digit 2
         value = 50;
       }
     }

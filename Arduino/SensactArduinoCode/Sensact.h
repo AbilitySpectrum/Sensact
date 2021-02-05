@@ -84,7 +84,7 @@ extern brkPoints BreakPoints;
 // === LED Values === //
 #define LED_RED    5
 #define LED_GREEN  6
-#define LED_BLUE   7
+#define LED_BLUE   4  // Different for Hub 2.0
 
 // === Sensor Pins === //
 #define SENSACT_IN1A A0
@@ -97,11 +97,12 @@ extern brkPoints BreakPoints;
 // === Action Pins === //
 #define SENSACT_IR_OUT  9
 #define SENSACT_BUZZER  10
-#define SENSACT_RELAY_1 11
-#define SENSACT_RELAY_2 12
+// - Modified for netCle Hub 2.0
+// #define SENSACT_RELAY_1 11
+#define SENSACT_RELAY 12
 
 // ==== Some Limits === //
-#define MAX_TRIGGERS 18         // Maximum number of triggers allowed - 15 bytes each.
+#define MAX_TRIGGERS 15         // Maximum number of triggers allowed - 15 bytes each.
 #define MAX_ACTIONS 10            // Maximum number of actions allowed per trigger check - 5 bytes each.
 #define MAX_SENSORS 10            // 2 bytes each
 #define MAX_ACTORS  11           // 2 bytes each

@@ -74,8 +74,9 @@ unsigned int timeDiff(unsigned int now, unsigned int prev) {
 
 void Actors::init() {
   // Add actors
-  addActor( new Relay(1, SENSACT_RELAY_1) );
-  addActor( new Relay(2, SENSACT_RELAY_2) );
+  addActor( new Relay(1, SENSACT_RELAY) );
+  // - Modified for netCle V2 hub
+  // addActor( new Relay(2, SENSACT_RELAY_2) );
   addActor( new BTKeyboard(3) );
 #ifdef __AVR_ATmega32U4__  // Leonardo
   addActor( new HIDKeyboard(4) );

@@ -1,4 +1,4 @@
-// -------------------------------------
+ // -------------------------------------
 // Triggers.cpp
 // -------------------------------------
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * 
@@ -45,7 +45,6 @@ void Triggers::init(int maxSID) {
 
 void Triggers::reset() {
   for(int i=0; i<=maxSensorID; i++) {
-    Serial.print("Reseting ");Serial.println(i);
     paSensorStates[i] = 1;
   }  
   for(int j=0; j<nTriggers; j++) {
@@ -178,6 +177,7 @@ int Triggers::readTriggers(InputStream *is) {
       return IO_ERROR;
     }
   }
+  nTriggers = tCount;
   
   int Z = is->getChar();
   if (Z == MOUSE_SPEED) {
@@ -207,7 +207,7 @@ void Triggers::addExtraTrigger() {
       
       aTriggers[i].actionID = 1;  // RELAY
       aTriggers[i].actionParameters = 0; // RELAY PULSE
-//      aTriggers[i].actionID = 7;  // BUZZER
+//      aTriggers[i].actionID = 7;  // BUZZER 
 //      aTriggers[i].actionParameters = (250L << 16) + 400L; // Pitch & Duration 
 
       aTriggers[i].delayMs = 0;
@@ -219,7 +219,7 @@ void Triggers::addExtraTrigger() {
 void Triggers::sendTriggers(OutputStream *os) {
   os->putChar(START_OF_TRIGGER_BLOCK);
   os->putNum(nTriggers - 1);  // minus 1 to drop fake IR trigger.
-  for(int i=0; i<nTriggers - 1; i++) {
+  for(int i=0; i<(nTriggers - 1); i++) {
     aTriggers[i].sendTrigger(os);
   }
   os->putChar(MOUSE_SPEED);
